@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/*
+	Bag Store chrome (converted from ref/index.html):
+	- design tokens (ref :root variables)
+	- font/scrollbar defaults
+	- Tailwind v4 preflight patch (v4 defaults border-color to currentColor, ref bundle assumed #EAEAEA)
+	Scoped under .admin-root/.store-root so demo routes are unaffected.
+	Used by the storefront landing page (`/`) and the dashboard (`/dashboard`...).
+*/
+
+:root {
+	--bg: #f8f8f7;
+	--surface: #ffffff;
+	--text-primary: #242424;
+	--text-secondary: #777777;
+	--border: #eaeaea;
+	--accent: #343434;
+	--success: #269b65;
+	--warning: #d69a35;
+	--danger: #d9534f;
+	--safe-area-inset-top: env(safe-area-inset-top, 0px);
+	--safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.admin-root *,
+.store-root * {
+	font-family: 'Inter', 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.admin-root .mono,
+.store-root .mono {
+	font-family: 'JetBrains Mono', monospace;
+}
+
+/* Arbitrary color classes (e.g. border-[#242424]) still win over this base rule. */
+.admin-root :where(*, ::before, ::after),
+.store-root :where(*, ::before, ::after) {
+	border-color: var(--border);
+}
+
+/* Scrollbar (ref global) */
+.admin-root ::-webkit-scrollbar,
+.store-root ::-webkit-scrollbar {
+	width: 4px;
+	height: 4px;
+}
+
+.admin-root ::-webkit-scrollbar-thumb,
+.store-root ::-webkit-scrollbar-thumb {
+	background: #e0e0e0;
+	border-radius: 4px;
+}
+
+/* Used by mobile "More" sheet entry animation (ref: animate-[slideUp_260ms_cubic-bezier(0.16,1,0.3,1)]) */
+@keyframes slideUp {
+	from {
+		transform: translateY(100%);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
