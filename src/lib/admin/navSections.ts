@@ -2,16 +2,16 @@
 
 import type { Component } from 'svelte';
 import {
-	ImageIcon,
+	Images,
 	Layers,
 	LayoutDashboard,
-	MegaphoneIcon,
+	Megaphone,
 	Menu,
 	Package,
 	PanelsTopLeft,
 	Settings,
 	Shapes,
-	ShieldCheckIcon,
+	ShieldCheck,
 	ShoppingCart,
 	Users,
 	Warehouse
@@ -65,8 +65,8 @@ export const NAV_SECTIONS: NavSection[] = [
 		label: 'CONTENT',
 		items: [
 			{ id: 'pages', label: 'Pages & Landing Pages', icon: PanelsTopLeft },
-			{ id: 'media', label: 'Media Library', icon: ImageIcon },
-			{ id: 'promotions', label: 'Promotions', icon: MegaphoneIcon },
+			{ id: 'media', label: 'Media Library', icon: Images },
+			{ id: 'promotions', label: 'Promotions', icon: Megaphone },
 			{ id: 'navigation', label: 'Navigation', icon: Menu }
 		]
 	},
@@ -74,7 +74,7 @@ export const NAV_SECTIONS: NavSection[] = [
 		label: 'SYSTEM',
 		items: [
 			{ id: 'store-settings', label: 'Store Settings', icon: Settings },
-			{ id: 'users-perms', label: 'Users & Permissions', icon: ShieldCheckIcon }
+			{ id: 'users-perms', label: 'Users & Permissions', icon: ShieldCheck }
 		]
 	}
 ];

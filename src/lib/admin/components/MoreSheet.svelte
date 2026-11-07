@@ -5,7 +5,7 @@
 	import type { Path } from '$app/types';
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { NAV_SECTIONS, ROUTE_BY_NAV_ID, navIdFromPath } from '#lib/admin/navSections.ts';
-	import { XIcon } from '@lucide/svelte';
+	import { X } from '@lucide/svelte';
 
 	let activeId = $derived(navIdFromPath(page.url.pathname));
 	let footerMode = $derived(
@@ -32,15 +32,15 @@
 		<div class="flex flex-col items-center pt-3 pb-2">
 			<div class="h-1 w-9 rounded-full bg-[#E5E5E3] mb-3"></div>
 			<div class="w-full flex items-center justify-between px-5 pb-3">
-				<h3 class="text-[14px] font-semibold">More navigation</h3>
+				<h3 class="text-[15px] font-semibold">More navigation</h3>
 				<button
 					type="button"
-					class="h-7 w-7 rounded-full bg-[#F5F5F4] border flex items-center justify-center"
+					class="h-9 w-9 rounded-full bg-[#F5F5F4] border flex items-center justify-center shrink-0"
 					style="border-color: var(--border);"
 					onclick={() => admin.toggleMoreSheet(false)}
 					aria-label="Close More sheet"
 				>
-					<XIcon className="h-4 w-4" />
+					<X class="h-4 w-4 text-[#777]" />
 				</button>
 			</div>
 		</div>
@@ -58,13 +58,13 @@
 								(item.id === 'products' && activeId.startsWith('products'))}
 							<button
 								type="button"
-								class="w-full flex items-center gap-3 px-3 h-11 rounded-[10px] border text-[13px] font-medium transition {isActive
+								class="w-full flex items-center gap-3 px-3 h-12 rounded-[10px] border text-[13px] font-medium transition {isActive
 									? 'bg-[#F0F0EF] border-[#242424]/10 text-[#242424]'
 									: 'bg-white border-[#EAEAEA] text-[#242424] hover:bg-[#F8F8F7]'}"
 								onclick={() => go(item.id)}
 							>
 								<item.icon
-									className="h-[18px] w-[18px] {isActive ? 'text-[#242424]' : 'text-[#777]'}"
+									class="h-5 w-5 {isActive ? 'text-[#242424]' : 'text-[#777]'}"
 									strokeWidth={1.6}
 								/>
 								<span class="flex-1 text-left">{item.label}</span>

@@ -62,7 +62,7 @@
 		<button
 			type="button"
 			disabled={requireArm && !armed}
-			class="flex-1 h-8 rounded-full text-[12px] font-medium transition disabled:opacity-50 {confirmClass}"
+			class="flex-1 h-10 rounded-full text-[12px] font-medium transition disabled:opacity-50 {confirmClass}"
 			onclick={() => {
 				armed = false;
 				onconfirm();
@@ -72,7 +72,7 @@
 		</button>
 		<button
 			type="button"
-			class="flex-1 h-8 rounded-full border bg-white text-[12px] font-medium transition hover:border-[#242424]"
+			class="flex-1 h-10 rounded-full border bg-white text-[12px] font-medium transition hover:border-[#242424]"
 			style="border-color: var(--border);"
 			onclick={oncancel}
 		>

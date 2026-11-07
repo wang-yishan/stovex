@@ -19,7 +19,7 @@
 >
 	<div class="flex flex-1 w-full overflow-x-clip relative">
 		<Sidebar />
-		<main class="flex-1 min-w-0 bg-[#F8F8F7] relative">
+		<main class="flex-1 min-w-0 bg-[#F8F8F7] relative overflow-x-clip">
 			{@render children()}
 		</main>
 	</div>

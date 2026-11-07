@@ -3,8 +3,10 @@
 	import {
 		formatIDR,
 		effectiveStock,
-		stockStatus
+		stockStatus,
+		waLink as settingsWaLink
 	} from '#lib/admin/data.ts';
+	import SectionRenderer from '#lib/admin/components/SectionRenderer.svelte';
 	import {
 		ShoppingBag,
 		MessageCircle,
@@ -14,6 +16,16 @@
 	} from '@lucide/svelte';
 
 	let { products, collections, categories } = admin;
+
+	// Live homepage (Pages module) — published homepage wins; falls back to static sections below.
+	let homepage = $derived(
+		admin.pages.find((p) => p.isHomepage && p.status === 'published') ??
+			admin.pages.find((p) => p.status === 'published') ??
+			null
+	);
+	let homepageSections = $derived(
+		homepage ? [...homepage.sections].sort((a, b) => a.order - b.order) : []
+	);
 
 	let active = $derived(
 		products.filter((p) => p.status === 'active')
@@ -68,6 +80,8 @@
 			`\nAvailability: ${avail}\n`;
 		return 'https://wa.me/?text=' + encodeURIComponent(msg.trim());
 	}
+
+	void settingsWaLink;
 </script>
 
 <!--
@@ -89,29 +103,43 @@
 		style="border-color: var(--border); padding-top: var(--safe-area-inset-top);"
 	>
 		<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8 h-[64px] flex items-center justify-between">
-			<a href="#" class="flex items-center gap-2.5">
-				<div class="h-8 w-8 bg-[#111] rounded-[6px] flex items-center justify-center">
-					<ShoppingBag className="h-4 w-4 text-white" strokeWidth={1.5} />
+			<a href="/" class="flex items-center gap-2.5">
+				<div class="h-9 w-9 bg-[#111] rounded-[6px] flex items-center justify-center shrink-0">
+					<ShoppingBag class="h-5 w-5 text-white" strokeWidth={1.5} />
 				</div>
 				<div>
 					<div class="text-[13px] font-bold tracking-[0.08em] leading-none text-[#242424]">
-						BAG STORE
+						{admin.settings.logo}
 					</div>
 					<div class="text-[9px] text-[#777] tracking-wide mt-0.5">Storefront</div>
 				</div>
 			</a>
+			<nav class="hidden md:flex items-center gap-4 ml-4">
+				{#each admin.settings.headerLinks as link (link.id)}
+					<a href={link.href} class="text-[12px] text-[#777] hover:text-[#242424]">{link.label}</a>
+				{/each}
+			</nav>
 			<a
 				href="/dashboard"
-				class="h-8 rounded-full border bg-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:border-[#242424] transition"
+				class="h-10 rounded-full border bg-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:border-[#242424] transition"
 				style="border-color: var(--border);"
 			>
-				<LayoutDashboard className="h-4 w-4" />
+				<LayoutDashboard class="h-4 w-4 shrink-0" />
 				<span class="hidden sm:inline">Admin dashboard</span>
 			</a>
 		</div>
 	</header>
 
-	<!-- Hero -->
+	<!-- Landing sections (Pages module homepage) — replaces static hero when published -->
+	{#if homepageSections.length > 0}
+		<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8 py-6 md:py-8 space-y-8">
+			{#each homepageSections as s (s.id)}
+				<SectionRenderer section={s} />
+			{/each}
+		</div>
+	{/if}
+	<!-- Hero (fallback — remove a published homepage to see this) -->
+	{#if homepageSections.length === 0}
 	<section
 		id="hero"
 		class="bg-[#F8F8F7] border-b"
@@ -123,7 +151,7 @@
 					<span class="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#999]">
 						BAG STORE — NEW SEASON
 					</span>
-					<h1 class="text-[32px] md:text-[40px] font-semibold tracking-tight text-[#242424] leading-tight mt-3">
+					<h1 class="text-[28px] sm:text-[36px] md:text-[40px] font-semibold tracking-tight text-[#242424] leading-tight mt-3">
 						Everyday bags, honestly&nbsp;made.
 					</h1>
 					<p class="text-[14px] text-[#777] mt-3 max-w-[420px] leading-relaxed">
@@ -132,14 +160,14 @@
 					<div class="flex gap-2 mt-6">
 						<a
 							href="#catalog"
-							class="h-9 rounded-full bg-[#343434] text-white px-5 text-[12px] font-medium flex items-center gap-1.5 hover:bg-[#242424] transition"
+							class="h-10 md:h-9 rounded-full bg-[#343434] text-white px-5 text-[12px] font-medium flex items-center gap-1.5 hover:bg-[#242424] transition"
 						>
 							Browse bags
-							<ArrowRight className="h-3.5 w-3.5" />
+							<ArrowRight class="h-4 w-4 shrink-0" />
 						</a>
 						<a
 							href="/dashboard"
-							class="h-9 rounded-full border bg-white px-5 text-[12px] font-medium flex items-center hover:border-[#242424] transition"
+							class="h-10 md:h-9 rounded-full border bg-white px-5 text-[12px] font-medium flex items-center hover:border-[#242424] transition"
 							style="border-color: var(--border);"
 						>
 							Open dashboard
@@ -170,6 +198,7 @@
 			</div>
 		</div>
 	</section>
+	{/if}
 
 	<!-- Featured bags -->
 	<section id="catalog" class="py-10 md:py-12">
@@ -184,7 +213,7 @@
 			{#if featured.length === 0}
 				<p class="text-[13px] text-[#777]">No active products yet — open the dashboard to publish one.</p>
 			{:else}
-				<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+				<div class="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
 					{#each featured as p (p.id)}
 						{@const primary = p.images.find((i) => i.isPrimary) ?? p.images[0]}
 						{@const stock = effectiveStock(p)}
@@ -249,19 +278,19 @@
 										href={waLink(p.name, p.sku, p.basePrice, p.compareAtPrice, stock)}
 										target="_blank"
 										rel="noopener"
-										class="flex-1 h-8 rounded-full bg-[#343434] text-white text-[11px] font-medium flex items-center justify-center gap-1.5 hover:bg-[#242424] transition"
+										class="flex-1 h-10 rounded-full bg-[#343434] text-white text-[12px] font-medium flex items-center justify-center gap-1.5 hover:bg-[#242424] transition"
 									>
-										<MessageCircle className="h-3.5 w-3.5" />
+										<MessageCircle class="h-4 w-4 shrink-0" />
 										Enquire via WhatsApp
 									</a>
 									<button
 										type="button"
-										class="h-8 w-8 rounded-full border bg-white flex items-center justify-center hover:border-[#242424] transition"
+										class="h-10 w-10 shrink-0 rounded-full border bg-white flex items-center justify-center hover:border-[#242424] transition"
 										style="border-color: var(--border);"
 										onclick={() => copyMsg(p.name, p.sku, p.basePrice, p.compareAtPrice)}
 										aria-label="Copy WhatsApp message"
 									>
-										<Copy className="h-3.5 w-3.5 text-[#777]" />
+										<Copy class="h-4 w-4 text-[#777]" />
 									</button>
 								</div>
 							</div>
@@ -331,7 +360,7 @@
 	<!-- Trusted strip -->
 	<section class="py-8 md:py-10 bg-white border-t" style="border-color: var(--border);">
 		<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8">
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 				<div>
 					<h3 class="text-[13px] font-medium text-[#242424]">Live inventory</h3>
 					<p class="text-[11px] text-[#777] mt-1">
@@ -358,12 +387,12 @@
 	<footer class="py-8 md:py-10 border-t" style="border-color: var(--border);">
 		<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
 			<div class="flex items-center gap-2.5">
-				<div class="h-7 w-7 bg-[#111] rounded-[6px] flex items-center justify-center">
-					<ShoppingBag className="h-3.5 w-3.5 text-white" strokeWidth={1.5} />
+				<div class="h-7 w-7 bg-[#111] rounded-[6px] flex items-center justify-center shrink-0">
+					<ShoppingBag class="h-4 w-4 text-white" strokeWidth={1.5} />
 				</div>
 				<div>
-					<div class="text-[12px] font-bold tracking-[0.08em] text-[#242424]">BAG STORE</div>
-					<div class="text-[10px] text-[#777]">Everyday bags, honestly made.</div>
+					<div class="text-[12px] font-bold tracking-[0.08em] text-[#242424]">{admin.settings.logo}</div>
+					<div class="text-[10px] text-[#777]">{admin.settings.footerText}</div>
 				</div>
 			</div>
 			<div class="flex items-center gap-3">

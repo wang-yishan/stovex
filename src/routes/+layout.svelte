@@ -1,5 +1,6 @@
 <script lang="ts">
 	import DemoLinks from './demo/DemoLinks.svelte';
+	import { ModeWatcher } from 'mode-watcher';
 	import type { Path } from '$app/types';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
@@ -10,6 +11,8 @@
 
 	let { children }: LayoutProps = $props();
 </script>
+
+<ModeWatcher />
 
 <svelte:head>
 	<link rel="icon" href={favicon} />

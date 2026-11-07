@@ -48,13 +48,13 @@
 
 <div
 	class="md:hidden fixed left-0 right-0 bottom-0 z-40 bg-white border-t flex"
-	style="border-color: var(--border); padding-bottom: var(--safe-area-inset-bottom); height: calc(64px + var(--safe-area-inset-bottom));"
+	style="border-color: var(--border); padding-bottom: var(--safe-area-inset-bottom); height: calc(68px + var(--safe-area-inset-bottom));"
 >
 	{#each TABS as tab (tab.id)}
 		{@const isActive = tabActive(tab.id)}
 		<button
 			type="button"
-			class="flex-1 flex flex-col items-center justify-center gap-1 relative transition-colors {isActive
+			class="flex-1 flex flex-col items-center justify-center gap-1 py-1.5 relative transition-colors min-h-[60px] {isActive
 				? 'text-[#242424]'
 				: 'text-[#999]'}"
 			onclick={() => tap(tab.id)}
@@ -65,12 +65,12 @@
 				></div>
 			{/if}
 			<div
-				class="h-6 w-6 rounded-[8px] flex items-center justify-center {isActive ? 'bg-[#F0F0EF]' : ''}"
+				class="h-9 w-9 rounded-[10px] flex items-center justify-center {isActive ? 'bg-[#F0F0EF]' : ''}"
 			>
-				<tab.icon className="h-[18px] w-[18px]" strokeWidth={isActive ? 2 : 1.6} />
+				<tab.icon class="h-5 w-5" strokeWidth={isActive ? 2 : 1.6} />
 			</div>
 			<span
-				class="text-[10px] font-medium tracking-wide {isActive ? 'text-[#242424]' : 'text-[#777]'}"
+				class="text-[11px] font-medium tracking-wide {isActive ? 'text-[#242424]' : 'text-[#777]'}"
 			>
 				{tab.label}
 			</span>

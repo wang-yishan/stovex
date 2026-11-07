@@ -5,11 +5,17 @@ import type {
 	AttributeDraft,
 	Category,
 	Collection,
+	MediaItem,
 	OrderRow,
+	PageSection,
 	Product,
 	ProductVariant,
+	SectionType,
 	StockLevel,
 	StockMovement,
+	StorePage,
+	StoreSettings,
+	PageVersion,
 	VariantAttribute
 } from './types';
 
@@ -482,6 +488,225 @@ export function emptyProduct(): Product {
 		stock: 0,
 		lowStockThreshold: 5
 	};
+}
+
+/* --- Pages & Landing Pages seeds (transcribed from ref: Ne / Yy / w2 / S2) --- */
+
+export const SECTION_TYPES: { type: SectionType; label: string; desc: string }[] = [
+	{ type: 'hero', label: 'Hero', desc: 'Image, headline, description, CTA' },
+	{ type: 'featured-products', label: 'Featured Products', desc: 'Manual Active products' },
+	{ type: 'categories', label: 'Categories', desc: 'Selected category tiles' },
+	{ type: 'promo-banner', label: 'Promo Banner', desc: 'Image, heading, CTA' },
+	{ type: 'collection-grid', label: 'Collection Grid', desc: 'Manual products, limit, variation' },
+	{ type: 'rich-text', label: 'Rich Text', desc: 'Heading, text, image, align' },
+	{ type: 'cta', label: 'CTA', desc: 'Heading, text, WhatsApp label' },
+	{ type: 'benefits', label: 'Benefits', desc: 'Icon, title, description items' },
+	{ type: 'gallery', label: 'Gallery', desc: 'Images, order, layout' },
+	{ type: 'testimonials', label: 'Testimonials', desc: 'Name, text, image, rating' }
+];
+
+const SECTION_DEFAULTS: Record<string, Record<string, unknown>> = {
+	hero: {
+		image: '',
+		headline: 'Bags for everyday, made to last',
+		description: 'Minimal silhouettes in honest materials.',
+		ctaLabel: 'Shop the collection',
+		ctaHref: '#shop',
+		align: 'left'
+	},
+	'featured-products': {
+		heading: 'Featured bags',
+		limit: 4,
+		orderMode: 'manual',
+		productIds: ['prod-1', 'prod-2', 'prod-5']
+	},
+	categories: {
+		heading: 'Shop by category',
+		categoryIds: ['cat-tote', 'cat-shoulder', 'cat-crossbody']
+	},
+	'promo-banner': {
+		image: '',
+		heading: 'The Summer Edit — up to 20% off',
+		ctaLabel: 'Explore the edit',
+		ctaHref: '#shop'
+	},
+	'collection-grid': {
+		heading: 'New arrivals',
+		limit: 6,
+		variation: 'grid',
+		productIds: ['prod-1', 'prod-2', 'prod-3', 'prod-4', 'prod-5', 'prod-6']
+	},
+	'rich-text': {
+		heading: 'Made slowly, carried daily',
+		text: 'We design bags that stay useful long after the season changes. Fewer pieces, better materials, honest construction.',
+		image: '',
+		align: 'left'
+	},
+	cta: {
+		heading: 'Not sure which bag fits you?',
+		text: 'Tell us what you carry every day and we will suggest the right size.',
+		label: 'Chat on WhatsApp',
+		useWhatsApp: true
+	},
+	benefits: {
+		heading: 'Why Bag Store',
+		items: [
+			{ icon: 'Shield', title: 'Quality checked', description: 'Every bag is inspected before it ships.' },
+			{ icon: 'Truck', title: 'Fast delivery', description: 'Carefully packed and shipped in 1–2 days.' },
+			{ icon: 'Refresh', title: 'Easy enquiries', description: 'Ask on WhatsApp before you decide.' }
+		]
+	},
+	gallery: { heading: 'In the wild', layout: 'grid', images: ['', '', ''] },
+	testimonials: {
+		heading: 'Loved by everyday carriers',
+		items: [
+			{ name: 'Ayu', text: 'The tote fits my laptop and still looks neat.', image: '', rating: 5 },
+			{ name: 'Raka', text: 'Simple, sturdy, and easy to carry all day.', image: '', rating: 5 }
+		]
+	}
+};
+
+export function newSection(type: SectionType, order: number): PageSection {
+	const def = SECTION_TYPES.find((s) => s.type === type);
+	return {
+		id: uid('sec-'),
+		type,
+		label: def?.label ?? type,
+		order,
+		visible: true,
+		layout: type === 'gallery' ? 'grid' : 'standard',
+		content: structuredClone(SECTION_DEFAULTS[type] ?? {})
+	};
+}
+
+export function seedSection(type: SectionType, order: number, overrides?: Record<string, unknown>): PageSection {
+	const s = newSection(type, order);
+	s.content = { ...s.content, ...(overrides ?? {}) };
+	return s;
+}
+
+export const SEED_MEDIA: MediaItem[] = [
+	{ id: 'med-1', name: 'hero-tote.jpg', url: '', type: 'image/jpeg', size: 184000, createdAt: '2024-11-10T08:00:00Z', alt: 'Hero tote' },
+	{ id: 'med-2', name: 'summer-edit.jpg', url: '', type: 'image/jpeg', size: 212000, createdAt: '2024-11-12T08:00:00Z', alt: 'Summer edit' },
+	{ id: 'med-3', name: 'atelier.jpg', url: '', type: 'image/jpeg', size: 156000, createdAt: '2024-11-13T08:00:00Z', alt: 'Atelier' },
+	{ id: 'med-4', name: 'gallery-look.jpg', url: '', type: 'image/jpeg', size: 98000, createdAt: '2024-11-14T08:00:00Z', alt: 'Gallery look' }
+];
+
+export const SEED_SETTINGS: StoreSettings = {
+	logo: 'BAG STORE',
+	whatsappNumber: '6281234567890',
+	whatsappTemplate:
+		'Halo, saya tertarik dengan {{productName}} {{variant}} (SKU: {{sku}}) — {{price}}. {{url}}',
+	headerLinks: [
+		{ id: 'hl-1', label: 'Shop', href: '#shop' },
+		{ id: 'hl-2', label: 'Categories', href: '#categories' },
+		{ id: 'hl-3', label: 'About', href: '#about' }
+	],
+	footerText: 'BAG STORE — Minimal bags, made to last. Enquiries via WhatsApp.',
+	social: { instagram: '@bagstore', facebook: 'bagstore', tiktok: '@bagstore' },
+	defaultSeo: {
+		title: 'Bag Store — Minimal bags, made to last',
+		description: 'Everyday totes, shoulder bags and crossbodies in honest materials.',
+		image: ''
+	}
+};
+
+export function seedPages(): StorePage[] {
+	const homeSections = [
+		seedSection('hero', 0, { headline: 'Carry less, carry better' }),
+		seedSection('featured-products', 1),
+		seedSection('categories', 2),
+		seedSection('rich-text', 3),
+		seedSection('cta', 4),
+		seedSection('benefits', 5)
+	];
+	const summerSections = [
+		seedSection('promo-banner', 0, { heading: 'The Summer Edit is here' }),
+		seedSection('collection-grid', 1, { heading: 'Summer picks' }),
+		seedSection('testimonials', 2)
+	];
+	return [
+		{
+			id: 'page-home',
+			title: 'Homepage',
+			slug: 'home',
+			type: 'homepage',
+			status: 'published',
+			sections: homeSections,
+			seo: {
+				title: 'Bag Store — Minimal bags, made to last',
+				description: 'Everyday totes, shoulder bags and crossbodies in honest materials.',
+				image: '',
+				canonical: '/home'
+			},
+			updatedAt: '2024-11-18T10:00:00Z',
+			publishedAt: '2024-11-18T10:00:00Z',
+			isHomepage: true
+		},
+		{
+			id: 'page-summer',
+			title: 'Summer Edit',
+			slug: 'summer-edit',
+			type: 'campaign',
+			status: 'draft',
+			sections: summerSections,
+			seo: {
+				title: 'Summer Edit — Bag Store',
+				description: 'Light, everyday bags for the season.',
+				image: '',
+				canonical: '/summer-edit'
+			},
+			updatedAt: '2024-11-17T14:00:00Z',
+			publishedAt: null,
+			isHomepage: false
+		}
+	];
+}
+
+export function seedVersions(pages: StorePage[]): PageVersion[] {
+	const home = pages.find((p) => p.id === 'page-home');
+	if (!home) return [];
+	return [
+		{
+			id: 'ver-1',
+			pageId: 'page-home',
+			ver: 1,
+			title: home.title,
+			sections: structuredClone(home.sections),
+			publishedAt: home.publishedAt ?? '2024-11-18T10:00:00Z'
+		}
+	];
+}
+
+export function emptyPage(): StorePage {
+	return {
+		id: uid('page-'),
+		title: '',
+		slug: '',
+		type: 'campaign',
+		status: 'draft',
+		sections: [newSection('hero', 0)],
+		seo: { title: '', description: '', image: '', canonical: '' },
+		updatedAt: nowISO(),
+		publishedAt: null,
+		isHomepage: false
+	};
+}
+
+/** WhatsApp message builder (ref Jy / O2). */
+export function waMessage(settings: StoreSettings, product: Product, variant?: ProductVariant): string {
+	const price = formatIDR(variant?.priceOverride ?? product.basePrice);
+	return settings.whatsappTemplate
+		.replaceAll('{{productName}}', product.name)
+		.replaceAll('{{variant}}', variant ? variant.name : '')
+		.replaceAll('{{sku}}', variant?.sku || product.sku || '-')
+		.replaceAll('{{price}}', price)
+		.replaceAll('{{url}}', `https://bagstore.example/products/${product.slug}`);
+}
+
+export function waLink(settings: StoreSettings, product: Product, variant?: ProductVariant): string {
+	const digits = settings.whatsappNumber.replace(/[^0-9]/g, '');
+	return `https://wa.me/${digits}?text=${encodeURIComponent(waMessage(settings, product, variant))}`;
 }
 
 /** Variant-style product type guard nicety (keeps callers honest). */

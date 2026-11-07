@@ -52,6 +52,88 @@
 	border-radius: 4px;
 }
 
+/* ---- Mobile responsiveness & icon system (375px-first) ---- */
+/* Prevent horizontal scroll / iOS text inflation on storefront + dashboard */
+.admin-root,
+.store-root {
+	-webkit-tap-highlight-color: transparent;
+	overflow-x: clip;
+}
+.admin-root img,
+.store-root img {
+	max-width: 100%;
+}
+.admin-root *,
+.store-root * {
+	min-width: 0;
+}
+html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
+
+/* Icon scale — one system, used by all Lucide icons in chrome.
+   .icon-* keeps every icon legible on a 375px viewport:
+   body/action icons 16-18px, tab/primary icons 20px, hero 24px. */
+.admin-root svg,
+.store-root svg {
+	flex-shrink: 0;
+	display: block;
+}
+.icon-sm {
+	width: 14px;
+	height: 14px;
+}
+.icon-md {
+	width: 16px;
+	height: 16px;
+}
+.icon-lg {
+	width: 20px;
+	height: 20px;
+}
+.icon-xl {
+	width: 24px;
+	height: 24px;
+}
+.admin-root .table-scroll,
+.store-root .table-scroll {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+.admin-root h1,
+.store-root h1,
+.admin-root h2,
+.store-root h2 {
+	text-wrap: balance;
+}
+
+@media (max-width: 767px) {
+	/* iOS zooms on focus when input text < 16px; keep tap targets ≥40px */
+	.admin-root input,
+	.admin-root select,
+	.admin-root textarea,
+	.store-root input,
+	.store-root select,
+	.store-root textarea {
+		font-size: 16px;
+	}
+	.admin-root button,
+	.admin-root a,
+	.store-root button,
+	.store-root a {
+		-webkit-tap-highlight-color: transparent;
+	}
+	/* Lift the smallest action icons (12–14px) to a legible 16px on mobile */
+	.admin-root svg[class*='h-3 '],
+	.admin-root svg[class*='w-3 '],
+	.store-root svg[class*='h-3 '],
+	.store-root svg[class*='w-3 '] {
+		width: 16px;
+		height: 16px;
+	}
+}
+
 /* Used by mobile "More" sheet entry animation (ref: animate-[slideUp_260ms_cubic-bezier(0.16,1,0.3,1)]) */
 @keyframes slideUp {
 	from {
@@ -60,4 +142,93 @@
 	to {
 		transform: translateY(0);
 	}
+}
+
+/* ---- Dark mode (mode-watcher toggles .dark on <html>) ----
+   Tokens flip via CSS variables; the hardcoded chrome hexes used across
+   .admin-root/.store-root are remapped here so dark stays readable. */
+.dark {
+	--bg: #101010;
+	--surface: #1c1c1c;
+	--text-primary: #f0f0f0;
+	--text-secondary: #a8a8a8;
+	--border: #2b2b2b;
+	--accent: #f5f5f5;
+}
+
+.dark body {
+	background-color: var(--bg);
+	color: var(--text-primary);
+}
+
+.dark .admin-root,
+.dark .store-root {
+	color: var(--text-primary);
+}
+
+.dark .admin-root .bg-white,
+.dark .store-root .bg-white {
+	background-color: var(--surface);
+}
+
+.dark .admin-root .bg-\[\#F8F8F7\],
+.dark .store-root .bg-\[\#F8F8F7\] {
+	background-color: var(--bg);
+}
+
+.dark .admin-root .bg-\[\#FBFBFA\],
+.dark .store-root .bg-\[\#FBFBFA\] {
+	background-color: #161616;
+}
+
+.dark .admin-root .bg-\[\#F5F5F4\],
+.dark .store-root .bg-\[\#F5F5F4\] {
+	background-color: #242424;
+}
+
+.dark .admin-root .bg-\[\#F0F0EF\],
+.dark .store-root .bg-\[\#F0F0EF\] {
+	background-color: #242424;
+}
+
+/* Primary dark buttons invert to light in dark mode */
+.dark .admin-root .bg-\[\#343434\],
+.dark .store-root .bg-\[\#343434\] {
+	background-color: #f0f0f0;
+	color: #111111;
+}
+
+.dark .admin-root .bg-\[\#242424\],
+.dark .store-root .bg-\[\#242424\] {
+	background-color: #f0f0f0;
+	color: #111111;
+}
+
+.dark .admin-root .text-\[\#242424\],
+.dark .store-root .text-\[\#242424\] {
+	color: var(--text-primary);
+}
+
+.dark .admin-root .text-\[\#777\],
+.dark .store-root .text-\[\#777\] {
+	color: var(--text-secondary);
+}
+
+.dark .admin-root .text-\[\#999\],
+.dark .store-root .text-\[\#999\] {
+	color: #8a8a8a;
+}
+
+.dark .admin-root input,
+.dark .admin-root select,
+.dark .admin-root textarea,
+.dark .store-root input,
+.dark .store-root select,
+.dark .store-root textarea {
+	color: var(--text-primary);
+}
+
+.dark .admin-root ::-webkit-scrollbar-thumb,
+.dark .store-root ::-webkit-scrollbar-thumb {
+	background: #333333;
 }

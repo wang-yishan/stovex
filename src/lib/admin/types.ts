@@ -123,3 +123,101 @@ export interface AdjustStockInput {
 	reason: 'Restock' | 'Correction' | 'Damaged';
 	note?: string;
 }
+
+/* --- Pages & Landing Pages (converted from ref: Uy / L2 / X2 / Pf / G2) --- */
+
+export type PageStatus = 'draft' | 'published' | 'archived';
+export type PageKind = 'homepage' | 'campaign';
+
+export type SectionType =
+	| 'hero'
+	| 'featured-products'
+	| 'categories'
+	| 'promo-banner'
+	| 'collection-grid'
+	| 'rich-text'
+	| 'cta'
+	| 'benefits'
+	| 'gallery'
+	| 'testimonials';
+
+export type SectionContent =
+	| Record<string, unknown>;
+
+export interface PageSection {
+	id: string;
+	type: SectionType;
+	label: string;
+	order: number;
+	visible: boolean;
+	layout: string;
+	content: {
+		image?: string;
+		headline?: string;
+		description?: string;
+		ctaLabel?: string;
+		ctaHref?: string;
+		align?: string;
+		heading?: string;
+		text?: string;
+		limit?: number;
+		orderMode?: string;
+		variation?: string;
+		productIds?: string[];
+		categoryIds?: string[];
+		label?: string;
+		useWhatsApp?: boolean;
+		items?: unknown[];
+		images?: string[];
+		[key: string]: unknown;
+	};
+}
+
+export interface PageSeo {
+	title: string;
+	description: string;
+	image: string;
+	canonical: string;
+}
+
+export interface StorePage {
+	id: string;
+	title: string;
+	slug: string;
+	type: PageKind;
+	status: PageStatus;
+	sections: PageSection[];
+	seo: PageSeo;
+	updatedAt: string;
+	publishedAt: string | null;
+	isHomepage: boolean;
+}
+
+export interface PageVersion {
+	id: string;
+	pageId: string;
+	ver: number;
+	title: string;
+	sections: PageSection[];
+	publishedAt: string;
+}
+
+export interface MediaItem {
+	id: string;
+	name: string;
+	url: string;
+	type: string;
+	size: number;
+	createdAt: string;
+	alt: string;
+}
+
+export interface StoreSettings {
+	logo: string;
+	whatsappNumber: string;
+	whatsappTemplate: string;
+	headerLinks: { id: string; label: string; href: string }[];
+	footerText: string;
+	social: { instagram: string; facebook: string; tiktok: string };
+	defaultSeo: { title: string; description: string; image: string };
+}

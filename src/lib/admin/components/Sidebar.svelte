@@ -25,7 +25,7 @@
 	<div class="h-[64px] flex items-center px-3 border-b shrink-0" style="border-color: var(--border);">
 		<div class="flex items-center gap-2.5 w-full">
 			<div class="h-8 w-8 bg-[#111] rounded-[6px] flex items-center justify-center shrink-0">
-				<ShoppingBag className="h-4 w-4 text-white" strokeWidth={1.5} />
+				<ShoppingBag class="h-4 w-4 text-white" strokeWidth={1.5} />
 			</div>
 			{#if !collapsed}
 				<div class="flex-1">
@@ -36,20 +36,20 @@
 				</div>
 				<button
 					type="button"
-					class="h-7 w-7 rounded-md flex items-center justify-center text-[#777] hover:bg-[#F8F8F7] hover:text-[#242424] transition"
+					class="h-8 w-8 shrink-0 rounded-md flex items-center justify-center text-[#777] hover:bg-[#F8F8F7] hover:text-[#242424] transition"
 					onclick={() => admin.toggleSidebar()}
 					aria-label="Collapse sidebar"
 				>
-					<PanelLeftClose className="h-4 w-4" />
+					<PanelLeftClose class="h-4 w-4" />
 				</button>
 			{:else}
 				<button
 					type="button"
-					class="mx-auto h-7 w-7 rounded-md flex items-center justify-center text-[#777] hover:bg-[#F8F8F7] hover:text-[#242424] transition"
+					class="mx-auto h-8 w-8 shrink-0 rounded-md flex items-center justify-center text-[#777] hover:bg-[#F8F8F7] hover:text-[#242424] transition"
 					onclick={() => admin.toggleSidebar()}
 					aria-label="Expand sidebar"
 				>
-					<PanelLeftOpen className="h-4 w-4" />
+					<PanelLeftOpen class="h-4 w-4" />
 				</button>
 			{/if}
 		</div>
@@ -73,7 +73,7 @@
 						<div class="relative group/item">
 							<a
 								href={href}
-								class="w-full flex items-center gap-2.5 px-2.5 h-9 rounded-md text-[13px] font-medium transition-colors relative {isActive
+								class="w-full flex items-center gap-2.5 px-2.5 h-10 rounded-md text-[13px] font-medium transition-colors relative {isActive
 									? 'bg-[#F0F0EF] text-[#242424]'
 									: 'text-[#5A5A5A] hover:bg-[#F8F8F7] hover:text-[#242424]'} {collapsed
 									? 'justify-center'
@@ -85,7 +85,7 @@
 									></span>
 								{/if}
 								<item.icon
-									className="h-[18px] w-[18px] shrink-0 {isActive ? 'text-[#242424]' : 'text-[#777]'}"
+									class="h-5 w-5 shrink-0 {isActive ? 'text-[#242424]' : 'text-[#777]'}"
 									strokeWidth={1.6}
 								/>
 								{#if !collapsed}
@@ -124,7 +124,7 @@
 					<div class="text-[12px] font-medium truncate">I. Kim</div>
 					<div class="text-[10px] text-[#777] truncate">Owner</div>
 				</div>
-				<ChevronDown className="h-3.5 w-3.5 text-[#999]" />
+				<ChevronDown class="h-4 w-4 text-[#999]" />
 			</div>
 		</div>
 	{/if}

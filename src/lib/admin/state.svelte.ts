@@ -3,25 +3,34 @@
    Note: module singleton is shared per server process under SSR; acceptable for
    this local prototype (ref parity — everything was in-memory anyway). */
 
-import { SEED_CATEGORIES, SEED_COLLECTIONS, SEED_MOVEMENTS, SEED_PRODUCTS, lowThreshold, nowISO, slugify, uid } from './data';
+import { SEED_CATEGORIES, SEED_COLLECTIONS, SEED_MEDIA, SEED_MOVEMENTS, SEED_PRODUCTS, SEED_SETTINGS, emptyPage, lowThreshold, nowISO, seedPages, seedVersions, slugify, uid } from './data';
 import type {
 	Category,
 	Collection,
+	MediaItem,
+	PageStatus,
+	PageVersion,
 	Product,
 	ProductStatus,
 	StockMovement,
+	StorePage,
+	StoreSettings,
 	ToastMsg,
 	ToastType,
 	AdjustStockInput
 } from './types';
 
-export type SlugKind = 'product' | 'category' | 'collection';
+export type SlugKind = 'product' | 'category' | 'collection' | 'page';
 
 class AdminStore {
 	products = $state<Product[]>(SEED_PRODUCTS);
 	categories = $state<Category[]>(SEED_CATEGORIES);
 	collections = $state<Collection[]>(SEED_COLLECTIONS);
 	movements = $state<StockMovement[]>(SEED_MOVEMENTS);
+	pages = $state<StorePage[]>(seedPages());
+	pageVersions = $state<PageVersion[]>(seedVersions(seedPages()));
+	media = $state<MediaItem[]>(SEED_MEDIA);
+	settings = $state<StoreSettings>(structuredClone(SEED_SETTINGS));
 
 	sidebarCollapsed = $state(false);
 	moreSheetOpen = $state(false);
@@ -57,7 +66,9 @@ class AdminStore {
 				? this.products
 				: kind === 'category'
 					? this.categories
-					: this.collections;
+					: kind === 'page'
+						? this.pages
+						: this.collections;
 		return !list.some((p) => p.slug === slug && p.id !== excludeId);
 	}
 
@@ -242,6 +253,150 @@ class AdminStore {
 
 	productLowThreshold(p: Product): number {
 		return lowThreshold(p);
+	}
+
+	pageSlugUnique(slug: string, excludeId?: string): boolean {
+		return this.slugUnique(slug, excludeId, 'page');
+	}
+
+	/* --- pages & landing pages (ref: Pe / wr / Vt / Q) --- */
+
+	/** Save with lifecycle action. Publish snapshots a version; homepage unsets others. */
+	savePage(page: StorePage, action: 'draft' | 'publish' | 'archive' = 'draft'): void {
+		const snapshot: StorePage = structuredClone($state.snapshot(page) as StorePage);
+		const next: StorePage = {
+			...snapshot,
+			updatedAt: nowISO(),
+			status: action === 'publish' ? 'published' : action === 'archive' ? 'archived' : 'draft',
+			publishedAt:
+				action === 'publish'
+					? nowISO()
+					: snapshot.publishedAt
+		};
+		if (!next.seo.canonical) next.seo.canonical = `/${next.slug}`;
+		const exists = this.pages.some((p) => p.id === next.id);
+		if (next.isHomepage) {
+			this.pages = this.pages.map((p) =>
+				p.id === next.id ? next : { ...p, isHomepage: false }
+			);
+		} else if (!exists) {
+			this.pages = [next, ...this.pages];
+		} else {
+			this.pages = this.pages.map((p) => (p.id === next.id ? next : p));
+		}
+		if (action === 'publish') {
+			const maxVer = this.pageVersions
+				.filter((v) => v.pageId === next.id)
+				.reduce((m, v) => Math.max(m, v.ver), 0);
+			this.pageVersions = [
+				{
+					id: uid('ver-'),
+					pageId: next.id,
+					ver: maxVer + 1,
+					title: next.title,
+					sections: structuredClone(next.sections),
+					publishedAt: next.publishedAt ?? nowISO()
+				},
+				...this.pageVersions
+			];
+		}
+		this.showToast(
+			action === 'publish'
+				? 'Page published — version created'
+				: action === 'archive'
+					? 'Page archived'
+					: 'Draft saved',
+			'action' === 'archive' ? 'info' : 'success'
+		);
+	}
+
+	duplicatePage(id: string): string | undefined {
+		const src = this.pages.find((p) => p.id === id);
+		if (!src) return undefined;
+		let slug = `${src.slug}-copy`;
+		let n = 1;
+		while (!this.pageSlugUnique(slug)) slug = `${src.slug}-copy-${n++}`;
+		const copy: StorePage = {
+			...structuredClone($state.snapshot(src) as StorePage),
+			id: uid('page-'),
+			title: `${src.title} Copy`,
+			slug,
+			status: 'draft',
+			isHomepage: false,
+			publishedAt: null,
+			updatedAt: nowISO()
+		};
+		this.pages = [copy, ...this.pages];
+		this.showToast('Page duplicated as draft', 'success');
+		return copy.id;
+	}
+
+	deletePage(id: string): void {
+		this.pages = this.pages.filter((p) => p.id !== id);
+		this.showToast('Page deleted', 'success');
+	}
+
+	setHomepage(id: string): void {
+		this.pages = this.pages.map((p) => ({ ...p, isHomepage: p.id === id }));
+		this.showToast('Homepage updated', 'success');
+	}
+
+	archivePage(id: string): void {
+		this.pages = this.pages.map((p) =>
+			p.id === id ? { ...p, status: 'archived' as PageStatus, updatedAt: nowISO() } : p
+		);
+		this.showToast('Page archived', 'success');
+	}
+
+	restoreVersion(versionId: string): void {
+		const v = this.pageVersions.find((x) => x.id === versionId);
+		if (!v) return;
+		this.pages = this.pages.map((p) =>
+			p.id === v.pageId
+				? {
+						...p,
+						title: v.title,
+						sections: structuredClone(v.sections),
+						updatedAt: nowISO()
+					}
+				: p
+		);
+		this.showToast(`Restored version ${v.ver} as draft content`, 'success');
+	}
+
+	/** New blank page draft (editor create mode). */
+	newPage(): StorePage {
+		return emptyPage();
+	}
+
+	/* --- media / settings (minimal, powers page editor selects + storefront) --- */
+
+	saveSettings(next: StoreSettings): void {
+		this.settings = structuredClone($state.snapshot(next) as StoreSettings);
+		this.showToast('Settings saved (this session)', 'success');
+	}
+
+	addMedia(items: MediaItem[]): void {
+		this.media = [...items, ...this.media];
+	}
+
+	updateMediaAlt(id: string, alt: string): void {
+		this.media = this.media.map((m) => (m.id === id ? { ...m, alt } : m));
+	}
+
+	deleteMedia(id: string): void {
+		this.media = this.media.filter((m) => m.id !== id);
+	}
+
+	mediaUsedIn(item: MediaItem): string[] {
+		if (!item.url) return [];
+		const used: string[] = [];
+		for (const page of this.pages) {
+			if (JSON.stringify(page).includes(item.url)) used.push(page.title);
+		}
+		if (this.settings.logo === item.url || this.settings.defaultSeo.image === item.url)
+			used.push('Store settings');
+		return [...new Set(used)];
 	}
 }
 

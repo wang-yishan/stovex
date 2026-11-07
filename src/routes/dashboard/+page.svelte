@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { get, innerWidth } from 'svelte/reactivity/window';
+	import { innerWidth } from 'svelte/reactivity/window';
 	import { page } from '$app/state';
 	import Topbar from '#lib/admin/components/Topbar.svelte';
 	import {
@@ -15,11 +15,12 @@
 		LayoutDashboard,
 		Bell,
 		ChevronDown,
+		CircleCheck,
 		Package,
 		TriangleAlert
 	} from '@lucide/svelte';
 
-	const isMobile = $derived(get(innerWidth) < 768);
+	const isMobile = $derived((innerWidth.current ?? 1024) < 768);
 
 	let activeCount = $derived(admin.products.filter((p) => p.status === 'active').length);
 	let lowCount = $derived(
@@ -47,19 +48,19 @@
 	{#snippet actions()}
 		<button
 			type="button"
-			class="h-8 rounded-full border bg-white px-3 text-[12px] font-medium flex items-center gap-1.5 hover:border-[#242424] transition"
+			class="h-10 sm:h-8 rounded-full border bg-white px-3 text-[12px] font-medium flex items-center gap-1.5 hover:border-[#242424] transition"
 			style="border-color: var(--border);"
 		>
 			Today
-			<ChevronDown className="h-3.5 w-3.5 text-[#777]" />
+			<ChevronDown class="h-4 w-4 text-[#777]" />
 		</button>
 		<button
 			type="button"
-			class="h-8 w-8 rounded-full border bg-white flex items-center justify-center relative hover:border-[#242424] transition"
+			class="h-10 w-10 sm:h-8 sm:w-8 rounded-full border bg-white flex items-center justify-center relative hover:border-[#242424] transition"
 			style="border-color: var(--border);"
 			aria-label="Notifications"
 		>
-			<Bell className="h-4 w-4 text-[#242424]" strokeWidth={1.6} />
+			<Bell class="h-5 w-5 text-[#242424]" strokeWidth={1.6} />
 			<span
 				class="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#D9534F] border-2 border-white"
 			></span>
@@ -69,12 +70,12 @@
 
 <div class="mx-auto max-w-[1280px] w-full {isMobile ? 'px-4 py-4 pb-[112px]' : 'px-4 md:px-6 lg:px-8 py-6'}">
 	<!-- KPI cards -->
-	<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4">
+	<div class="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4">
 		<!-- Orders KPI -->
 		<div class="bg-white border rounded-[12px] p-4 min-w-0" style="border-color: var(--border);">
 			<div class="flex items-start justify-between gap-2 mb-3">
-				<div class="h-8 w-8 rounded-[8px] bg-[#FFF8E6] border flex items-center justify-center shrink-0" style="border-color: #F3D9A0;">
-					<ShoppingCart className="h-4 w-4 text-[#8A6A24]" strokeWidth={1.6} />
+				<div class="h-9 w-9 rounded-[8px] bg-[#FFF8E6] border flex items-center justify-center shrink-0" style="border-color: #F3D9A0;">
+					<ShoppingCart class="h-5 w-5 text-[#8A6A24]" strokeWidth={1.6} />
 				</div>
 				<span
 					class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#FFF8E6] text-[#8A6A24] border shrink-0 max-w-[92px] truncate"
@@ -84,7 +85,7 @@
 					Needs action
 				</span>
 			</div>
-			<div class="text-[28px] font-semibold leading-none tracking-tight text-[#242424]">
+			<div class="text-[24px] sm:text-[28px] font-semibold leading-none tracking-tight text-[#242424]">
 				{ordersNeedingAction}
 			</div>
 			<div class="mt-1 text-[11px] text-[#777]">Orders awaiting confirmation</div>
@@ -93,8 +94,8 @@
 		<!-- Active products KPI -->
 		<div class="bg-white border rounded-[12px] p-4 min-w-0" style="border-color: var(--border);">
 			<div class="flex items-start justify-between gap-2 mb-3">
-				<div class="h-8 w-8 rounded-[8px] bg-[#F0FAF6] border flex items-center justify-center shrink-0" style="border-color: #C7EBDB;">
-					<Package className="h-4 w-4 text-[#1A7A52]" strokeWidth={1.6} />
+				<div class="h-9 w-9 rounded-[8px] bg-[#F0FAF6] border flex items-center justify-center shrink-0" style="border-color: #C7EBDB;">
+					<Package class="h-5 w-5 text-[#1A7A52]" strokeWidth={1.6} />
 				</div>
 				<span
 					class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#F0FAF6] text-[#1A7A52] border shrink-0 max-w-[92px] truncate"
@@ -104,7 +105,7 @@
 					Live
 				</span>
 			</div>
-			<div class="text-[28px] font-semibold leading-none tracking-tight text-[#242424]">
+			<div class="text-[24px] sm:text-[28px] font-semibold leading-none tracking-tight text-[#242424]">
 				{activeCount}
 			</div>
 			<div class="mt-1 text-[11px] text-[#777]">Active in storefront</div>
@@ -113,8 +114,8 @@
 		<!-- Low stock KPI -->
 		<div class="bg-white border rounded-[12px] p-4 min-w-0" style="border-color: var(--border);">
 			<div class="flex items-start justify-between gap-2 mb-3">
-				<div class="h-8 w-8 rounded-[8px] bg-[#FFF0F0] border flex items-center justify-center shrink-0" style="border-color: #F2C2C0;">
-					<TriangleAlert className="h-4 w-4 text-[#A33A37]" strokeWidth={1.6} />
+				<div class="h-9 w-9 rounded-[8px] bg-[#FFF0F0] border flex items-center justify-center shrink-0" style="border-color: #F2C2C0;">
+					<TriangleAlert class="h-5 w-5 text-[#A33A37]" strokeWidth={1.6} />
 				</div>
 				<span
 					class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#FFF0F0] text-[#A33A37] border shrink-0 max-w-[92px] truncate"
@@ -124,7 +125,7 @@
 					Attention
 				</span>
 			</div>
-			<div class="text-[28px] font-semibold leading-none tracking-tight text-[#242424]">
+			<div class="text-[24px] sm:text-[28px] font-semibold leading-none tracking-tight text-[#242424]">
 				{lowCount}
 			</div>
 			<div class="mt-1 text-[11px] text-[#777]">Low stock items</div>
@@ -133,8 +134,8 @@
 		<!-- Store health KPI -->
 		<div class="bg-white border rounded-[12px] p-4 min-w-0" style="border-color: var(--border);">
 			<div class="flex items-start justify-between gap-2 mb-3">
-				<div class="h-8 w-8 rounded-[8px] bg-[#F5F5F4] border flex items-center justify-center shrink-0" style="border-color: var(--border);">
-					<LayoutDashboard className="h-4 w-4 text-[#5A5A5A]" strokeWidth={1.6} />
+				<div class="h-9 w-9 rounded-[8px] bg-[#F5F5F4] border flex items-center justify-center shrink-0" style="border-color: var(--border);">
+					<LayoutDashboard class="h-5 w-5 text-[#5A5A5A]" strokeWidth={1.6} />
 				</div>
 				<span
 					class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#F5F5F4] text-[#5A5A5A] border shrink-0 max-w-[92px] truncate"
@@ -144,8 +145,8 @@
 					Healthy
 				</span>
 			</div>
-			<div class="text-[28px] font-semibold leading-none tracking-tight text-[#242424]">
-				✓
+			<div class="text-[24px] sm:text-[28px] font-semibold leading-none tracking-tight text-[#242424]">
+				<CircleCheck class="h-6 w-6 text-[#269B65]" strokeWidth={1.6} />
 			</div>
 			<div class="mt-1 text-[11px] text-[#777]">All systems operational</div>
 		</div>
@@ -220,24 +221,37 @@
 			{/if}
 		</div>
 
-		<!-- Activity stream -->
+		<!-- Activity stream: matches ref Recent store activity (timeline + footer) -->
 		<div class="bg-white border rounded-[12px] overflow-hidden" style="border-color: var(--border);">
-			<div class="px-4 md:px-5 py-3 border-b flex items-center justify-between" style="border-color: var(--border);">
-				<h3 class="text-[13px] font-semibold">Recent activity</h3>
-				<span class="text-[11px] text-[#777]">Live</span>
+			<div class="px-4 md:px-5 py-3.5 border-b flex items-center justify-between" style="border-color: var(--border);">
+				<h2 class="text-[13px] font-semibold tracking-tight text-[#242424]">Recent store activity</h2>
 			</div>
-			<div class="divide-y" style="border-color: var(--border);">
-				{#each SEED_ACTIVITY as item (item.time + item.title)}
-					<div class="px-4 md:px-5 py-3 flex items-start gap-3">
-						<span class="h-2 w-2 rounded-full mt-1.5 shrink-0 {item.dot}"></span>
-						<div class="flex-1 min-w-0">
-							<div class="text-[12px] font-medium">{item.title}</div>
-							<div class="text-[11px] text-[#777]">
-								{item.entity} • {item.time}
+			<div class="p-4 md:p-5">
+				<div class="relative">
+					<div class="absolute left-[4px] top-1 bottom-1 w-px bg-[#EAEAEA]"></div>
+					<div class="space-y-5">
+						{#each SEED_ACTIVITY as item (item.time + item.title)}
+							<div class="relative flex gap-3">
+								<span class="mt-1 h-2 w-2 rounded-full shrink-0 {item.dot} ring-4 ring-white relative z-10"></span>
+								<div class="flex-1 min-w-0 -mt-0.5">
+									<div class="flex items-center gap-2">
+										<span class="text-[11px] text-[#999]">{item.time}</span>
+									</div>
+									<div class="mt-1 text-[12px] leading-snug">
+										<span class="text-[#5A5A5A]">{item.title}</span>{' '}
+										<span class="font-medium text-[#242424]">{item.entity}</span>
+									</div>
+								</div>
 							</div>
-						</div>
+						{/each}
 					</div>
-				{/each}
+				</div>
+			</div>
+			<div
+				class="px-5 py-3 bg-[#FBFBFA] border-t text-[11px] text-[#777] flex items-center justify-between"
+				style="border-color: var(--border);"
+			>
+				<span>Showing last 6 events</span>
 			</div>
 		</div>
 	</div>
