@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#fbfbfa" />
+  <title>FORMA — Everyday Bags, Considered Design</title>
+  <meta name="description" content="Temukan tas pilihan dengan desain timeless, detail fungsional, dan kualitas untuk menemani setiap hari." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: {
+          paper: '#FBFBFA', ink: '#242424', muted: '#77736E',
+          line: '#EAE8E4', coral: '#D9534F', gold: '#D69A35',
+          soft: '#F5F3EF', sage: '#E8EEE8'
+        },
+        fontFamily: { sans: ['DM Sans','sans-serif'], display: ['Playfair Display','serif'] },
+        boxShadow: { soft: '0 14px 45px rgba(36,36,36,.07)' }
+      }}
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background:#FBFBFA; color:#242424; }
+    .image-zoom img { transition: transform .65s cubic-bezier(.2,.7,.2,1); }
+    .image-zoom:hover img { transform: scale(1.045); }
+    .nav-link:after { content:""; display:block; height:1px; width:0; background:#D9534F; transition:width .25s; }
+    .nav-link:hover:after { width:100%; }
+    .product-card[hidden] { display:none; }
+    .filter.active { background:#242424; color:white; border-color:#242424; }
+    .menu-open { display:flex !important; }
+  </style>
+</head>
+<body class="font-sans antialiased">
+  <!-- Announcement -->
+  <div class="bg-ink text-white text-center px-4 py-2 text-[11px] sm:text-xs tracking-[.12em]">
+    FREE SHIPPING untuk pembelian di atas Rp750.000 <span class="text-gold mx-1">✦</span> Pengiriman ke seluruh Indonesia
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-paper/95 backdrop-blur border-b border-line">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 h-[76px] flex items-center justify-between">
+      <button id="mobileMenuBtn" class="lg:hidden p-2 -ml-2" aria-label="Buka menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+      </button>
+      <a href="#" class="flex items-center gap-2">
+        <span class="text-[25px] font-semibold tracking-[.18em] leading-none">FORMA<span class="text-coral">.</span></span>
+      </a>
+      <nav class="hidden lg:flex items-center gap-9 text-[13px] tracking-wide text-ink/80">
+        <a class="nav-link" href="#koleksi">Koleksi</a>
+        <a class="nav-link" href="#cerita">Tentang Forma</a>
+        <a class="nav-link" href="#pilihan">Pilihan Kami</a>
+        <a class="nav-link" href="#kontak">Kontak</a>
+      </nav>
+      <div class="flex items-center gap-4 sm:gap-5">
+        <a href="#koleksi" class="hidden sm:block text-[13px] text-ink/80 hover:text-coral">Cari tas</a>
+        <button id="cartButton" class="relative p-1" aria-label="Keranjang belanja">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+          <span id="cartCount" class="absolute -top-2 -right-2 bg-coral text-white text-[9px] w-[17px] h-[17px] rounded-full flex items-center justify-center">0</span>
+        </button>
+      </div>
+    </div>
+    <nav id="mobileMenu" class="hidden flex-col lg:hidden border-t border-line bg-paper px-6 py-5 gap-4 text-sm">
+      <a href="#koleksi" class="mobile-link">Koleksi</a>
+      <a href="#cerita" class="mobile-link">Tentang Forma</a>
+      <a href="#pilihan" class="mobile-link">Pilihan Kami</a>
+      <a href="#kontak" class="mobile-link">Kontak</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 pt-7 sm:pt-10">
+      <div class="relative overflow-hidden bg-soft min-h-[540px] sm:min-h-[610px] grid lg:grid-cols-[.92fr_1.08fr]">
+        <div class="relative z-10 flex flex-col justify-center px-7 py-12 sm:px-12 lg:px-16 xl:px-20">
+          <p class="text-[10px] sm:text-xs tracking-[.24em] uppercase text-coral font-semibold mb-6">The art of carrying well</p>
+          <h1 class="font-display text-[44px] sm:text-6xl xl:text-[72px] leading-[1.08] tracking-[-.035em] max-w-xl">
+            Membawa gaya,<br><em class="font-medium text-coral">menjalani hari.</em>
+          </h1>
+          <p class="text-muted text-sm sm:text-base leading-7 max-w-md mt-7">
+            Tas pilihan dengan desain yang tenang, detail yang dipikirkan, dan karakter yang bertahan melampaui tren.
+          </p>
+          <div class="flex flex-wrap items-center gap-5 mt-9">
+            <a href="#koleksi" class="inline-flex items-center gap-4 bg-ink text-white px-6 py-4 text-xs tracking-[.12em] uppercase hover:bg-coral transition">
+              Jelajahi koleksi <span aria-hidden="true">↗</span>
+            </a>
+            <a href="#cerita" class="text-xs tracking-wide border-b border-ink/40 pb-1 hover:border-coral hover:text-coral transition">Kenali Forma</a>
+          </div>
+          <div class="flex items-center gap-8 mt-14 pt-6 border-t border-black/10 max-w-md">
+            <div><p class="font-display text-2xl">01</p><p class="text-[10px] text-muted tracking-wider uppercase mt-1">Thoughtful design</p></div>
+            <div><p class="font-display text-2xl">02</p><p class="text-[10px] text-muted tracking-wider uppercase mt-1">Everyday function</p></div>
+            <div><p class="font-display text-2xl">03</p><p class="text-[10px] text-muted tracking-wider uppercase mt-1">Timeless style</p></div>
+          </div>
+        </div>
+        <div class="relative min-h-[360px] lg:min-h-full overflow-hidden">
+          <img class="absolute inset-0 w-full h-full object-cover" src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=1400&q=88" alt="Tas kulit berwarna netral dengan desain elegan" />
+          <div class="absolute bottom-6 right-6 sm:bottom-9 sm:right-9 bg-paper/95 px-5 py-4 max-w-[210px]">
+            <p class="text-[9px] tracking-[.2em] uppercase text-muted">Curated essentials</p>
+            <p class="font-display text-xl mt-1">Less, but better.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust strip -->
+    <section class="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-9 sm:py-12">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4 border-b border-line pb-9">
+        <div class="flex items-center gap-3"><span class="text-xl text-gold">✳</span><div><p class="text-xs font-semibold">Pilihan terkurasi</p><p class="text-[11px] text-muted mt-1">Gaya yang relevan setiap hari</p></div></div>
+        <div class="flex items-center gap-3"><span class="text-xl text-gold">◇</span><div><p class="text-xs font-semibold">Detail fungsional</p><p class="text-[11px] text-muted mt-1">Dirancang untuk digunakan</p></div></div>
+        <div class="flex items-center gap-3"><span class="text-xl text-gold">↗</span><div><p class="text-xs font-semibold">Belanja mudah</p><p class="text-[11px] text-muted mt-1">Pesan langsung via WhatsApp</p></div></div>
+        <div class="flex items-center gap-3"><span class="text-xl text-gold">♡</span><div><p class="text-xs font-semibold">Layanan personal</p><p class="text-[11px] text-muted mt-1">Kami siap membantu pilihanmu</p></div></div>
+      </div>
+    </section>
+
+    <!-- Collections -->
+    <section id="koleksi" class="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-10 sm:py-14">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 mb-8 sm:mb-10">
+        <div>
+          <p class="text-[10px] tracking-[.22em] uppercase text-coral font-semibold mb-3">Find your everyday piece</p>
+          <h2 class="font-display text-4xl sm:text-5xl tracking-tight">Koleksi pilihan<span class="text-coral">.</span></h2>
+          <p class="text-sm text-muted mt-3">Temukan bentuk yang paling sesuai dengan ritme harimu.</p>
+        </div>
+        <a href="#pilihan" class="text-xs border-b border-ink/40 pb-1 self-start sm:self-auto hover:text-coral hover:border-coral">Lihat panduan memilih ↗</a>
+      </div>
+      <div class="flex gap-2 overflow-x-auto pb-2 mb-7" role="group" aria-label="Filter kategori">
+        <button class="filter active shrink-0 border border-line rounded-full px-5 py-2.5 text-xs transition" data-filter="all">Semua</button>
+        <button class="filter shrink-0 border border-line rounded-full px-5 py-2.5 text-xs transition hover:border-ink" data-filter="shoulder">Shoulder bag</button>
+        <button class="filter shrink-0 border border-line rounded-full px-5 py-2.5 text-xs transition hover:border-ink" data-filter="tote">Tote bag</button>
+        <button class="filter shrink-0 border border-line rounded-full px-5 py-2.5 text-xs transition hover:border-ink" data-filter="crossbody">Crossbody</button>
+        <button class="filter shrink-0 border border-line rounded-full px-5 py-2.5 text-xs transition hover:border-ink" data-filter="mini">Mini bag</button>
+      </div>
+
+      <div id="productGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-x-3 sm:gap-x-5 gap-y-9 sm:gap-y-12">
+        <article class="product-card group" data-category="shoulder" data-name="The Curve Shoulder" data-price="429000">
+          <div class="image-zoom relative overflow-hidden bg-soft aspect-[4/5]">
+            <span class="absolute z-10 top-3 left-3 bg-paper px-2.5 py-1 text-[9px] uppercase tracking-wider">Bestseller</span>
+            <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=700&q=85" alt="The Curve Shoulder bag" loading="lazy">
+            <button class="add-cart absolute bottom-3 right-3 bg-paper text-ink w-10 h-10 rounded-full shadow-soft flex items-center justify-center hover:bg-coral hover:text-white transition" aria-label="Tambah The Curve Shoulder ke keranjang">+</button>
+          </div>
+          <div class="flex justify-between gap-2 mt-4"><div><p class="text-xs sm:text-sm font-semibold">The Curve Shoulder</p><p class="text-[10px] sm:text-xs text-muted mt-1">Shoulder bag · Cocoa</p></div><p class="text-xs sm:text-sm whitespace-nowrap">Rp429.000</p></div>
+        </article>
+        <article class="product-card group" data-category="tote" data-name="Daily Form Tote" data-price="389000">
+          <div class="image-zoom relative overflow-hidden bg-soft aspect-[4/5]">
+            <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=700&q=85" alt="Daily Form Tote bag" loading="lazy">
+            <button class="add-cart absolute bottom-3 right-3 bg-paper text-ink w-10 h-10 rounded-full shadow-soft flex items-center justify-center hover:bg-coral hover:text-white transition" aria-label="Tambah Daily Form Tote ke keranjang">+</button>
+          </div>
+          <div class="flex justify-between gap-2 mt-4"><div><p class="text-xs sm:text-sm font-semibold">Daily Form Tote</p><p class="text-[10px] sm:text-xs text-muted mt-1">Tote bag · Sand</p></div><p class="text-xs sm:text-sm whitespace-nowrap">Rp389.000</p></div>
+        </article>
+        <article class="product-card group" data-category="crossbody" data-name="The Mini Route" data-price="349000">
+          <div class="image-zoom relative overflow-hidden bg-soft aspect-[4/5]">
+            <span class="absolute z-10 top-3 left-3 bg-coral text-white px-2.5 py-1 text-[9px] uppercase tracking-wider">New arrival</span>
+            <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=700&q=85" alt="The Mini Route crossbody bag" loading="lazy">
+            <button class="add-cart absolute bottom-3 right-3 bg-paper text-ink w-10 h-10 rounded-full shadow-soft flex items-center justify-center hover:bg-coral hover:text-white transition" aria-label="Tambah The Mini Route ke keranjang">+</button>
+          </div>
+          <div class="flex justify-between gap-2 mt-4"><div><p class="text-xs sm:text-sm font-semibold">The Mini Route</p><p class="text-[10px] sm:text-xs text-muted mt-1">Crossbody · Black</p></div><p class="text-xs sm:text-sm whitespace-nowrap">Rp349.000</p></div>
+        </article>
+        <article class="product-card group" data-category="mini" data-name="Soft Structure Mini" data-price="319000">
+          <div class="image-zoom relative overflow-hidden bg-soft aspect-[4/5]">
+            <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=700&q=85" alt="Soft Structure Mini bag" loading="lazy">
+            <button class="add-cart absolute bottom-3 right-3 bg-paper text-ink w-10 h-10 rounded-full shadow-soft flex items-center justify-center hover:bg-coral hover:text-white transition" aria-label="Tambah Soft Structure Mini ke keranjang">+</button>
+          </div>
+          <div class="flex justify-between gap-2 mt-4"><div><p class="text-xs sm:text-sm font-semibold">Soft Structure Mini</p><p class="text-[10px] sm:text-xs text-muted mt-1">Mini bag · Taupe</p></div><p class="text-xs sm:text-sm whitespace-nowrap">Rp319.000</p></div>
+        </article>
+      </div>
+      <p class="text-center text-[10px] text-muted mt-8">*Nama produk, harga, dan foto di halaman ini merupakan konten contoh yang dapat diganti.</p>
+    </section>
+
+    <!-- Editorial split -->
+    <section id="cerita" class="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-14 sm:py-20">
+      <div class="grid lg:grid-cols-2 bg-[#F2F0EC]">
+        <div class="min-h-[360px] sm:min-h-[500px] overflow-hidden">
+          <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1591561954557-26941169b49e?auto=format&fit=crop&w=1100&q=85" alt="Detail tas dengan material dan bentuk yang elegan" loading="lazy">
+        </div>
+        <div class="flex flex-col justify-center px-8 py-12 sm:px-14 lg:px-16 xl:px-20">
+          <p class="text-[10px] tracking-[.22em] uppercase text-coral font-semibold mb-5">Our point of view</p>
+          <h2 class="font-display text-4xl sm:text-5xl leading-[1.12]">Bukan sekadar<br>pelengkap penampilan.</h2>
+          <p class="text-sm text-muted leading-7 mt-6 max-w-lg">Kami percaya tas yang baik seharusnya terasa tepat—mudah dipadukan, nyaman digunakan, dan cukup istimewa untuk menemani banyak cerita. Karena itu, setiap pilihan di Forma mengutamakan siluet yang bersih dan fungsi sehari-hari.</p>
+          <a href="#koleksi" class="mt-8 inline-flex items-center gap-4 text-xs tracking-[.12em] uppercase border-b border-ink/40 pb-3 self-start hover:text-coral hover:border-coral transition">Temukan koleksimu <span>↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feature / editorial cards -->
+    <section id="pilihan" class="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-10 sm:py-14">
+      <div class="text-center max-w-xl mx-auto mb-10">
+        <p class="text-[10px] tracking-[.22em] uppercase text-coral font-semibold mb-3">Made for your rhythm</p>
+        <h2 class="font-display text-4xl sm:text-5xl">Satu tas, banyak cerita.</h2>
+        <p class="text-sm text-muted mt-4 leading-6">Mulai dari hari kerja yang padat hingga akhir pekan yang santai.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-4 sm:gap-5">
+        <a href="#koleksi" class="group relative h-[330px] sm:h-[410px] overflow-hidden bg-soft">
+          <img class="w-full h-full object-cover transition duration-700 group-hover:scale-105" src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=800&q=85" alt="Tas untuk aktivitas sehari-hari" loading="lazy">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent"></div>
+          <div class="absolute bottom-6 left-6 text-white"><p class="text-[9px] tracking-[.2em] uppercase">01 / Everyday</p><h3 class="font-display text-2xl mt-1">Daily essentials</h3></div>
+        </a>
+        <a href="#koleksi" class="group relative h-[330px] sm:h-[410px] overflow-hidden bg-soft">
+          <img class="w-full h-full object-cover transition duration-700 group-hover:scale-105" src="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=800&q=85" alt="Tas untuk tampilan yang lebih rapi" loading="lazy">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent"></div>
+          <div class="absolute bottom-6 left-6 text-white"><p class="text-[9px] tracking-[.2em] uppercase">02 / Workday</p><h3 class="font-display text-2xl mt-1">Work, reimagined</h3></div>
+        </a>
+        <a href="#koleksi" class="group relative h-[330px] sm:h-[410px] overflow-hidden bg-soft">
+          <img class="w-full h-full object-cover transition duration-700 group-hover:scale-105" src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=85" alt="Tas untuk gaya akhir pekan" loading="lazy">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent"></div>
+          <div class="absolute bottom-6 left-6 text-white"><p class="text-[9px] tracking-[.2em] uppercase">03 / Weekend</p><h3 class="font-display text-2xl mt-1">Off-duty mood</h3></div>
+        </a>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-16 sm:py-24">
+      <div class="bg-ink text-white px-7 py-14 sm:px-14 sm:py-16 text-center relative overflow-hidden">
+        <div class="absolute -top-20 -right-10 w-64 h-64 border border-white/10 rounded-full"></div>
+        <div class="absolute -bottom-36 -left-12 w-80 h-80 border border-white/10 rounded-full"></div>
+        <p class="relative text-[10px] tracking-[.24em] uppercase text-gold font-semibold">A better everyday starts here</p>
+        <h2 class="relative font-display text-4xl sm:text-5xl mt-4">Temukan tas yang terasa seperti kamu.</h2>
+        <p class="relative text-white/60 text-sm mt-4">Butuh bantuan memilih? Ceritakan kebutuhanmu kepada tim kami.</p>
+        <a id="waCta" href="https://wa.me/6281234567890?text=Halo%20Forma%2C%20saya%20ingin%20bertanya%20tentang%20koleksi%20tas." target="_blank" rel="noopener" class="relative inline-flex mt-8 bg-paper text-ink px-7 py-4 text-xs tracking-[.12em] uppercase hover:bg-coral hover:text-white transition">Hubungi via WhatsApp ↗</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer id="kontak" class="border-t border-line">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 pt-12 pb-8">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-12">
+        <div class="lg:col-span-2">
+          <a href="#" class="text-[25px] font-semibold tracking-[.18em]">FORMA<span class="text-coral">.</span></a>
+          <p class="text-sm text-muted leading-7 max-w-sm mt-4">Everyday bags, considered design. Temukan koleksi tas yang mengutamakan desain, fungsi, dan karakter.</p>
+        </div>
+        <div><p class="text-xs font-semibold tracking-wider uppercase mb-5">Explore</p><div class="flex flex-col gap-3 text-sm text-muted"><a class="hover:text-coral" href="#koleksi">Koleksi tas</a><a class="hover:text-coral" href="#cerita">Tentang kami</a><a class="hover:text-coral" href="#pilihan">Inspirasi gaya</a></div></div>
+        <div><p class="text-xs font-semibold tracking-wider uppercase mb-5">Customer care</p><div class="flex flex-col gap-3 text-sm text-muted"><a class="hover:text-coral" href="#kontak">Bantuan & FAQ</a><a class="hover:text-coral" href="#kontak">Informasi pengiriman</a><a class="hover:text-coral" href="https://instagram.com/" target="_blank" rel="noopener">Instagram ↗</a></div></div>
+      </div>
+      <div class="border-t border-line pt-6 flex flex-col sm:flex-row justify-between gap-3 text-[10px] tracking-wide text-muted"><p>© 2026 FORMA. All rights reserved.</p><p>Designed for everyday, made to be remembered.</p></div>
+    </div>
+  </footer>
+
+  <script>
+    // Ubah nomor ini ke nomor WhatsApp bisnis (format internasional tanpa +).
+    const WHATSAPP_NUMBER = '6281234567890';
+    let cart = [];
+    const cartCount = document.getElementById('cartCount');
+
+    document.querySelectorAll('.filter').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.filter').forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+        const selected = button.dataset.filter;
+        document.querySelectorAll('.product-card').forEach(card => {
+          card.hidden = selected !== 'all' && card.dataset.category !== selected;
+        });
+      });
+    });
+
+    document.querySelectorAll('.add-cart').forEach(button => {
+      button.addEventListener('click', () => {
+        const card = button.closest('.product-card');
+        cart.push({ name: card.dataset.name, price: Number(card.dataset.price) });
+        cartCount.textContent = cart.length;
+        button.textContent = '✓';
+        button.classList.add('bg-coral','text-white');
+        setTimeout(() => {
+          button.textContent = '+';
+          button.classList.remove('bg-coral','text-white');
+        }, 900);
+      });
+    });
+
+    document.getElementById('cartButton').addEventListener('click', () => {
+      if (!cart.length) {
+        alert('Keranjang masih kosong. Pilih produk yang kamu suka terlebih dahulu.');
+        return;
+      }
+      const lines = cart.map((item, index) => `${index + 1}. ${item.name} — Rp${item.price.toLocaleString('id-ID')}`);
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+      const message = `Halo Forma, saya ingin memesan:\n${lines.join('\n')}\n\nTotal: Rp${total.toLocaleString('id-ID')}`;
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+    });
+
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('menu-open'));
+    document.querySelectorAll('.mobile-link').forEach(link => link.addEventListener('click', () => mobileMenu.classList.remove('menu-open')));
+
+    document.getElementById('waCta').href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Forma, saya ingin bertanya tentang koleksi tas.')}`;
+  </script>
+</body>
+</html>

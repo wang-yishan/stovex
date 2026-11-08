@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f7f6f2" />
+  <title>Product Detail — Forma Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --paper:#f7f6f2; --ink:#252522; --muted:#77766f; --line:#e5e2da; --accent:#8a755f; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:'DM Sans',sans-serif; }
+    .serif { font-family:'Playfair Display',serif; }
+    .thumb { border:1px solid transparent; opacity:.72; transition:.2s ease; }
+    .thumb.active { border-color:#252522; opacity:1; }
+    .thumb:hover { opacity:1; }
+    .swatch { width:27px;height:27px;border-radius:999px;border:2px solid var(--paper);outline:1px solid transparent; transition:.18s; }
+    .swatch.active { outline-color:#252522; }
+    .size-option.active { background:#252522;color:white;border-color:#252522; }
+    .size-option:disabled { opacity:.35;text-decoration:line-through;cursor:not-allowed; }
+    .gallery-image { transition:opacity .2s ease; }
+    .modal { display:none; }
+    .modal.open { display:flex; }
+    .no-scroll { overflow:hidden; }
+    .accordion-content { display:none; }
+    .accordion.open .accordion-content { display:block; }
+    .accordion.open .chevron { transform:rotate(180deg); }
+    .chevron { transition:transform .2s; }
+    .sticky-buy { box-shadow:0 -8px 24px rgba(25,25,20,.06); }
+    @media (min-width: 1024px) {
+      .gallery-sticky { position:sticky; top:100px; align-self:start; }
+      .info-sticky { position:sticky; top:104px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Demo storefront header -->
+  <header class="h-[72px] border-b border-[var(--line)] bg-[var(--paper)]/95 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-[1440px] mx-auto h-full px-5 md:px-10 flex items-center justify-between">
+      <button class="text-xs tracking-[.22em] uppercase text-[var(--muted)] md:hidden" aria-label="Open menu">Menu</button>
+      <a href="#" class="serif text-[27px] md:text-[30px] tracking-[.12em]">FORMA</a>
+      <nav class="hidden md:flex items-center gap-9 text-[11px] uppercase tracking-[.16em] text-[#55544e]">
+        <a href="#" class="hover:text-black">New In</a><a href="#" class="hover:text-black">Bags</a><a href="#" class="hover:text-black">Collections</a><a href="#" class="hover:text-black">Our Story</a>
+      </nav>
+      <div class="flex items-center gap-4 text-[11px] uppercase tracking-[.13em]">
+        <a href="#" class="hidden sm:inline hover:text-[var(--accent)]">Search</a>
+        <a href="#" class="hover:text-[var(--accent)]">Bag (0)</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-[1440px] mx-auto px-4 md:px-10 pb-28 md:pb-20">
+    <!-- Breadcrumb -->
+    <div class="py-5 md:py-7 text-[10px] md:text-[11px] tracking-[.12em] uppercase text-[var(--muted)]">
+      <a href="#" class="hover:text-black">Home</a><span class="mx-2">/</span><a href="#" class="hover:text-black">Bags</a><span class="mx-2">/</span><span class="text-[var(--ink)]">The Everyday Tote</span>
+    </div>
+
+    <!-- Gallery-first product area -->
+    <section class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.9fr)_minmax(330px,.9fr)] gap-7 lg:gap-12 items-start">
+      <!-- Gallery -->
+      <div class="gallery-sticky min-w-0">
+        <div class="grid grid-cols-[58px_minmax(0,1fr)] md:grid-cols-[76px_minmax(0,1fr)] gap-3 md:gap-4">
+          <div id="thumbs" class="flex flex-col gap-2 md:gap-3 order-1">
+            <button class="thumb active aspect-[3/4] overflow-hidden" data-index="0" aria-label="View image 1"><img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=180&q=85" alt="Front view of brown leather tote"></button>
+            <button class="thumb aspect-[3/4] overflow-hidden" data-index="1" aria-label="View image 2"><img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=180&q=85" alt="Tote bag side view"></button>
+            <button class="thumb aspect-[3/4] overflow-hidden" data-index="2" aria-label="View image 3"><img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=180&q=85" alt="Bag detail view"></button>
+            <button class="thumb aspect-[3/4] overflow-hidden" data-index="3" aria-label="View image 4"><img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=180&q=85" alt="Bag styling view"></button>
+            <button class="thumb aspect-[3/4] overflow-hidden" data-index="4" aria-label="View image 5"><img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=180&q=85&sat=-35" alt="Bag close-up"></button>
+          </div>
+          <div class="relative order-2 min-w-0 group">
+            <button id="mainImageButton" class="block w-full text-left overflow-hidden bg-[#eeece6] cursor-zoom-in" aria-label="Open image viewer">
+              <img id="mainImage" class="gallery-image w-full aspect-[4/5] md:aspect-[5/6] object-cover" src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=1400&q=90" alt="The Everyday Tote in chestnut brown">
+            </button>
+            <div class="absolute left-4 top-4 text-[9px] tracking-[.18em] uppercase bg-[var(--paper)]/90 px-3 py-2">New collection</div>
+            <div class="absolute bottom-4 right-4 flex items-center gap-2">
+              <button id="prevImage" class="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center hover:bg-white" aria-label="Previous image">←</button>
+              <span id="imageCount" class="text-[10px] tracking-widest bg-white/90 px-3 py-[11px]">01 / 05</span>
+              <button id="nextImage" class="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center hover:bg-white" aria-label="Next image">→</button>
+            </div>
+            <div class="absolute top-4 right-4 text-[9px] tracking-[.12em] uppercase bg-white/90 px-3 py-2 hidden md:block">Click to enlarge ↗</div>
+          </div>
+        </div>
+        <p class="mt-3 text-[10px] tracking-[.12em] uppercase text-[var(--muted)] text-right">A closer look at the details</p>
+      </div>
+
+      <!-- Product information -->
+      <aside class="lg:pl-1">
+        <div class="lg:info-sticky">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-[10px] tracking-[.18em] uppercase text-[var(--muted)]">FORMA / Everyday Series</span>
+            <button id="wishlist" class="text-xl leading-none text-[#77766f] hover:text-black" aria-label="Add to wishlist">♡</button>
+          </div>
+          <h1 class="serif text-[36px] md:text-[42px] leading-[1.12] font-normal">The Everyday Tote</h1>
+          <p class="mt-3 text-[13px] text-[#77766f] leading-6 max-w-md">A considered everyday companion, designed to move effortlessly from one moment to the next.</p>
+          <div class="flex items-baseline gap-3 mt-6">
+            <span id="price" class="text-[15px] tracking-wide">Rp 689.000</span>
+            <span id="comparePrice" class="text-[12px] text-[#99958d] line-through">Rp 829.000</span>
+            <span class="text-[9px] tracking-[.12em] uppercase text-[#806b55] border border-[#d7cbbb] px-2 py-1">Demo price</span>
+          </div>
+          <div class="h-px bg-[var(--line)] my-6"></div>
+
+          <!-- Color -->
+          <div class="mb-6">
+            <div class="flex justify-between items-center mb-3">
+              <label class="text-[10px] tracking-[.16em] uppercase">Color</label>
+              <span id="selectedColor" class="text-[11px] text-[var(--muted)]">Chestnut</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <button class="swatch active" data-color="Chestnut" style="background:#805b43" aria-label="Chestnut color" title="Chestnut"></button>
+              <button class="swatch" data-color="Black" style="background:#292927" aria-label="Black color" title="Black"></button>
+              <button class="swatch" data-color="Sand" style="background:#c8b79d" aria-label="Sand color" title="Sand"></button>
+            </div>
+          </div>
+
+          <!-- Size -->
+          <div class="mb-6">
+            <div class="flex justify-between items-center mb-3">
+              <label class="text-[10px] tracking-[.16em] uppercase">Size</label>
+              <button class="text-[10px] underline underline-offset-4 text-[var(--muted)]" id="sizeGuide">Size guide</button>
+            </div>
+            <div class="flex gap-2">
+              <button class="size-option border border-[#d9d6ce] px-5 py-3 text-[11px] active" data-size="One Size">One Size</button>
+            </div>
+            <p class="text-[10px] text-[var(--muted)] mt-2">This style is available in one size.</p>
+          </div>
+
+          <!-- Availability -->
+          <div class="flex items-center gap-2 text-[11px] mb-5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#71846c]"></span>
+            <span id="availability">Available — demo inventory</span>
+          </div>
+
+          <!-- Quantity -->
+          <div class="flex items-center justify-between mb-5">
+            <label class="text-[10px] tracking-[.16em] uppercase">Quantity</label>
+            <div class="flex items-center border border-[var(--line)]">
+              <button id="decrease" class="w-10 h-10 text-lg hover:bg-[#efede7]" aria-label="Decrease quantity">−</button>
+              <span id="quantity" class="w-9 text-center text-[12px]">1</span>
+              <button id="increase" class="w-10 h-10 text-lg hover:bg-[#efede7]" aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+
+          <button id="buyButton" class="w-full bg-[#252522] text-white py-[17px] text-[10px] tracking-[.18em] uppercase hover:bg-[#494840] transition">Buy via WhatsApp <span class="ml-2">↗</span></button>
+          <button id="askButton" class="w-full border border-[#c9c6bd] py-[16px] mt-2 text-[10px] tracking-[.16em] uppercase hover:border-black transition">Ask about this product</button>
+          <p class="text-[10px] leading-5 text-[var(--muted)] mt-4">Your order enquiry will open in WhatsApp. Availability and shipping will be confirmed by our team.</p>
+
+          <div class="h-px bg-[var(--line)] my-7"></div>
+          <div class="flex flex-col gap-3 text-[11px] text-[#5f5e57]">
+            <div class="flex justify-between"><span>Product code</span><span class="tracking-wide">FM-ET-001-CH</span></div>
+            <div class="flex justify-between"><span>Collection</span><span>Everyday Series</span></div>
+            <div class="flex justify-between"><span>Availability</span><span>In stock · Demo</span></div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Editorial detail content -->
+    <section class="mt-20 md:mt-28 border-t border-[var(--line)] pt-10 md:pt-14">
+      <div class="grid md:grid-cols-[.8fr_1.2fr] gap-8 md:gap-20">
+        <div>
+          <p class="text-[10px] tracking-[.18em] uppercase text-[var(--muted)]">The details</p>
+          <h2 class="serif text-[32px] md:text-[38px] leading-tight mt-3">Made for the everyday, and everything in between.</h2>
+        </div>
+        <div class="max-w-2xl">
+          <p class="text-[13px] leading-7 text-[#68675f]">A clean silhouette with considered proportions. The Everyday Tote is designed as a versatile daily carryall, with an understated shape that works across different routines and personal styles.</p>
+          <p class="text-[13px] leading-7 text-[#68675f] mt-4">This is sample editorial copy for the HTML preview. Replace it with the product description managed in your Product Management system before publishing.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Visual detail strip -->
+    <section class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+      <img class="w-full aspect-[4/5] object-cover bg-[#eeece6]" src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=700&q=85" alt="Bag side profile detail" loading="lazy">
+      <img class="w-full aspect-[4/5] object-cover bg-[#eeece6]" src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=700&q=85" alt="Bag texture detail" loading="lazy">
+      <img class="w-full aspect-[4/5] object-cover bg-[#eeece6]" src="https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=700&q=85" alt="Bag styling detail" loading="lazy">
+      <img class="w-full aspect-[4/5] object-cover bg-[#eeece6]" src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=700&q=85&sat=-35" alt="Bag close-up detail" loading="lazy">
+    </section>
+
+    <!-- Specifications and policies -->
+    <section class="mt-16 md:mt-24 max-w-4xl mx-auto">
+      <div class="border-t border-[var(--line)]">
+        <div class="accordion border-b border-[var(--line)]">
+          <button class="accordion-toggle w-full py-5 flex justify-between items-center text-left"><span class="text-[10px] tracking-[.16em] uppercase">Product specifications</span><span class="chevron">⌄</span></button>
+          <div class="accordion-content pb-6">
+            <dl class="grid grid-cols-2 gap-y-4 text-[11px]">
+              <div><dt class="text-[var(--muted)] mb-1">Material</dt><dd>Sample — update from product data</dd></div>
+              <div><dt class="text-[var(--muted)] mb-1">Dimensions</dt><dd>Not configured</dd></div>
+              <div><dt class="text-[var(--muted)] mb-1">Weight</dt><dd>Not configured</dd></div>
+              <div><dt class="text-[var(--muted)] mb-1">Closure</dt><dd>Not configured</dd></div>
+            </dl>
+          </div>
+        </div>
+        <div class="accordion border-b border-[var(--line)]">
+          <button class="accordion-toggle w-full py-5 flex justify-between items-center text-left"><span class="text-[10px] tracking-[.16em] uppercase">Shipping & delivery</span><span class="chevron">⌄</span></button>
+          <div class="accordion-content pb-6 text-[12px] leading-6 text-[var(--muted)]">Shipping details and estimated delivery information will be confirmed by our team through WhatsApp.</div>
+        </div>
+        <div class="accordion border-b border-[var(--line)]">
+          <button class="accordion-toggle w-full py-5 flex justify-between items-center text-left"><span class="text-[10px] tracking-[.16em] uppercase">Care instructions</span><span class="chevron">⌄</span></button>
+          <div class="accordion-content pb-6 text-[12px] leading-6 text-[var(--muted)]">Care instructions have not been configured for this demo product.</div>
+        </div>
+        <div class="accordion border-b border-[var(--line)]">
+          <button class="accordion-toggle w-full py-5 flex justify-between items-center text-left"><span class="text-[10px] tracking-[.16em] uppercase">Returns & exchange</span><span class="chevron">⌄</span></button>
+          <div class="accordion-content pb-6 text-[12px] leading-6 text-[var(--muted)]">Please contact the store team for the applicable return and exchange policy.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recommendations -->
+    <section class="mt-20 md:mt-28">
+      <div class="flex items-end justify-between mb-7">
+        <div><p class="text-[10px] tracking-[.18em] uppercase text-[var(--muted)]">Discover more</p><h2 class="serif text-[30px] md:text-[36px] mt-2">You may also like</h2></div>
+        <a href="/products" class="text-[10px] tracking-[.14em] uppercase border-b border-[#aaa69c] pb-1 hidden sm:inline">View all products ↗</a>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+        <a href="#" class="group"><div class="overflow-hidden bg-[#eeece6]"><img class="w-full aspect-[4/5] object-cover group-hover:scale-[1.03] transition duration-500" src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=700&q=85" alt="Structured shoulder bag" loading="lazy"></div><p class="text-[11px] mt-3">The Structured Shoulder</p><p class="text-[11px] text-[var(--muted)] mt-1">Rp 759.000</p></a>
+        <a href="#" class="group"><div class="overflow-hidden bg-[#eeece6]"><img class="w-full aspect-[4/5] object-cover group-hover:scale-[1.03] transition duration-500" src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=700&q=85" alt="Minimal daily bag" loading="lazy"></div><p class="text-[11px] mt-3">The Minimal Daily</p><p class="text-[11px] text-[var(--muted)] mt-1">Rp 599.000</p></a>
+        <a href="#" class="group"><div class="overflow-hidden bg-[#eeece6]"><img class="w-full aspect-[4/5] object-cover group-hover:scale-[1.03] transition duration-500" src="https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=700&q=85" alt="Soft carryall bag" loading="lazy"></div><p class="text-[11px] mt-3">The Soft Carryall</p><p class="text-[11px] text-[var(--muted)] mt-1">Rp 729.000</p></a>
+        <a href="#" class="group"><div class="overflow-hidden bg-[#eeece6]"><img class="w-full aspect-[4/5] object-cover group-hover:scale-[1.03] transition duration-500" src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=700&q=85&sat=-35" alt="Classic mini tote" loading="lazy"></div><p class="text-[11px] mt-3">The Classic Mini</p><p class="text-[11px] text-[var(--muted)] mt-1">Rp 529.000</p></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-[var(--line)] py-9 px-5 md:px-10">
+    <div class="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between gap-4 text-[10px] tracking-[.12em] uppercase text-[var(--muted)]">
+      <span class="serif text-xl tracking-[.14em] text-[var(--ink)]">FORMA</span><span>Thoughtfully carried. © 2026 Forma Studio</span><span>Instagram&nbsp;&nbsp; · &nbsp;&nbsp;Contact</span>
+    </div>
+  </footer>
+
+  <!-- Mobile sticky purchase bar -->
+  <div class="sticky-buy fixed bottom-0 left-0 right-0 z-40 bg-[var(--paper)] border-t border-[var(--line)] px-4 py-3 md:hidden">
+    <div class="flex items-center justify-between gap-4 max-w-xl mx-auto">
+      <div class="min-w-0"><p class="text-[9px] tracking-[.12em] uppercase text-[var(--muted)]">The Everyday Tote</p><p id="mobilePrice" class="text-[13px] mt-1">Rp 689.000</p></div>
+      <button id="mobileBuy" class="bg-[#252522] text-white px-6 py-4 text-[9px] tracking-[.15em] uppercase whitespace-nowrap">Buy via WhatsApp ↗</button>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="modal fixed inset-0 z-50 bg-black/95 items-center justify-center p-4 md:p-10" role="dialog" aria-modal="true" aria-label="Product image viewer">
+    <button id="closeLightbox" class="absolute top-5 right-5 text-white text-3xl font-light" aria-label="Close image viewer">×</button>
+    <button id="lightPrev" class="absolute left-3 md:left-8 text-white text-3xl p-3" aria-label="Previous image">‹</button>
+    <img id="lightboxImage" class="max-h-[86vh] max-w-[88vw] object-contain" src="" alt="Product enlarged view">
+    <button id="lightNext" class="absolute right-3 md:right-8 text-white text-3xl p-3" aria-label="Next image">›</button>
+    <span id="lightCount" class="absolute bottom-5 text-white text-[10px] tracking-[.2em]">01 / 05</span>
+  </div>
+
+  <script>
+    // Demo data only. Connect these values to the existing Product Management API in production.
+    const product = {
+      name: "The Everyday Tote",
+      slug: "the-everyday-tote",
+      sku: "FM-ET-001",
+      price: 689000,
+      compareAtPrice: 829000,
+      whatsappNumber: "6281234567890", // Replace with configured store WhatsApp number.
+      storeName: "FORMA",
+      images: [
+        { src: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=1600&q=90", alt: "The Everyday Tote front view in chestnut" },
+        { src: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=1600&q=90", alt: "The Everyday Tote side view" },
+        { src: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1600&q=90", alt: "The Everyday Tote detail view" },
+        { src: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=1600&q=90", alt: "The Everyday Tote styled view" },
+        { src: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=1600&q=90&sat=-35", alt: "The Everyday Tote close-up" }
+      ],
+      variants: [
+        { color: "Chestnut", size: "One Size", sku: "FM-ET-001-CH", price: 689000, available: true, stock: 8 },
+        { color: "Black", size: "One Size", sku: "FM-ET-001-BK", price: 689000, available: true, stock: 5 },
+        { color: "Sand", size: "One Size", sku: "FM-ET-001-SD", price: 689000, available: false, stock: 0 }
+      ]
+    };
+
+    let currentImage = 0;
+    let selectedColor = "Chestnut";
+    let selectedSize = "One Size";
+    let quantity = 1;
+    let touchStartX = 0;
+
+    const $ = (id) => document.getElementById(id);
+    const formatIDR = (value) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(value);
+
+    function selectedVariant() {
+      return product.variants.find(v => v.color === selectedColor && v.size === selectedSize);
+    }
+    function updateImage(index) {
+      currentImage = (index + product.images.length) % product.images.length;
+      const image = product.images[currentImage];
+      $("mainImage").src = image.src;
+      $("mainImage").alt = image.alt;
+      $("lightboxImage").src = image.src;
+      $("lightboxImage").alt = image.alt;
+      $("imageCount").textContent = `${String(currentImage + 1).padStart(2,"0")} / ${String(product.images.length).padStart(2,"0")}`;
+      $("lightCount").textContent = $("imageCount").textContent;
+      document.querySelectorAll(".thumb").forEach((thumb, i) => thumb.classList.toggle("active", i === currentImage));
+    }
+    function updateVariant() {
+      const variant = selectedVariant();
+      $("selectedColor").textContent = selectedColor;
+      $("price").textContent = variant ? formatIDR(variant.price) : formatIDR(product.price);
+      $("mobilePrice").textContent = variant ? formatIDR(variant.price) : formatIDR(product.price);
+      $("availability").textContent = !variant ? "This option is unavailable" : variant.available ? `Available · ${variant.stock} demo units` : "Currently unavailable";
+      $("buyButton").disabled = !variant || !variant.available;
+      $("mobileBuy").disabled = !variant || !variant.available;
+      [$("buyButton"), $("mobileBuy")].forEach(btn => {
+        btn.classList.toggle("opacity-40", btn.disabled);
+        btn.classList.toggle("cursor-not-allowed", btn.disabled);
+      });
+      $("quantity").textContent = quantity;
+      if (variant && !variant.available) quantity = 1;
+      if (variant && variant.available && quantity > variant.stock) quantity = variant.stock;
+      $("quantity").textContent = quantity;
+      document.querySelectorAll(".swatch").forEach(btn => btn.classList.toggle("active", btn.dataset.color === selectedColor));
+    }
+    function openWhatsApp(mode = "buy") {
+      const variant = selectedVariant();
+      if (!variant || !variant.available) {
+        alert("Maaf, pilihan warna ini sedang tidak tersedia.");
+        return;
+      }
+      if (!Number.isInteger(quantity) || quantity < 1 || quantity > variant.stock) {
+        alert("Periksa kembali jumlah produk yang dipilih.");
+        return;
+      }
+      const subtotal = variant.price * quantity;
+      const message = mode === "ask"
+        ? `Halo ${product.storeName}, saya ingin bertanya tentang produk ini.\\n\\nProduk: ${product.name}\\nWarna: ${variant.color}\\nUkuran: ${variant.size}\\nSKU: ${variant.sku}\\nLink: ${location.origin}/products/${product.slug}\\n\\nMohon informasinya.`
+        : `Halo ${product.storeName}, saya tertarik untuk memesan produk berikut.\\n\\nProduk: ${product.name}\\nWarna: ${variant.color}\\nUkuran: ${variant.size}\\nSKU: ${variant.sku}\\nJumlah: ${quantity}\\nHarga satuan: ${formatIDR(variant.price)}\\nSubtotal: ${formatIDR(subtotal)}\\nLink produk: ${location.origin}/products/${product.slug}\\n\\nMohon konfirmasi ketersediaan dan informasi pengiriman.`;
+      const url = `https://wa.me/${product.whatsappNumber}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+
+    document.querySelectorAll(".thumb").forEach(btn => btn.addEventListener("click", () => updateImage(Number(btn.dataset.index))));
+    $("prevImage").addEventListener("click", () => updateImage(currentImage - 1));
+    $("nextImage").addEventListener("click", () => updateImage(currentImage + 1));
+    $("mainImageButton").addEventListener("click", () => { $("lightbox").classList.add("open"); document.body.classList.add("no-scroll"); updateImage(currentImage); });
+    function closeLightbox() { $("lightbox").classList.remove("open"); document.body.classList.remove("no-scroll"); }
+    $("closeLightbox").addEventListener("click", closeLightbox);
+    $("lightbox").addEventListener("click", e => { if (e.target === $("lightbox")) closeLightbox(); });
+    $("lightPrev").addEventListener("click", () => updateImage(currentImage - 1));
+    $("lightNext").addEventListener("click", () => updateImage(currentImage + 1));
+    document.addEventListener("keydown", e => {
+      if (!$("lightbox").classList.contains("open")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") updateImage(currentImage - 1);
+      if (e.key === "ArrowRight") updateImage(currentImage + 1);
+    });
+    $("mainImageButton").addEventListener("touchstart", e => touchStartX = e.changedTouches[0].screenX, { passive:true });
+    $("mainImageButton").addEventListener("touchend", e => {
+      const delta = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(delta) > 45) updateImage(currentImage + (delta < 0 ? 1 : -1));
+    }, { passive:true });
+    document.querySelectorAll(".swatch").forEach(btn => btn.addEventListener("click", () => {
+      selectedColor = btn.dataset.color;
+      const variant = selectedVariant();
+      if (variant) updateVariant();
+      else { updateVariant(); }
+      // In production, switch to the selected variant's image set when configured.
+      updateImage(0);
+    }));
+    $("decrease").addEventListener("click", () => { quantity = Math.max(1, quantity - 1); updateVariant(); });
+    $("increase").addEventListener("click", () => {
+      const variant = selectedVariant();
+      const max = variant && variant.available ? variant.stock : 1;
+      quantity = Math.min(max, quantity + 1);
+      updateVariant();
+    });
+    $("buyButton").addEventListener("click", () => openWhatsApp("buy"));
+    $("mobileBuy").addEventListener("click", () => openWhatsApp("buy"));
+    $("askButton").addEventListener("click", () => openWhatsApp("ask"));
+    $("wishlist").addEventListener("click", e => { e.currentTarget.textContent = e.currentTarget.textContent === "♡" ? "♥" : "♡"; });
+    $("sizeGuide").addEventListener("click", () => alert("Size guide belum dikonfigurasi untuk produk demo ini."));
+    document.querySelectorAll(".accordion-toggle").forEach(btn => btn.addEventListener("click", () => btn.parentElement.classList.toggle("open")));
+    updateImage(0);
+    updateVariant();
+  </script>
+</body>
+</html>
