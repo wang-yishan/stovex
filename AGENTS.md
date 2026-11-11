@@ -2,13 +2,13 @@
 
 ## Dev speed (user request)
 
-- **Do NOT run `bun run check` / `bun run build` unless the user explicitly asks.** Prioritize development speed; defer typecheck and build verification to the user.
-- Verify UI work visually via the dev server when needed; only run checks on request.
+- **Never run `bun run dev`, `bun run check`, `bun run build`, tests, or any verification command unless the user explicitly asks.** This includes starting the dev server and curl spot checks. Prioritize development speed; leave verification to the user.
+- When the user does ask for verification, run only the specific command needed — not the full suite.
 
 ## Commands
 
 - Package manager is **bun only** (`bun.lock`, `engine-strict` in `.npmrc`). Never use npm/pnpm/npx.
-- `bun run dev` — Vite dev server (auto adapter; no deploy adapter configured)
+- `bun run dev` — Vite dev server (auto adapter; no deploy adapter configured; don't start it on your own)
 - `bun run check` — `svelte-kit sync` + `svelte-check` (typecheck; only on user request, see Dev speed)
 - `bun run lint` — prettier check only (no eslint). `bun run format` to fix (tabs, single quotes, printWidth 100, trailingComma none)
 - `bun run build` / `bun run preview`
@@ -28,7 +28,7 @@ There is **no test runner and no CI**. Verification only on user request (see De
 - Tailwind v4 via `@tailwindcss/vite` (plugins: forms, typography). Stylesheet entry is `src/routes/layout.css`, which imports `admin.css`. Prettier points at that file too — don't move it.
 - `mdsvex` handles `.svx`/`.md` as Svelte components (see `vite.config.ts` extensions).
 - **Paraglide i18n**: locales `en` (base) + `id`. `src/lib/paraglide/` is **generated and gitignored** — never edit it. Edit `messages/*.json` and `project.inlang/settings.json`; the Vite plugin regenerates on dev/build. Global `reroute` lives in `src/hooks.ts` — don't remove it.
-- **Auth / DB**: Better Auth (`better-auth/minimal` + `drizzleAdapter`, sqlite) in `src/lib/server/auth.ts`. `src/hooks.server.ts` chains `handleParaglide` then `handleBetterAuth` via `sequence()` — preserve order; `sveltekitCookies` must stay last in the plugins array. Env vars `DATABASE_URL`, `ORIGIN`, `BETTER_AUTH_SECRET` are declared in `src/env.ts`; `drizzle.config.ts` throws if `DATABASE_URL` is missing (local default `file:local.db` in `.env`).
+- **Auth / DB**: Better Auth (`better-auth/minimal` + `drizzleAdapter`, sqlite) in `src/lib/server/auth.ts`. `src/hooks.server.ts` chains `handleParaglide` then `handleBetterAuth` via `sequence()` — preserve order; `sveltekitCookies` must stay last in the plugins array. Env vars `DATABASE_URL`, `ORIGIN`, `BETTER_AUTH_SECRET` are declared in `src/env.ts` (all required). `ORIGIN` — not `BETTER_AUTH_URL` — feeds Better Auth's `baseURL`; a missing/empty value fails startup validation. `drizzle.config.ts` throws if `DATABASE_URL` is missing (local default `file:local.db` in `.env`).
 - DB commands: `bun run db:push` (schema push), `bun run db:generate`, `bun run db:migrate`, `bun run db:studio`. `bun run auth:schema` regenerates `src/lib/server/db/auth.schema.ts` — run after changing Better Auth config.
 - **Admin dashboard** (`/dashboard/*`): runes singleton `admin` in `src/lib/admin/state.svelte.ts`, seed data in `src/lib/admin/data.ts`. Data is **in-memory only** — no DB persistence. `ref/index.html` is the Bag Store prototype being converted; don't treat it as source of truth.
 - Public storefront is `src/routes/+page.svelte`; demo routes under `src/routes/demo/` (Paraglide + Better Auth demos) — `DemoLinks` in root layout only renders on `/demo` paths.
@@ -41,4 +41,4 @@ There is **no test runner and no CI**. Verification only on user request (see De
 
 ## Browser testing
 
-Playwright was removed from this project by user request — do not install, configure or suggest it. Verify UI work via the dev server (curl spot checks); run `bun run check` / `bun run build` only on user request (see Dev speed).
+Playwright was removed from this project by user request — do not install, configure or suggest it. Don't start the dev server or run checks on your own; only when the user explicitly asks (see Dev speed).

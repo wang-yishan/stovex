@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { Path } from '$app/types';
 	import Topbar from '#lib/admin/components/Topbar.svelte';
 	import PageStatusBadge from '#lib/admin/components/PageStatusBadge.svelte';
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { Archive, Copy, Ellipsis, Home, Plus, Search, Trash2 } from '@lucide/svelte';
+	import { resolvePath } from '#lib/admin/paths.ts';
 
 	let search = $state('');
 	let typeFilter = $state<'all' | 'homepage' | 'campaign'>('all');
@@ -41,10 +41,10 @@
 	mobileSubtitle="Manage landing pages"
 >
 	{#snippet actions()}
-		<a href={resolve('/dashboard/storefront' as Path)} class="h-10 sm:h-8 rounded-full border bg-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:border-[#242424] transition" style="border-color: var(--border);">
+		<a href={resolve('/dashboard/storefront')} class="h-10 sm:h-8 rounded-full border bg-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:border-[#242424] transition" style="border-color: var(--border);">
 			<Ellipsis class="h-4 w-4 shrink-0" /> Storefront
 		</a>
-		<a href={resolve('/dashboard/pages/new' as Path)} class="h-10 sm:h-8 rounded-full bg-[#343434] text-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:bg-[#242424] transition">
+		<a href={resolve('/dashboard/pages/new')} class="h-10 sm:h-8 rounded-full bg-[#343434] text-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:bg-[#242424] transition">
 			<Plus class="h-4 w-4 shrink-0" /> New Page
 		</a>
 	{/snippet}
@@ -93,14 +93,14 @@
 			<div class="py-12 text-center px-6">
 				<h3 class="text-[14px] font-semibold">No pages match</h3>
 				<p class="text-[12px] text-[#777] mt-1">Adjust search or filters, or create a page.</p>
-				<a href={resolve('/dashboard/pages/new' as Path)} class="mt-4 h-9 rounded-full bg-[#242424] text-white px-5 text-[12px] inline-flex items-center">Create page</a>
+				<a href={resolve('/dashboard/pages/new')} class="mt-4 h-9 rounded-full bg-[#242424] text-white px-5 text-[12px] inline-flex items-center">Create page</a>
 			</div>
 		{:else}
 			<div class="divide-y" style="border-color: var(--border);">
 				{#each filtered as p (p.id)}
 					<div class="p-4 flex flex-col md:flex-row md:items-center gap-3">
 						<div class="flex-1 min-w-0">
-							<a href={resolve(`/dashboard/pages/${p.id}` as Path)} class="text-[14px] font-medium hover:underline text-left">{p.title}</a>
+							<a href={resolvePath(`/dashboard/pages/${p.id}`)} class="text-[14px] font-medium hover:underline text-left">{p.title}</a>
 							<div class="text-[11px] text-[#777] mt-0.5 mono">/{p.slug} • {p.sections.length} sections • updated {fmtDate(p.updatedAt)}</div>
 							<div class="flex flex-wrap gap-1.5 mt-2">
 								<span class="text-[10px] px-2 py-0.5 rounded-full border bg-[#F5F5F4]" style="border-color: var(--border);">{p.type}</span>
@@ -111,8 +111,8 @@
 							</div>
 						</div>
 						<div class="flex flex-wrap gap-1.5">
-							<a href={resolve(`/dashboard/pages/${p.id}` as Path)} class="h-8 px-3 rounded-full border bg-white text-[11px] font-medium inline-flex items-center" style="border-color: var(--border);">View</a>
-							<a href={resolve(`/dashboard/pages/${p.id}/edit` as Path)} class="h-8 px-3 rounded-full border bg-white text-[11px] font-medium inline-flex items-center" style="border-color: var(--border);">Edit</a>
+							<a href={resolvePath(`/dashboard/pages/${p.id}`)} class="h-8 px-3 rounded-full border bg-white text-[11px] font-medium inline-flex items-center" style="border-color: var(--border);">View</a>
+							<a href={resolvePath(`/dashboard/pages/${p.id}/edit`)} class="h-8 px-3 rounded-full border bg-white text-[11px] font-medium inline-flex items-center" style="border-color: var(--border);">Edit</a>
 							{#if !p.isHomepage}
 								<button type="button" onclick={() => admin.setHomepage(p.id)} class="h-8 px-3 rounded-full border bg-white text-[11px] font-medium inline-flex items-center gap-1" style="border-color: var(--border);">
 									<Home class="h-3.5 w-3.5 inline" /> Set homepage

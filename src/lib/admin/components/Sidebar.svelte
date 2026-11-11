@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { resolve } from '$app/paths';
-	import type { Path } from '$app/types';
+	import { resolvePath } from '#lib/admin/paths.ts';
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { NAV_SECTIONS, ROUTE_BY_NAV_ID, navIdFromPath } from '#lib/admin/navSections.ts';
 	import { ChevronDown, PanelLeftClose, PanelLeftOpen, ShoppingBag } from '@lucide/svelte';
@@ -9,7 +8,7 @@
 	let collapsed = $derived(admin.sidebarCollapsed);
 	let activeId = $derived(navIdFromPath(page.url.pathname));
 
-	const routeHref = (id: keyof typeof ROUTE_BY_NAV_ID): string => resolve(ROUTE_BY_NAV_ID[id] as Path);
+	const routeHref = (id: keyof typeof ROUTE_BY_NAV_ID): string => resolvePath(ROUTE_BY_NAV_ID[id]);
 </script>
 
 <!--

@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import ThemeToggle from '#lib/admin/components/ThemeToggle.svelte';
-	import type { Path } from '$app/types';
 	import type { Snippet } from 'svelte';
+	import { resolvePath } from '#lib/admin/paths.ts';
 
 	let {
 		crumbs,
@@ -42,7 +41,7 @@
 							<span class="opacity-60 shrink-0">/</span>
 						{/if}
 						{#if crumb.href}
-							<a href={resolve(crumb.href as Path)} class="hover:text-[#242424] hover:underline shrink-0">
+							<a href={resolvePath(crumb.href)} class="hover:text-[#242424] hover:underline shrink-0">
 								{crumb.label}
 							</a>
 						{:else}

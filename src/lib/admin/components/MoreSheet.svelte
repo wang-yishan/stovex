@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { resolve } from '$app/paths';
-	import type { Path } from '$app/types';
+	import { resolvePath } from '#lib/admin/paths.ts';
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { NAV_SECTIONS, ROUTE_BY_NAV_ID, navIdFromPath } from '#lib/admin/navSections.ts';
 	import { X } from '@lucide/svelte';
@@ -14,7 +13,7 @@
 
 	const go = (id: keyof typeof ROUTE_BY_NAV_ID): void => {
 		admin.toggleMoreSheet(false);
-		goto(resolve(ROUTE_BY_NAV_ID[id] as Path));
+		goto(resolvePath(ROUTE_BY_NAV_ID[id]));
 	};
 </script>
 

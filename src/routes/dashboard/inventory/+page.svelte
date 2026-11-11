@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { innerWidth } from 'svelte/reactivity/window';
-	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
-	import type { Path } from '$app/types';
 	import Topbar from '#lib/admin/components/Topbar.svelte';
 	import SearchInput from '#lib/admin/components/SearchInput.svelte';
 	import StockBadge from '#lib/admin/components/StockBadge.svelte';
@@ -11,6 +9,7 @@
 	import { stockStatus } from '#lib/admin/data.ts';
 	import type { StockLevel } from '#lib/admin/types.ts';
 	import { Eye, PenLine, TriangleAlert } from '@lucide/svelte';
+	import { resolvePath } from '#lib/admin/paths.ts';
 
 	const isMobile = $derived((innerWidth.current ?? 1024) < 768);
 
@@ -193,7 +192,7 @@
 								<td class="px-5 py-3 text-[11px] text-[#777]">{new Date(r.updatedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}</td>
 								<td class="px-5 py-3 text-right">
 									<div class="flex justify-end gap-1">
-										<button type="button" class="flex h-7 w-7 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]" style="border-color: var(--border);" onclick={() => void goto(resolve(`/dashboard/products/${r.productId}` as Path))} aria-label="View product"><Eye class="h-3.5 w-3.5 text-[#777]" /></button>
+										<button type="button" class="flex h-7 w-7 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]" style="border-color: var(--border);" onclick={() => void goto(resolvePath(`/dashboard/products/${r.productId}`))} aria-label="View product"><Eye class="h-3.5 w-3.5 text-[#777]" /></button>
 										<button type="button" class="h-8 px-2.5 rounded-full border bg-white text-[12px] font-medium flex items-center gap-1" style="border-color: var(--border);" onclick={() => openAdjust(r)}><PenLine class="h-4 w-4 shrink-0" /> Adjust</button>
 									</div>
 								</td>

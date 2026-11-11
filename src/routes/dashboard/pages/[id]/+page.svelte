@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import type { Path } from '$app/types';
 	import Topbar from '#lib/admin/components/Topbar.svelte';
 	import PageStatusBadge from '#lib/admin/components/PageStatusBadge.svelte';
 	import SectionRenderer from '#lib/admin/components/SectionRenderer.svelte';
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { ArrowLeft, History, PenLine } from '@lucide/svelte';
 	import type { PageProps } from './$types';
+	import { resolvePath } from '#lib/admin/paths.ts';
 
 	let { params }: PageProps = $props();
 	let page = $derived(admin.pages.find((p) => p.id === params.id));
@@ -21,7 +21,7 @@
 		// unknown id → back to list
 		if (!page) {
 			// avoid flash loop on first paint when navigating; goto list.
-			void goto(resolve('/dashboard/pages' as Path));
+			void goto(resolve('/dashboard/pages'));
 		}
 	});
 
@@ -41,8 +41,8 @@
 >
 	{#snippet actions()}
 		{#if page}
-			<button type="button" onclick={() => void goto(resolve('/dashboard/pages' as Path))} class="h-10 w-10 sm:h-8 sm:w-8 rounded-full border bg-white flex items-center justify-center shrink-0" style="border-color: var(--border);" aria-label="Back to pages"><ArrowLeft class="h-4 w-4" /></button>
-			<a href={resolve(`/dashboard/pages/${page.id}/edit` as Path)} class="h-10 sm:h-8 rounded-full bg-[#343434] text-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:bg-[#242424] transition whitespace-nowrap shrink-0"><PenLine class="h-4 w-4 shrink-0" /> Edit</a>
+			<button type="button" onclick={() => void goto(resolve('/dashboard/pages'))} class="h-10 w-10 sm:h-8 sm:w-8 rounded-full border bg-white flex items-center justify-center shrink-0" style="border-color: var(--border);" aria-label="Back to pages"><ArrowLeft class="h-4 w-4" /></button>
+			<a href={resolvePath(`/dashboard/pages/${page.id}/edit`)} class="h-10 sm:h-8 rounded-full bg-[#343434] text-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:bg-[#242424] transition whitespace-nowrap shrink-0"><PenLine class="h-4 w-4 shrink-0" /> Edit</a>
 		{/if}
 	{/snippet}
 </Topbar>
@@ -58,7 +58,7 @@
 			<div class="w-full sm:w-auto sm:ml-auto grid grid-cols-3 sm:flex gap-2">
 				<button type="button" onclick={() => admin.duplicatePage(page!.id)} class="h-10 sm:h-8 px-2 sm:px-3 rounded-full border bg-white text-[12px] font-medium whitespace-nowrap" style="border-color: var(--border);">Duplicate</button>
 				<button type="button" onclick={() => admin.archivePage(page!.id)} class="h-10 sm:h-8 px-2 sm:px-3 rounded-full border bg-white text-[12px] font-medium whitespace-nowrap" style="border-color: var(--border);">Archive</button>
-				<a href={resolve(`/dashboard/pages/${page.id}/edit` as Path)} class="h-10 sm:h-8 rounded-full bg-[#343434] text-white px-2 sm:px-4 text-[12px] font-medium flex items-center justify-center gap-1.5 whitespace-nowrap"><PenLine class="h-4 w-4 shrink-0" /> Edit</a>
+				<a href={resolvePath(`/dashboard/pages/${page.id}/edit`)} class="h-10 sm:h-8 rounded-full bg-[#343434] text-white px-2 sm:px-4 text-[12px] font-medium flex items-center justify-center gap-1.5 whitespace-nowrap"><PenLine class="h-4 w-4 shrink-0" /> Edit</a>
 			</div>
 		</div>
 

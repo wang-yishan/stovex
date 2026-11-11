@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import type { Path } from '$app/types';
+	import { resolvePath } from '#lib/admin/paths.ts';
 	import {
 		Box,
 		ChevronDown,
@@ -355,7 +355,7 @@
 		};
 		admin.upsertProduct(toSave);
 		const target = mode === 'create' ? '/dashboard/products' : `/dashboard/products/${draft.id}`;
-		await goto(resolve(target as Path));
+		await goto(resolvePath(target));
 	}
 
 	/* --- Dirty guard --- */
@@ -376,7 +376,7 @@
 		dirty = false;
 		initialJson = JSON.stringify(draft);
 		guardOpen = false;
-		if (pendingTo) await goto(pendingTo as Path);
+		if (pendingTo) await goto(pendingTo);
 	}
 </script>
 
@@ -398,7 +398,7 @@
 <div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8 py-4 md:py-6 pb-[120px] md:pb-6">
 	<div class="flex items-center gap-2 mb-4">
 		<a
-			href={resolve('/dashboard/products' as Path)}
+			href={resolve('/dashboard/products')}
 			class="h-10 w-10 shrink-0 rounded-full border bg-white flex items-center justify-center hover:border-[#242424] transition"
 			style="border-color: var(--border);"
 			aria-label="Back to products"

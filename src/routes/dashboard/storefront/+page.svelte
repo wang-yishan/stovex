@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
-	import type { Path } from '$app/types';
 	import Topbar from '#lib/admin/components/Topbar.svelte';
 	import SectionRenderer from '#lib/admin/components/SectionRenderer.svelte';
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { effectiveStock, formatIDR, stockStatus, waLink } from '#lib/admin/data.ts';
 	import { MessageCircle, PenLine, Search, ShoppingBag } from '@lucide/svelte';
+	import { resolvePath } from '#lib/admin/paths.ts';
 
 	// Default: published homepage, else first published, else first page.
 	const defaultId =
@@ -79,7 +78,7 @@
 >
 	{#snippet actions()}
 		{#if selectedPage}
-			<button type="button" onclick={() => void goto(resolve(`/dashboard/pages/${selectedPage!.id}/edit` as Path))} class="h-10 sm:h-8 rounded-full border bg-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:border-[#242424] transition" style="border-color: var(--border);">
+			<button type="button" onclick={() => void goto(resolvePath(`/dashboard/pages/${selectedPage!.id}/edit`))} class="h-10 sm:h-8 rounded-full border bg-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:border-[#242424] transition" style="border-color: var(--border);">
 				<PenLine class="h-4 w-4 shrink-0" /> Edit page
 			</button>
 		{/if}

@@ -1,6 +1,12 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/jetbrains-mono';
+@import '@fontsource-variable/dm-sans';
+@import '@fontsource-variable/playfair-display';
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 /* Class-based dark mode (mode-watcher toggles .dark on <html>) */
 @custom-variant dark (&:where(.dark, .dark *));
 @import './admin.css';
+@import './storefront.css';

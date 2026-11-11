@@ -1,406 +1,353 @@
 <script lang="ts">
 	import { admin } from '#lib/admin/state.svelte.ts';
-	import {
-		formatIDR,
-		effectiveStock,
-		stockStatus,
-		waLink as settingsWaLink
-	} from '#lib/admin/data.ts';
-	import SectionRenderer from '#lib/admin/components/SectionRenderer.svelte';
-	import {
-		ShoppingBag,
-		MessageCircle,
-		Copy,
-		ArrowRight,
-		LayoutDashboard
-	} from '@lucide/svelte';
+	import { effectiveStock, formatIDR, stockStatus } from '#lib/admin/data.ts';
+	import type { Product } from '#lib/admin/types.ts';
+	import { cart } from '#lib/catalog/cart.svelte.ts';
+	import { FALLBACK_PHOTOS } from '#lib/catalog/photos.ts';
+	import { generalWaLink } from '#lib/catalog/wa.ts';
+	import StoreHeader from '#lib/components/storefront/StoreHeader.svelte';
+	import StoreFooter from '#lib/components/storefront/StoreFooter.svelte';
+	import ProductCard from '#lib/components/storefront/ProductCard.svelte';
+	import { ArrowUpRight, MessageCircle } from '@lucide/svelte';
 
-	let { products, collections, categories } = admin;
+	/* ------------------------------------------------------------------ *
+	 * Data — live in-memory catalog owned by the admin dashboard.
+	 * ------------------------------------------------------------------ */
 
-	// Live homepage (Pages module) — published homepage wins; falls back to static sections below.
-	let homepage = $derived(
-		admin.pages.find((p) => p.isHomepage && p.status === 'published') ??
-			admin.pages.find((p) => p.status === 'published') ??
-			null
-	);
-	let homepageSections = $derived(
-		homepage ? [...homepage.sections].sort((a, b) => a.order - b.order) : []
-	);
+	let active = $derived(admin.products.filter((p) => p.status === 'active'));
 
-	let active = $derived(
-		products.filter((p) => p.status === 'active')
-	);
+	let activeFilter = $state('all');
 
-	let featured = $derived(
-		[...active]
-			.sort((a, b) => {
-				if (a.featured !== b.featured) return a.featured ? -1 : 1;
-				return b.updatedAt.localeCompare(a.updatedAt);
-			})
-			.slice(0, 8)
+	let filterPills = $derived([
+		{ id: 'all', name: 'Semua' },
+		...admin.categories.map((c) => ({ id: c.id, name: c.name }))
+	]);
+
+	let filtered = $derived(
+		activeFilter === 'all' ? active : active.filter((p) => p.categoryId === activeFilter)
 	);
 
 	let collectionCards = $derived(
-		[...collections]
+		[...admin.collections]
 			.sort((a, b) => a.order - b.order)
 			.map((c) => ({
 				...c,
-				count: c.productIds.filter((id) =>
-					active.some((p) => p.id === id)
-				).length
+				count: c.productIds.filter((id) => active.some((p) => p.id === id)).length
 			}))
 	);
 
-	let categoryPills = $derived(
-		categories.map((c) => ({
-			...c,
-			count: active.filter((p) => p.categoryId === c.id).length
-		}))
-	);
+	/* Fallback photography — the seeded catalog ships without image URLs. */
+	const FALLBACKS = FALLBACK_PHOTOS;
 
-	function copyMsg(name: string, sku: string | undefined, price: number, compareAt?: number) {
-		let msg = `Halo, saya tertarik dengan ${name} ${formatIDR(price)}`;
-		if (compareAt) msg += ` (was ${formatIDR(compareAt)})`;
-		if (sku) msg += `\nSKU: ${sku}`;
-		const el = document.createElement('textarea');
-		el.value = msg;
-		document.body.appendChild(el);
-		el.select();
-		document.execCommand('copy');
-		document.body.removeChild(el);
+	function isOut(p: Product): boolean {
+		const stock = effectiveStock(p);
+		return stockStatus(stock, p.lowStockThreshold || 5, p.trackInventory) === 'out';
 	}
-
-	function waLink(name: string, sku: string | undefined, price: number, compareAt?: number, stock = 0) {
-		const avail = stock > 0 ? `In stock (${stock})` : 'Out of stock';
-		let msg =
-			`Halo, saya tertarik dengan produk:\n${name}\n` +
-			`Harga: ${formatIDR(price)}` +
-			(compareAt ? ` (was ${formatIDR(compareAt)})` : '') +
-			`\nSKU: ${sku ?? '-'}` +
-			`\nAvailability: ${avail}\n`;
-		return 'https://wa.me/?text=' + encodeURIComponent(msg.trim());
-	}
-
-	void settingsWaLink;
 </script>
 
 <!--
 	@component
-	Storefront landing — reads live in-memory catalog, WhatsApp-enquiry CTAs, no cart.
+	FORMA storefront landing — live in-memory catalog, WhatsApp ordering, mini cart.
 -->
 
 <svelte:head>
-	<title>Bag Store — Everyday bags, honestly made</title>
+	<title>{admin.settings.defaultSeo.title}</title>
+	<meta name="description" content={admin.settings.defaultSeo.description} />
+	<meta name="theme-color" content="#fbfbfa" />
 </svelte:head>
 
-<div
-	class="store-root min-h-screen w-full flex flex-col"
-	style="background: var(--bg);"
->
-	<!-- Top bar -->
-	<header
-		class="sticky top-0 z-40 bg-[#F8F8F7]/80 backdrop-blur-xl border-b"
-		style="border-color: var(--border); padding-top: var(--safe-area-inset-top);"
-	>
-		<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8 h-[64px] flex items-center justify-between">
-			<a href="/" class="flex items-center gap-2.5">
-				<div class="h-9 w-9 bg-[#111] rounded-[6px] flex items-center justify-center shrink-0">
-					<ShoppingBag class="h-5 w-5 text-white" strokeWidth={1.5} />
-				</div>
-				<div>
-					<div class="text-[13px] font-bold tracking-[0.08em] leading-none text-[#242424]">
-						{admin.settings.logo}
-					</div>
-					<div class="text-[9px] text-[#777] tracking-wide mt-0.5">Storefront</div>
-				</div>
-			</a>
-			<nav class="hidden md:flex items-center gap-4 ml-4">
-				{#each admin.settings.headerLinks as link (link.id)}
-					<a href={link.href} class="text-[12px] text-[#777] hover:text-[#242424]">{link.label}</a>
-				{/each}
-			</nav>
-			<a
-				href="/dashboard"
-				class="h-10 rounded-full border bg-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:border-[#242424] transition"
-				style="border-color: var(--border);"
+<div class="forma-root min-h-screen w-full bg-[#FBFBFA] text-[#242424]">
+	<StoreHeader />
+
+	<main id="top">
+		<!-- Hero -->
+		<section class="mx-auto max-w-[1400px] px-5 pt-7 sm:px-8 sm:pt-10 lg:px-12">
+			<div
+				class="relative grid min-h-[540px] overflow-hidden bg-[#F5F3EF] sm:min-h-[610px] lg:grid-cols-[0.92fr_1.08fr]"
 			>
-				<LayoutDashboard class="h-4 w-4 shrink-0" />
-				<span class="hidden sm:inline">Admin dashboard</span>
-			</a>
-		</div>
-	</header>
-
-	<!-- Landing sections (Pages module homepage) — replaces static hero when published -->
-	{#if homepageSections.length > 0}
-		<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8 py-6 md:py-8 space-y-8">
-			{#each homepageSections as s (s.id)}
-				<SectionRenderer section={s} />
-			{/each}
-		</div>
-	{/if}
-	<!-- Hero (fallback — remove a published homepage to see this) -->
-	{#if homepageSections.length === 0}
-	<section
-		id="hero"
-		class="bg-[#F8F8F7] border-b"
-		style="border-color: var(--border);"
-	>
-		<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8 py-10 md:py-14">
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-				<div>
-					<span class="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#999]">
-						BAG STORE — NEW SEASON
-					</span>
-					<h1 class="text-[28px] sm:text-[36px] md:text-[40px] font-semibold tracking-tight text-[#242424] leading-tight mt-3">
-						Everyday bags, honestly&nbsp;made.
-					</h1>
-					<p class="text-[14px] text-[#777] mt-3 max-w-[420px] leading-relaxed">
-						IDR pricing • WhatsApp enquiries • No cart, no checkout.
+				<div
+					class="relative z-10 flex flex-col justify-center px-7 py-12 sm:px-12 lg:px-16 xl:px-20"
+				>
+					<p
+						class="mb-6 text-[10px] font-semibold tracking-[0.24em] text-[#D9534F] uppercase sm:text-xs"
+					>
+						The art of carrying well
 					</p>
-					<div class="flex gap-2 mt-6">
+					<h1
+						class="font-display max-w-xl text-[44px] leading-[1.08] tracking-[-0.035em] sm:text-6xl xl:text-[72px]"
+					>
+						Membawa gaya,<br /><em class="font-medium text-[#D9534F]">menjalani hari.</em>
+					</h1>
+					<p class="mt-7 max-w-md text-sm leading-7 text-[#77736E] sm:text-base">
+						Tas pilihan dengan desain yang tenang, detail yang dipikirkan, dan karakter yang
+						bertahan melampaui tren.
+					</p>
+					<div class="mt-9 flex flex-wrap items-center gap-5">
 						<a
-							href="#catalog"
-							class="h-10 md:h-9 rounded-full bg-[#343434] text-white px-5 text-[12px] font-medium flex items-center gap-1.5 hover:bg-[#242424] transition"
+							href="#koleksi"
+							class="inline-flex items-center gap-4 bg-[#242424] px-6 py-4 text-xs tracking-[0.12em] text-white uppercase transition hover:bg-[#D9534F]"
 						>
-							Browse bags
-							<ArrowRight class="h-4 w-4 shrink-0" />
+							Jelajahi koleksi
+							<ArrowUpRight class="h-4 w-4" strokeWidth={1.6} />
 						</a>
 						<a
-							href="/dashboard"
-							class="h-10 md:h-9 rounded-full border bg-white px-5 text-[12px] font-medium flex items-center hover:border-[#242424] transition"
-							style="border-color: var(--border);"
+							href="#cerita"
+							class="border-b border-[#242424]/40 pb-1 text-xs tracking-wide transition hover:border-[#D9534F] hover:text-[#D9534F]"
 						>
-							Open dashboard
+							Kenali Forma
 						</a>
 					</div>
-				</div>
-				<div class="hidden lg:grid grid-cols-3 gap-3">
-					{#each featured.slice(0, 3) as p (p.id)}
-						{@const primary = p.images.find((i) => i.isPrimary) ?? p.images[0]}
-						<div
-							class="aspect-[3/4] rounded-[10px] border flex items-center justify-center overflow-hidden bg-[#F0F0EF]"
-							style="border-color: var(--border);"
-						>
-							{#if primary?.url}
-								<img
-									src={primary.url}
-									alt={primary.alt ?? p.name}
-									class="h-full w-full object-cover"
-								/>
-							{:else}
-								<span class="text-[20px] font-bold text-[#999]">
-									{p.name.slice(0, 2).toUpperCase()}
-								</span>
-							{/if}
+					<div class="mt-14 flex max-w-md items-center gap-8 border-t border-black/10 pt-6">
+						<div>
+							<p class="font-display text-2xl">01</p>
+							<p class="mt-1 text-[10px] tracking-wider text-[#77736E] uppercase">
+								Thoughtful design
+							</p>
 						</div>
-					{/each}
+						<div>
+							<p class="font-display text-2xl">02</p>
+							<p class="mt-1 text-[10px] tracking-wider text-[#77736E] uppercase">
+								Everyday function
+							</p>
+						</div>
+						<div>
+							<p class="font-display text-2xl">03</p>
+							<p class="mt-1 text-[10px] tracking-wider text-[#77736E] uppercase">Timeless style</p>
+						</div>
+					</div>
+				</div>
+				<div class="relative min-h-[360px] overflow-hidden lg:min-h-full">
+					<img
+						class="absolute inset-0 h-full w-full object-cover"
+						src={FALLBACKS[3]}
+						alt="Tas kulit berwarna netral dengan desain elegan"
+					/>
+					<div
+						class="absolute right-6 bottom-6 max-w-[210px] bg-[#FBFBFA]/95 px-5 py-4 sm:right-9 sm:bottom-9"
+					>
+						<p class="text-[9px] tracking-[0.2em] text-[#77736E] uppercase">Curated essentials</p>
+						<p class="font-display mt-1 text-xl">Less, but better.</p>
+					</div>
 				</div>
 			</div>
-		</div>
-	</section>
-	{/if}
+		</section>
 
-	<!-- Featured bags -->
-	<section id="catalog" class="py-10 md:py-12">
-		<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8">
-			<div class="flex items-baseline justify-between mb-4">
-				<h2 class="text-[18px] font-semibold tracking-tight text-[#242424]">
-					Featured bags
-				</h2>
-				<span class="text-[12px] text-[#777]">{active.length} in store</span>
+		<!-- Trust strip -->
+		<section class="mx-auto max-w-[1400px] px-5 py-9 sm:px-8 sm:py-12 lg:px-12">
+			<div class="grid grid-cols-2 gap-x-4 gap-y-6 border-b border-[#EAE8E4] pb-9 md:grid-cols-4">
+				<div class="flex items-center gap-3">
+					<span class="text-xl text-[#D69A35]">✳</span>
+					<div>
+						<p class="text-xs font-semibold">Pilihan terkurasi</p>
+						<p class="mt-1 text-[11px] text-[#77736E]">Gaya yang relevan setiap hari</p>
+					</div>
+				</div>
+				<div class="flex items-center gap-3">
+					<span class="text-xl text-[#D69A35]">◇</span>
+					<div>
+						<p class="text-xs font-semibold">Detail fungsional</p>
+						<p class="mt-1 text-[11px] text-[#77736E]">Dirancang untuk digunakan</p>
+					</div>
+				</div>
+				<div class="flex items-center gap-3">
+					<span class="text-xl text-[#D69A35]">↗</span>
+					<div>
+						<p class="text-xs font-semibold">Belanja mudah</p>
+						<p class="mt-1 text-[11px] text-[#77736E]">Pesan langsung via WhatsApp</p>
+					</div>
+				</div>
+				<div class="flex items-center gap-3">
+					<span class="text-xl text-[#D69A35]">♡</span>
+					<div>
+						<p class="text-xs font-semibold">Layanan personal</p>
+						<p class="mt-1 text-[11px] text-[#77736E]">Kami siap membantu pilihanmu</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Collections -->
+		<section id="koleksi" class="mx-auto max-w-[1400px] px-5 py-10 sm:px-8 sm:py-14 lg:px-12">
+			<div class="mb-8 flex flex-col gap-5 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
+				<div>
+					<p class="mb-3 text-[10px] font-semibold tracking-[0.22em] text-[#D9534F] uppercase">
+						Find your everyday piece
+					</p>
+					<h2 class="font-display text-4xl tracking-tight sm:text-5xl">
+						Koleksi pilihan<span class="text-[#D9534F]">.</span>
+					</h2>
+					<p class="mt-3 text-sm text-[#77736E]">
+						Temukan bentuk yang paling sesuai dengan ritme harimu.
+					</p>
+				</div>
+				<a
+					href="#pilihan"
+					class="self-start border-b border-[#242424]/40 pb-1 text-xs hover:border-[#D9534F] hover:text-[#D9534F] sm:self-auto"
+				>
+					Lihat panduan memilih
+					<ArrowUpRight class="inline h-3.5 w-3.5 align-[-2px]" strokeWidth={1.6} />
+				</a>
 			</div>
 
-			{#if featured.length === 0}
-				<p class="text-[13px] text-[#777]">No active products yet — open the dashboard to publish one.</p>
+			<div class="mb-7 flex gap-2 overflow-x-auto pb-2" role="group" aria-label="Filter kategori">
+				{#each filterPills as pill (pill.id)}
+					<button
+						type="button"
+						class="shrink-0 rounded-full border border-[#EAE8E4] px-5 py-2.5 text-xs transition hover:border-[#242424] {activeFilter ===
+						pill.id
+							? 'border-[#242424] bg-[#242424] text-white'
+							: 'bg-transparent text-[#242424]'}"
+						onclick={() => (activeFilter = pill.id)}
+					>
+						{pill.name}
+					</button>
+				{/each}
+			</div>
+
+			{#if filtered.length === 0}
+				<p class="py-10 text-center text-sm text-[#77736E]">
+					Belum ada produk pada kategori ini. Silakan cek kembali nanti.
+				</p>
 			{:else}
-				<div class="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-					{#each featured as p (p.id)}
-						{@const primary = p.images.find((i) => i.isPrimary) ?? p.images[0]}
-						{@const stock = effectiveStock(p)}
-						{@const st = stockStatus(stock, p.lowStockThreshold || 5, p.trackInventory)}
-						{@const compare = p.compareAtPrice}
-						<article
-							class="bg-white border rounded-[12px] overflow-hidden flex flex-col"
-							style="border-color: var(--border);"
-						>
-							<div class="relative">
-								<div
-									class="aspect-[4/3] bg-[#F0F0EF] flex items-center justify-center overflow-hidden"
-								>
-									{#if primary?.url}
-										<img
-											src={primary.url}
-											alt={primary.alt ?? p.name}
-											class="h-full w-full object-cover"
-										/>
-									{:else}
-										<span class="text-[24px] font-bold text-[#999]">
-											{p.name.slice(0, 2).toUpperCase()}
-										</span>
-									{/if}
-								</div>
-								{#if p.featured}
-									<span
-										class="absolute top-2 left-2 text-[9px] px-1.5 py-0.5 rounded-full bg-[#FFF8E6] border text-[#8A6A24] font-medium"
-										style="border-color: #F3D9A0;"
-									>
-										Featured
-									</span>
-								{/if}
-								{#if st === 'out'}
-									<span
-										class="absolute top-2 right-2 text-[9px] px-1.5 py-0.5 rounded-full bg-[#FFF0F0] border text-[#A33A37] font-medium"
-										style="border-color: #F2C2C0;"
-									>
-										Out of stock
-									</span>
-								{/if}
-							</div>
-							<div class="p-3 flex flex-col gap-1 flex-1">
-								<h3 class="text-[13px] font-medium text-[#242424] leading-tight">
-									{p.name}
-								</h3>
-								{#if p.shortDescription}
-									<p class="text-[11px] text-[#777] line-clamp-2">{p.shortDescription}</p>
-								{/if}
-								<div class="flex items-baseline gap-1.5">
-									<span class="text-[13px] font-semibold text-[#242424]">
-										{formatIDR(p.basePrice)}
-									</span>
-									{#if compare}
-										<span class="text-[10px] text-[#999] line-through">
-											{formatIDR(compare)}
-										</span>
-									{/if}
-								</div>
-								<div class="flex gap-1.5 mt-auto pt-2">
-									<a
-										href={waLink(p.name, p.sku, p.basePrice, p.compareAtPrice, stock)}
-										target="_blank"
-										rel="noopener"
-										class="flex-1 h-10 rounded-full bg-[#343434] text-white text-[12px] font-medium flex items-center justify-center gap-1.5 hover:bg-[#242424] transition"
-									>
-										<MessageCircle class="h-4 w-4 shrink-0" />
-										Enquire via WhatsApp
-									</a>
-									<button
-										type="button"
-										class="h-10 w-10 shrink-0 rounded-full border bg-white flex items-center justify-center hover:border-[#242424] transition"
-										style="border-color: var(--border);"
-										onclick={() => copyMsg(p.name, p.sku, p.basePrice, p.compareAtPrice)}
-										aria-label="Copy WhatsApp message"
-									>
-										<Copy class="h-4 w-4 text-[#777]" />
-									</button>
-								</div>
-							</div>
-						</article>
+				<div class="grid grid-cols-2 gap-x-3 gap-y-9 sm:gap-x-5 sm:gap-y-12 lg:grid-cols-4">
+					{#each filtered as p, i (p.id)}
+						<ProductCard product={p} index={i} />
 					{/each}
 				</div>
 			{/if}
-		</div>
-	</section>
+			<p class="mt-8 text-center text-[10px] text-[#77736E]">
+				*Katalog, harga, dan foto mengikuti data yang aktif di dashboard.
+			</p>
+		</section>
 
-	<!-- Collections -->
-	{#if collectionCards.length > 0}
-		<section class="py-8 md:py-10">
-			<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8">
-				<h2 class="text-[18px] font-semibold tracking-tight text-[#242424] mb-4">
-					Shop by collection
-				</h2>
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-					{#each collectionCards as c (c.id)}
-						<div
-							class="bg-white border rounded-[12px] p-4 flex items-center gap-3"
-							style="border-color: var(--border);"
+		<!-- Editorial split -->
+		<section id="cerita" class="mx-auto max-w-[1400px] px-5 py-14 sm:px-8 sm:py-20 lg:px-12">
+			<div class="grid bg-[#F2F0EC] lg:grid-cols-2">
+				<div class="min-h-[360px] overflow-hidden sm:min-h-[500px]">
+					<img
+						class="h-full w-full object-cover"
+						src={FALLBACKS[4]}
+						alt="Detail tas dengan material dan bentuk yang elegan"
+						loading="lazy"
+					/>
+				</div>
+				<div class="flex flex-col justify-center px-8 py-12 sm:px-14 lg:px-16 xl:px-20">
+					<p class="mb-5 text-[10px] font-semibold tracking-[0.22em] text-[#D9534F] uppercase">
+						Our point of view
+					</p>
+					<h2 class="font-display text-4xl leading-[1.12] sm:text-5xl">
+						Bukan sekadar<br />pelengkap penampilan.
+					</h2>
+					<p class="mt-6 max-w-lg text-sm leading-7 text-[#77736E]">
+						Kami percaya tas yang baik seharusnya terasa tepat—mudah dipadukan, nyaman digunakan,
+						dan cukup istimewa untuk menemani banyak cerita. Karena itu, setiap pilihan di Forma
+						mengutamakan siluet yang bersih dan fungsi sehari-hari.
+					</p>
+					<a
+						href="#koleksi"
+						class="mt-8 inline-flex items-center gap-4 self-start border-b border-[#242424]/40 pb-3 text-xs tracking-[0.12em] uppercase transition hover:border-[#D9534F] hover:text-[#D9534F]"
+					>
+						Temukan koleksimu
+						<ArrowUpRight class="h-4 w-4" strokeWidth={1.6} />
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<!-- Collection editorial cards -->
+		<section id="pilihan" class="mx-auto max-w-[1400px] px-5 py-10 sm:px-8 sm:py-14 lg:px-12">
+			<div class="mx-auto mb-10 max-w-xl text-center">
+				<p class="mb-3 text-[10px] font-semibold tracking-[0.22em] text-[#D9534F] uppercase">
+					Made for your rhythm
+				</p>
+				<h2 class="font-display text-4xl sm:text-5xl">Satu tas, banyak cerita.</h2>
+				<p class="mt-4 text-sm leading-6 text-[#77736E]">
+					Mulai dari hari kerja yang padat hingga akhir pekan yang santai.
+				</p>
+			</div>
+
+			{#if collectionCards.length > 0}
+				<div class="grid gap-4 sm:gap-5 md:grid-cols-3">
+					{#each collectionCards as c, i (c.id)}
+						<a
+							href="#koleksi"
+							class="group relative h-[330px] overflow-hidden bg-[#F5F3EF] sm:h-[410px]"
 						>
-							<div class="h-12 w-12 rounded-[8px] bg-[#F0F0EF] border flex items-center justify-center shrink-0" style="border-color: var(--border);">
-								<span class="text-[10px] font-bold text-[#999]">
-									{c.name.slice(0, 2).toUpperCase()}
-								</span>
-							</div>
-							<div class="flex-1 min-w-0">
-								<h3 class="text-[13px] font-medium text-[#242424]">{c.name}</h3>
-								{#if c.description}
-									<p class="text-[11px] text-[#777] truncate">{c.description}</p>
-								{/if}
-								<p class="text-[11px] text-[#777] mt-1">
-									{c.count} active {c.count === 1 ? 'product' : 'products'}
+							<img
+								class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+								src={c.coverImage || FALLBACKS[(i + 1) % FALLBACKS.length]}
+								alt={c.name}
+								loading="lazy"
+							/>
+							<div
+								class="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent"
+							></div>
+							<div class="absolute bottom-6 left-6 text-white">
+								<p class="text-[9px] tracking-[0.2em] uppercase">
+									0{i + 1} / {c.count}
+									{c.count === 1 ? 'item' : 'items'}
 								</p>
+								<h3 class="font-display mt-1 text-2xl">{c.name}</h3>
 							</div>
-						</div>
+						</a>
 					{/each}
 				</div>
-			</div>
-		</section>
-	{/if}
-
-	<!-- Categories -->
-	{#if categoryPills.length > 0}
-		<section class="py-8 md:py-10">
-			<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8">
-				<h2 class="text-[18px] font-semibold tracking-tight text-[#242424] mb-4">
-					Browse by category
-				</h2>
-				<div class="flex flex-wrap gap-2">
-					{#each categoryPills as c (c.id)}
-						<span
-							class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border bg-white text-[12px] font-medium"
-							style="border-color: var(--border);"
+			{:else}
+				<div class="grid gap-4 sm:gap-5 md:grid-cols-3">
+					{#each [{ k: '01 / Everyday', t: 'Daily essentials' }, { k: '02 / Workday', t: 'Work, reimagined' }, { k: '03 / Weekend', t: 'Off-duty mood' }] as card, i (card.t)}
+						<a
+							href="#koleksi"
+							class="group relative h-[330px] overflow-hidden bg-[#F5F3EF] sm:h-[410px]"
 						>
-							{c.name}
-							<span class="text-[#777]">({c.count})</span>
-						</span>
+							<img
+								class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+								src={FALLBACKS[(i + 1) % FALLBACKS.length]}
+								alt={card.t}
+								loading="lazy"
+							/>
+							<div
+								class="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent"
+							></div>
+							<div class="absolute bottom-6 left-6 text-white">
+								<p class="text-[9px] tracking-[0.2em] uppercase">{card.k}</p>
+								<h3 class="font-display mt-1 text-2xl">{card.t}</h3>
+							</div>
+						</a>
 					{/each}
 				</div>
+			{/if}
+		</section>
+
+		<!-- CTA -->
+		<section class="mx-auto max-w-[1400px] px-5 py-16 sm:px-8 sm:py-24 lg:px-12">
+			<div
+				class="relative overflow-hidden bg-[#242424] px-7 py-14 text-center text-white sm:px-14 sm:py-16"
+			>
+				<div class="absolute -top-20 -right-10 h-64 w-64 rounded-full border border-white/10"></div>
+				<div
+					class="absolute -bottom-36 -left-12 h-80 w-80 rounded-full border border-white/10"
+				></div>
+				<p class="relative text-[10px] font-semibold tracking-[0.24em] text-[#D69A35] uppercase">
+					A better everyday starts here
+				</p>
+				<h2 class="font-display relative mt-4 text-4xl sm:text-5xl">
+					Temukan tas yang terasa seperti kamu.
+				</h2>
+				<p class="relative mt-4 text-sm text-white/60">
+					Butuh bantuan memilih? Ceritakan kebutuhanmu kepada tim kami.
+				</p>
+				<a
+					href={generalWaLink('Halo Forma, saya ingin bertanya tentang koleksi tas.')}
+					target="_blank"
+					rel="noopener"
+					class="relative mt-8 inline-flex items-center gap-2 bg-[#FBFBFA] px-7 py-4 text-xs tracking-[0.12em] text-[#242424] uppercase transition hover:bg-[#D9534F] hover:text-white"
+				>
+					<MessageCircle class="h-4 w-4" strokeWidth={1.6} />
+					Hubungi via WhatsApp
+				</a>
 			</div>
 		</section>
-	{/if}
+	</main>
 
-	<!-- Trusted strip -->
-	<section class="py-8 md:py-10 bg-white border-t" style="border-color: var(--border);">
-		<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8">
-			<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-				<div>
-					<h3 class="text-[13px] font-medium text-[#242424]">Live inventory</h3>
-					<p class="text-[11px] text-[#777] mt-1">
-						Reflects live dashboard stock in real time.
-					</p>
-				</div>
-				<div>
-					<h3 class="text-[13px] font-medium text-[#242424]">Movement-logged stock</h3>
-					<p class="text-[11px] text-[#777] mt-1">
-						Every adjustment is traceable.
-					</p>
-				</div>
-				<div>
-					<h3 class="text-[13px] font-medium text-[#242424]">Enquiry-first sales</h3>
-					<p class="text-[11px] text-[#777] mt-1">
-						No cart, no checkout — direct WhatsApp inquiries.
-					</p>
-				</div>
-			</div>
-		</div>
-	</section>
-
-	<!-- Footer -->
-	<footer class="py-8 md:py-10 border-t" style="border-color: var(--border);">
-		<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-			<div class="flex items-center gap-2.5">
-				<div class="h-7 w-7 bg-[#111] rounded-[6px] flex items-center justify-center shrink-0">
-					<ShoppingBag class="h-4 w-4 text-white" strokeWidth={1.5} />
-				</div>
-				<div>
-					<div class="text-[12px] font-bold tracking-[0.08em] text-[#242424]">{admin.settings.logo}</div>
-					<div class="text-[10px] text-[#777]">{admin.settings.footerText}</div>
-				</div>
-			</div>
-			<div class="flex items-center gap-3">
-				<a href="/dashboard" class="text-[12px] text-[#777] hover:text-[#242424]">
-					Admin dashboard
-				</a>
-				<span class="text-[11px] text-[#999]">In-memory demo catalog</span>
-			</div>
-		</div>
-	</footer>
+	<StoreFooter base="" />
 </div>

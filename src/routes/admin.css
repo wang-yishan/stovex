@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-
 /*
 	Bag Store chrome (converted from ref/index.html):
 	- design tokens (ref :root variables)
@@ -25,12 +23,19 @@
 
 .admin-root *,
 .store-root * {
-	font-family: 'Inter', 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family:
+		'Inter Variable',
+		'Inter',
+		'Geist Variable',
+		'Geist',
+		-apple-system,
+		BlinkMacSystemFont,
+		sans-serif;
 }
 
 .admin-root .mono,
 .store-root .mono {
-	font-family: 'JetBrains Mono', monospace;
+	font-family: 'JetBrains Mono Variable', 'JetBrains Mono', monospace;
 }
 
 /* Arbitrary color classes (e.g. border-[#242424]) still win over this base rule. */

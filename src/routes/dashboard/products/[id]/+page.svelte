@@ -7,9 +7,9 @@
 	import { effectiveStock, formatIDR, stockStatus } from '#lib/admin/data.ts';
 	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
-	import type { Path } from '$app/types';
 	import type { PageProps } from './$types';
 	import { Archive, Copy, Ellipsis, PenLine, Star, Trash2 } from '@lucide/svelte';
+	import { resolvePath } from '#lib/admin/paths.ts';
 
 	let { params }: PageProps = $props();
 	let product = $derived(admin.products.find((p) => p.id === params.id));
@@ -17,7 +17,7 @@
 	let selectedImage = $state<string | undefined>(undefined);
 	$effect(() => {
 		if (!product) {
-			void goto(resolve('/dashboard/products' as Path));
+			void goto(resolve('/dashboard/products'));
 			return;
 		}
 		if (!selectedImage) {
@@ -57,7 +57,7 @@
 	{#snippet actions()}
 		{#if product}
 			<a
-				href={resolve(`/dashboard/products/${product.id}/edit` as Path)}
+				href={resolvePath(`/dashboard/products/${product.id}/edit`)}
 				class="h-10 sm:h-8 rounded-full bg-[#343434] text-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:bg-[#242424] transition"
 			>
 				<PenLine class="h-4 w-4 shrink-0" /> Edit
@@ -253,7 +253,7 @@
 			confirmLabel="Delete"
 			danger
 			requireArm
-			onconfirm={() => { admin.deleteProducts([product.id]); admin.showToast('Product deleted', 'success'); void goto(resolve('/dashboard/products' as Path)); }}
+			onconfirm={() => { admin.deleteProducts([product.id]); admin.showToast('Product deleted', 'success'); void goto(resolve('/dashboard/products')); }}
 			oncancel={() => (deleteOpen = false)}
 		/>
 	{/if}

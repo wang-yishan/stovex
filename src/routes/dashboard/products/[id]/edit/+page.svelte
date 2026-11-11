@@ -4,15 +4,15 @@
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
-	import type { Path } from '$app/types';
 	import type { PageProps } from './$types';
+	import { resolvePath } from '#lib/admin/paths.ts';
 
 	let { params }: PageProps = $props();
 	let product = $derived(admin.products.find((p) => p.id === params.id));
 
 	$effect(() => {
 		if (!product) {
-			void goto(resolve('/dashboard/products' as Path));
+			void goto(resolve('/dashboard/products'));
 		}
 	});
 </script>
@@ -32,7 +32,7 @@
 					product && admin.products.some((p) => p.id === product.id)
 						? `/dashboard/products/${product.id}`
 						: '/dashboard/products';
-				void goto(resolve(to as Path));
+				void goto(resolvePath(to));
 			}}
 		>
 			Cancel

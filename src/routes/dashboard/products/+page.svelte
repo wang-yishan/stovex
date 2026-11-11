@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { Path } from '$app/types';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { innerWidth } from 'svelte/reactivity/window';
 	import Topbar from '#lib/admin/components/Topbar.svelte';
@@ -30,6 +29,7 @@
 		TriangleAlert,
 		Trash2
 	} from '@lucide/svelte';
+	import { resolvePath } from '#lib/admin/paths.ts';
 
 	const isMobile = $derived((innerWidth.current ?? 1024) < 768);
 
@@ -183,7 +183,7 @@
 			><span class="sm:hidden">{storefrontPreview ? 'Exit' : 'Preview'}</span>
 		</button>
 		<a
-			href={resolve('/dashboard/products/new' as Path)}
+			href={resolve('/dashboard/products/new')}
 			class="flex h-10 items-center gap-1.5 rounded-full bg-[#343434] px-3 text-[12px] font-medium text-white transition hover:bg-[#242424] sm:h-8 sm:px-4"
 		>
 			<Plus class="h-4 w-4 shrink-0" />
@@ -367,7 +367,7 @@
 					No products yet. Add your first bag to start managing catalog with full spec.
 				</p>
 				<a
-					href={resolve('/dashboard/products/new' as Path)}
+					href={resolve('/dashboard/products/new')}
 					class="mt-4 inline-flex h-10 items-center rounded-full bg-[#242424] px-5 text-[12px] font-medium text-white sm:h-9"
 				>
 					Add first product
@@ -435,7 +435,7 @@
 								</td>
 								<td class="px-3 py-3">
 									<a
-										href={resolve(`/dashboard/products/${p.id}` as Path)}
+										href={resolvePath(`/dashboard/products/${p.id}`)}
 										class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-[8px] border bg-[#F5F5F4] text-[10px] font-bold"
 										style="border-color: var(--border);"
 									>
@@ -452,7 +452,7 @@
 								</td>
 								<td class="px-3 py-3">
 									<a
-										href={resolve(`/dashboard/products/${p.id}` as Path)}
+										href={resolvePath(`/dashboard/products/${p.id}`)}
 										class="block max-w-[180px] truncate text-left text-[13px] leading-tight font-medium text-[#242424] hover:underline"
 										title={p.name}>{p.name}</a
 									>
@@ -493,7 +493,7 @@
 								<td class="px-3 py-3 text-right">
 									<div class="flex items-center justify-end gap-1">
 										<a
-											href={resolve(`/dashboard/products/${p.id}/edit` as Path)}
+											href={resolvePath(`/dashboard/products/${p.id}/edit`)}
 											class="flex h-7 w-7 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]"
 											style="border-color: var(--border);"
 											aria-label="Edit"
@@ -576,7 +576,7 @@
 						</div>
 						<div class="min-w-0 flex-1">
 							<a
-								href={resolve(`/dashboard/products/${p.id}` as Path)}
+								href={resolvePath(`/dashboard/products/${p.id}`)}
 								class="block truncate text-left text-[13px] font-medium">{p.name}</a
 							>
 							<div class="mt-0.5 flex items-center gap-1.5 text-[11px] text-[#777]">
@@ -594,7 +594,7 @@
 							</div>
 						</div>
 						<a
-							href={resolve(`/dashboard/products/${p.id}/edit` as Path)}
+							href={resolvePath(`/dashboard/products/${p.id}/edit`)}
 							class="flex h-8 w-8 shrink-0 items-center justify-center self-center rounded-full border bg-white"
 							style="border-color: var(--border);"
 							aria-label="Edit"
