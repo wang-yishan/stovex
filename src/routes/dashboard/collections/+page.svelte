@@ -4,6 +4,10 @@
 	import SearchInput from '#lib/admin/components/SearchInput.svelte';
 	import Modal from '#lib/admin/components/Modal.svelte';
 	import { admin } from '#lib/admin/state.svelte.ts';
+	import { Button } from '#lib/components/ui/button/index.ts';
+	import { Checkbox } from '#lib/components/ui/checkbox/index.ts';
+	import { Input } from '#lib/components/ui/input/index.ts';
+	import { Textarea } from '#lib/components/ui/textarea/index.ts';
 	import { slugify } from '#lib/admin/data.ts';
 	import type { Collection } from '#lib/admin/types.ts';
 	import { ChevronDown, ChevronUp, PenLine, Plus, Trash2 } from '@lucide/svelte';
@@ -12,7 +16,13 @@
 
 	let search = $state('');
 	let editing = $state<{ mode: 'create' | 'edit'; col?: Collection } | null>(null);
-	let draft = $state({ name: '', slug: '', description: '', coverImage: '', productIds: [] as string[] });
+	let draft = $state({
+		name: '',
+		slug: '',
+		description: '',
+		coverImage: '',
+		productIds: [] as string[]
+	});
 	let productSearch = $state('');
 
 	let sorted = $derived(
@@ -30,7 +40,13 @@
 		editing = { mode: 'create' };
 	}
 	function startEdit(c: Collection) {
-		draft = { name: c.name, slug: c.slug, description: c.description ?? '', coverImage: c.coverImage ?? '', productIds: [...c.productIds] };
+		draft = {
+			name: c.name,
+			slug: c.slug,
+			description: c.description ?? '',
+			coverImage: c.coverImage ?? '',
+			productIds: [...c.productIds]
+		};
 		productSearch = '';
 		editing = { mode: 'edit', col: c };
 	}
@@ -76,20 +92,30 @@
 	subtitle="Group products for the storefront."
 />
 
-<div class="mx-auto max-w-[1280px] w-full {isMobile ? 'px-4 py-4 pb-[112px]' : 'px-4 md:px-6 lg:px-8 py-6'}">
-	<div class="bg-white border rounded-[12px] p-3 md:p-4 mb-4 flex flex-col md:flex-row gap-3 justify-between" style="border-color: var(--border);">
+<div
+	class="mx-auto w-full max-w-[1280px] {isMobile
+		? 'px-4 py-4 pb-[112px]'
+		: 'px-4 py-6 md:px-6 lg:px-8'}"
+>
+	<div
+		class="mb-4 flex flex-col justify-between gap-3 rounded-[12px] border bg-white p-3 md:flex-row md:p-4"
+		style="border-color: var(--border);"
+	>
 		<SearchInput bind:value={search} placeholder="Search collections..." />
-		<button type="button" onclick={startCreate} class="h-10 sm:h-9 rounded-full bg-[#343434] text-white px-4 text-[12px] font-medium flex items-center justify-center gap-1.5">
+		<Button onclick={startCreate} class="px-4">
 			<Plus class="h-4 w-4 shrink-0" /> Create Collection
-		</button>
+		</Button>
 	</div>
 
-	<div class="bg-white border rounded-[12px] overflow-hidden" style="border-color: var(--border);">
+	<div class="overflow-hidden rounded-[12px] border bg-white" style="border-color: var(--border);">
 		{#if !isMobile}
 			<div class="overflow-x-auto">
 				<table class="w-full text-left">
 					<thead>
-						<tr class="bg-[#FBFBFA] border-b text-[10px] font-semibold tracking-[0.08em] uppercase text-[#999]" style="border-color: var(--border);">
+						<tr
+							class="border-b bg-[#FBFBFA] text-[10px] font-semibold tracking-[0.08em] text-[#636363] uppercase"
+							style="border-color: var(--border);"
+						>
 							<th class="px-5 py-2.5">Order</th>
 							<th class="px-5 py-2.5">Name</th>
 							<th class="px-5 py-2.5">Slug</th>
@@ -104,19 +130,53 @@
 							<tr class="hover:bg-[#F8F8F7]">
 								<td class="px-5 py-3">
 									<div class="flex gap-1">
-										<button type="button" class="flex h-7 w-7 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]" style="border-color: var(--border);" onclick={() => admin.moveCollection(c.id, -1)} aria-label="Move up"><ChevronUp class="h-3.5 w-3.5 text-[#777]" /></button>
-										<button type="button" class="flex h-7 w-7 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]" style="border-color: var(--border);" onclick={() => admin.moveCollection(c.id, 1)} aria-label="Move down"><ChevronDown class="h-3.5 w-3.5 text-[#777]" /></button>
+										<Button
+											variant="outline"
+											size="icon-sm"
+											onclick={() => admin.moveCollection(c.id, -1)}
+											aria-label="Move up"><ChevronUp class="h-3.5 w-3.5 text-[#5A5A5A]" /></Button
+										>
+										<Button
+											variant="outline"
+											size="icon-sm"
+											onclick={() => admin.moveCollection(c.id, 1)}
+											aria-label="Move down"
+											><ChevronDown class="h-3.5 w-3.5 text-[#5A5A5A]" /></Button
+										>
 									</div>
 								</td>
 								<td class="px-5 py-3 text-[13px] font-medium">{c.name}</td>
-								<td class="px-5 py-3 mono text-[11px] text-[#777]">{c.slug}</td>
-								<td class="px-5 py-3 text-[12px] text-[#5A5A5A] max-w-[200px] truncate">{c.description || '—'}</td>
-								<td class="px-5 py-3"><div class="h-8 w-8 rounded-[6px] bg-[#F5F5F4] border flex items-center justify-center text-[10px]" style="border-color: var(--border);">{c.coverImage ? 'IMG' : '—'}</div></td>
+								<td class="mono px-5 py-3 text-[11px] text-[#5A5A5A]">{c.slug}</td>
+								<td class="max-w-[200px] truncate px-5 py-3 text-[12px] text-[#5A5A5A]"
+									>{c.description || '—'}</td
+								>
+								<td class="px-5 py-3"
+									><div
+										class="flex h-8 w-8 items-center justify-center rounded-[6px] border bg-[#F5F5F4] text-[10px]"
+										style="border-color: var(--border);"
+									>
+										{c.coverImage ? 'IMG' : '—'}
+									</div></td
+								>
 								<td class="px-5 py-3 text-[12px]">{c.productIds.length}</td>
 								<td class="px-5 py-3 text-right">
 									<div class="flex justify-end gap-1">
-										<button type="button" class="flex h-7 w-7 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]" style="border-color: var(--border);" onclick={() => startEdit(c)} aria-label="Edit"><PenLine class="h-3.5 w-3.5 text-[#777]" /></button>
-										<button type="button" class="flex h-7 w-7 items-center justify-center rounded-full border bg-white transition hover:border-[#242424] hover:bg-[#FFF0F0]" style="border-color: var(--border);" onclick={() => { admin.deleteCollection(c.id); admin.showToast('Collection deleted', 'success'); }} aria-label="Delete"><Trash2 class="h-3.5 w-3.5 text-[#777]" /></button>
+										<Button
+											variant="outline"
+											size="icon-sm"
+											onclick={() => startEdit(c)}
+											aria-label="Edit"><PenLine class="h-3.5 w-3.5 text-[#5A5A5A]" /></Button
+										>
+										<Button
+											variant="outline"
+											size="icon-sm"
+											class="hover:border-destructive/40 hover:bg-destructive/10!"
+											onclick={() => {
+												admin.deleteCollection(c.id);
+												admin.showToast('Collection deleted', 'success');
+											}}
+											aria-label="Delete"><Trash2 class="h-3.5 w-3.5 text-[#5A5A5A]" /></Button
+										>
 									</div>
 								</td>
 							</tr>
@@ -127,14 +187,28 @@
 		{:else}
 			<div class="divide-y" style="border-color: var(--border);">
 				{#each sorted as c (c.id)}
-					<div class="p-4 flex justify-between gap-3">
+					<div class="flex justify-between gap-3 p-4">
 						<div>
 							<div class="text-[13px] font-medium">{c.name}</div>
-							<div class="mono text-[11px] text-[#777]">{c.slug} • {c.productIds.length} products</div>
+							<div class="mono text-[11px] text-[#5A5A5A]">
+								{c.slug} • {c.productIds.length} products
+							</div>
 						</div>
 						<div class="flex gap-1">
-							<button type="button" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border bg-white" style="border-color: var(--border);" onclick={() => admin.moveCollection(c.id, -1)} aria-label="Move up"><ChevronUp class="h-4 w-4 text-[#777]" /></button>
-							<button type="button" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border bg-white" style="border-color: var(--border);" onclick={() => startEdit(c)} aria-label="Edit"><PenLine class="h-4 w-4 text-[#777]" /></button>
+							<Button
+								variant="outline"
+								size="icon"
+								class="shrink-0"
+								onclick={() => admin.moveCollection(c.id, -1)}
+								aria-label="Move up"><ChevronUp class="h-4 w-4 text-[#5A5A5A]" /></Button
+							>
+							<Button
+								variant="outline"
+								size="icon"
+								class="shrink-0"
+								onclick={() => startEdit(c)}
+								aria-label="Edit"><PenLine class="h-4 w-4 text-[#5A5A5A]" /></Button
+							>
 						</div>
 					</div>
 				{/each}
@@ -146,33 +220,51 @@
 {#if editing}
 	<Modal title={editing.mode === 'create' ? 'Create Collection' : 'Edit Collection'}>
 		<!-- max height scroll handled via inner div -->
-		<div class="max-h-[70vh] overflow-y-auto -mx-1 px-1">
+		<div class="-mx-1 max-h-[70vh] overflow-y-auto px-1">
 			<div class="mt-3 space-y-3">
-				<input class="w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px]" style="border-color: var(--border);" placeholder="Name" bind:value={draft.name} oninput={() => (draft.slug = slugify(draft.name))} />
-				<input class="w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px] mono" style="border-color: var(--border);" placeholder="Slug" bind:value={draft.slug} />
-				<textarea rows="2" class="w-full rounded-[8px] border px-3 py-2 text-[13px]" style="border-color: var(--border);" placeholder="Description" bind:value={draft.description}></textarea>
-				<input class="w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px]" style="border-color: var(--border);" placeholder="Cover image URL optional (reference)" bind:value={draft.coverImage} />
+				<Input
+					class="w-full"
+					placeholder="Name"
+					bind:value={draft.name}
+					oninput={() => (draft.slug = slugify(draft.name))}
+				/>
+				<Input font="mono" class="w-full" placeholder="Slug" bind:value={draft.slug} />
+				<Textarea class="w-full" rows="2" placeholder="Description" bind:value={draft.description}
+				></Textarea>
+				<Input
+					class="w-full"
+					placeholder="Cover image URL optional (reference)"
+					bind:value={draft.coverImage}
+				/>
 				<div>
-					<span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#777]">Assign products (multi-select search)</span>
+					<span class="text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+						>Assign products (multi-select search)</span
+					>
 					<SearchInput
 						bind:value={productSearch}
 						placeholder="Search products..."
 						size="sm"
 						wrapperClass="relative mt-1"
 					/>
-					<div class="mt-2 border rounded-[8px] max-h-[160px] overflow-y-auto p-2" style="border-color: var(--border);">
+					<div
+						class="mt-2 max-h-[160px] overflow-y-auto rounded-[8px] border p-2"
+						style="border-color: var(--border);"
+					>
 						{#each productOptions as p (p.id)}
 							<label class="flex items-center gap-2 py-1 text-[12px]">
-								<input type="checkbox" checked={draft.productIds.includes(p.id)} onchange={(e) => toggleProduct(p.id, (e.currentTarget as HTMLInputElement).checked)} class="rounded" />
-								{p.name} <span class="text-[10px] text-[#999] mono">{p.sku}</span>
+								<Checkbox
+									checked={draft.productIds.includes(p.id)}
+									onCheckedChange={(on) => toggleProduct(p.id, on)}
+								/>
+								{p.name} <span class="mono text-[10px] text-[#636363]">{p.sku}</span>
 							</label>
 						{/each}
 					</div>
 				</div>
 			</div>
-			<div class="flex gap-2 mt-4">
-				<button type="button" class="flex-1 h-10 rounded-full bg-[#242424] text-white text-[12px]" onclick={save}>Save</button>
-				<button type="button" class="flex-1 h-10 rounded-full border bg-white text-[12px]" style="border-color: var(--border);" onclick={() => (editing = null)}>Cancel</button>
+			<div class="mt-4 flex gap-2">
+				<Button class="flex-1" onclick={save}>Save</Button>
+				<Button variant="outline" class="flex-1" onclick={() => (editing = null)}>Cancel</Button>
 			</div>
 		</div>
 	</Modal>

@@ -47,7 +47,7 @@
 				<div class="pb-6">
 					{#if item.paragraphs}
 						{#each item.paragraphs as paragraph, i (i)}
-							<p class="text-[12px] leading-6 text-[#77736E] {i > 0 ? 'mt-3' : ''}">
+							<p class="text-[12px] leading-6 text-[#6B6762] {i > 0 ? 'mt-3' : ''}">
 								{paragraph}
 							</p>
 						{/each}
@@ -57,7 +57,7 @@
 						<dl class="grid grid-cols-2 gap-y-4 text-[11px]">
 							{#each item.facts as fact (fact.label)}
 								<div>
-									<dt class="mb-1 text-[#77736E]">{fact.label}</dt>
+									<dt class="mb-1 text-[#6B6762]">{fact.label}</dt>
 									<dd>{fact.value}</dd>
 								</div>
 							{/each}

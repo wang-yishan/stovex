@@ -13,10 +13,10 @@
 <div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8 py-12">
 	<div class="bg-white border rounded-[12px] p-5 sm:p-8 max-w-[480px] mx-auto text-center" style="border-color: var(--border);">
 		<div class="h-12 w-12 mx-auto rounded-full bg-[#F5F5F4] border flex items-center justify-center mb-3" style="border-color: var(--border);">
-			<Layers class="h-6 w-6 text-[#999]" />
+			<Layers class="h-6 w-6 text-[#636363]" />
 		</div>
 		<h3 class="text-[14px] font-semibold capitalize">{title.replace(/-/g, ' ')} — Module coming</h3>
-		<p class="text-[12px] text-[#777] mt-1">
+		<p class="text-[12px] text-[#5A5A5A] mt-1">
 			This supporting page is placeholder per spec. Products, Categories, Collections, Inventory are
 			fully linked in same dashboard chrome.
 		</p>

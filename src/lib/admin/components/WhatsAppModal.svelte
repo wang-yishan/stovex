@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { effectiveStock, formatIDR, stockStatus } from '#lib/admin/data.ts';
 	import type { Product } from '#lib/admin/types.ts';
+	import { Button } from '#lib/components/ui/button/index.ts';
+	import { NativeSelect } from '#lib/components/ui/native-select/index.ts';
 	import { Copy, MessageCircle } from '@lucide/svelte';
 
 	let {
@@ -10,7 +12,6 @@
 		product: Product;
 		onclose: () => void;
 	} = $props();
-
 
 	let variantId = $state<string>('');
 
@@ -30,7 +31,9 @@
 
 	let price = $derived(selectedVariant?.priceOverride ?? product.basePrice);
 	let sku = $derived(selectedVariant?.sku ?? product.sku ?? '');
-	let compareAt = $derived(selectedVariant?.priceOverride ? product.compareAtPrice : product.compareAtPrice);
+	let compareAt = $derived(
+		selectedVariant?.priceOverride ? product.compareAtPrice : product.compareAtPrice
+	);
 
 	let message = $derived.by(() => {
 		const lines = [
@@ -58,70 +61,58 @@
 </script>
 
 <!-- @component WhatsApp enquiry modal (converted from ref preview). -->
-<div class="fixed inset-0 z-[120] bg-black/40 flex items-center justify-center p-4 sm:p-5">
+<div class="fixed inset-0 z-[120] flex items-center justify-center bg-black/40 p-4 sm:p-5">
 	<div
-		class="bg-white rounded-[12px] border shadow-xl w-full p-4 sm:p-5 max-h-[90dvh] overflow-y-auto"
+		class="max-h-[90dvh] w-full overflow-y-auto rounded-[12px] border bg-white p-4 shadow-xl sm:p-5"
 		style="border-color: var(--border); max-width: 420px;"
 	>
 		<div class="flex items-start justify-between gap-2">
 			<div>
 				<h3 class="text-[14px] font-semibold">WhatsApp enquiry</h3>
-				<p class="text-[11px] text-[#777] mt-1">Preview matches the reference format.</p>
+				<p class="mt-1 text-[11px] text-[#5A5A5A]">Preview matches the reference format.</p>
 			</div>
-			<button
-				type="button"
-				class="text-[12px] text-[#777] hover:text-[#242424]"
+			<Button
+				variant="ghost"
+				size="sm"
 				onclick={onclose}
+				class="h-auto px-1 text-[12px] text-muted-foreground hover:text-foreground"
 			>
 				Close
-			</button>
+			</Button>
 		</div>
 
 		<div class="mt-4">
 			<label
-				class="text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]"
+				class="text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
 				for="wa-variant">Variant</label
 			>
 			{#if product.variants.length > 0}
-				<select
-					id="wa-variant"
-					class="mt-1 w-full h-9 rounded-[8px] border px-3 text-[13px] bg-white"
-					style="border-color: var(--border);"
-					bind:value={variantId}
-				>
+				<NativeSelect id="wa-variant" class="mt-1 w-full" bind:value={variantId}>
 					<option value="">Default</option>
 					{#each product.variants as v (v.id)}
-						<option value={v.id}>{v.name} — {formatIDR(v.priceOverride ?? product.basePrice)}</option>
+						<option value={v.id}
+							>{v.name} — {formatIDR(v.priceOverride ?? product.basePrice)}</option
+						>
 					{/each}
-				</select>
+				</NativeSelect>
 			{:else}
-				<p class="text-[12px] text-[#777] mt-1">No variants.</p>
+				<p class="mt-1 text-[12px] text-muted-foreground">No variants.</p>
 			{/if}
 		</div>
 
 		<pre
-			class="mt-3 bg-[#FBFBFA] border rounded-[8px] p-3 text-[11px] whitespace-pre-wrap break-words"
+			class="mt-3 rounded-[8px] border bg-[#FBFBFA] p-3 text-[11px] break-words whitespace-pre-wrap"
 			style="border-color: var(--border);">{message}</pre>
 
-		<div class="flex gap-2 mt-4">
-			<a
-				href={waUrl}
-				target="_blank"
-				rel="noopener"
-				class="flex-1 h-10 rounded-full bg-[#343434] text-white text-[12px] font-medium flex items-center justify-center gap-1.5 hover:bg-[#242424] transition"
-			>
+		<div class="mt-4 flex gap-2">
+			<Button href={waUrl} target="_blank" rel="noopener" class="flex-1">
 				<MessageCircle class="h-4 w-4 shrink-0" />
 				Open WhatsApp
-			</a>
-			<button
-				type="button"
-				class="h-10 rounded-full border bg-white px-3 text-[12px] font-medium flex items-center gap-1.5 hover:border-[#242424] transition"
-				style="border-color: var(--border);"
-				onclick={copyMsg}
-			>
+			</Button>
+			<Button variant="outline" onclick={copyMsg}>
 				<Copy class="h-4 w-4 shrink-0" />
 				Copy message
-			</button>
+			</Button>
 		</div>
 	</div>
 </div>

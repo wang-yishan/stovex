@@ -5,6 +5,7 @@
 	import { cart } from '#lib/catalog/cart.svelte.ts';
 	import { FALLBACK_PHOTOS } from '#lib/catalog/photos.ts';
 	import { generalWaLink } from '#lib/catalog/wa.ts';
+	import { catalogHref } from '#lib/catalog/links.ts';
 	import StoreHeader from '#lib/components/storefront/StoreHeader.svelte';
 	import StoreFooter from '#lib/components/storefront/StoreFooter.svelte';
 	import ProductCard from '#lib/components/storefront/ProductCard.svelte';
@@ -78,7 +79,7 @@
 					>
 						Membawa gaya,<br /><em class="font-medium text-[#D9534F]">menjalani hari.</em>
 					</h1>
-					<p class="mt-7 max-w-md text-sm leading-7 text-[#77736E] sm:text-base">
+					<p class="mt-7 max-w-md text-sm leading-7 text-[#6B6762] sm:text-base">
 						Tas pilihan dengan desain yang tenang, detail yang dipikirkan, dan karakter yang
 						bertahan melampaui tren.
 					</p>
@@ -100,19 +101,19 @@
 					<div class="mt-14 flex max-w-md items-center gap-8 border-t border-black/10 pt-6">
 						<div>
 							<p class="font-display text-2xl">01</p>
-							<p class="mt-1 text-[10px] tracking-wider text-[#77736E] uppercase">
+							<p class="mt-1 text-[10px] tracking-wider text-[#6B6762] uppercase">
 								Thoughtful design
 							</p>
 						</div>
 						<div>
 							<p class="font-display text-2xl">02</p>
-							<p class="mt-1 text-[10px] tracking-wider text-[#77736E] uppercase">
+							<p class="mt-1 text-[10px] tracking-wider text-[#6B6762] uppercase">
 								Everyday function
 							</p>
 						</div>
 						<div>
 							<p class="font-display text-2xl">03</p>
-							<p class="mt-1 text-[10px] tracking-wider text-[#77736E] uppercase">Timeless style</p>
+							<p class="mt-1 text-[10px] tracking-wider text-[#6B6762] uppercase">Timeless style</p>
 						</div>
 					</div>
 				</div>
@@ -125,7 +126,7 @@
 					<div
 						class="absolute right-6 bottom-6 max-w-[210px] bg-[#FBFBFA]/95 px-5 py-4 sm:right-9 sm:bottom-9"
 					>
-						<p class="text-[9px] tracking-[0.2em] text-[#77736E] uppercase">Curated essentials</p>
+						<p class="text-[9px] tracking-[0.2em] text-[#6B6762] uppercase">Curated essentials</p>
 						<p class="font-display mt-1 text-xl">Less, but better.</p>
 					</div>
 				</div>
@@ -139,28 +140,28 @@
 					<span class="text-xl text-[#D69A35]">✳</span>
 					<div>
 						<p class="text-xs font-semibold">Pilihan terkurasi</p>
-						<p class="mt-1 text-[11px] text-[#77736E]">Gaya yang relevan setiap hari</p>
+						<p class="mt-1 text-[11px] text-[#6B6762]">Gaya yang relevan setiap hari</p>
 					</div>
 				</div>
 				<div class="flex items-center gap-3">
 					<span class="text-xl text-[#D69A35]">◇</span>
 					<div>
 						<p class="text-xs font-semibold">Detail fungsional</p>
-						<p class="mt-1 text-[11px] text-[#77736E]">Dirancang untuk digunakan</p>
+						<p class="mt-1 text-[11px] text-[#6B6762]">Dirancang untuk digunakan</p>
 					</div>
 				</div>
 				<div class="flex items-center gap-3">
 					<span class="text-xl text-[#D69A35]">↗</span>
 					<div>
 						<p class="text-xs font-semibold">Belanja mudah</p>
-						<p class="mt-1 text-[11px] text-[#77736E]">Pesan langsung via WhatsApp</p>
+						<p class="mt-1 text-[11px] text-[#6B6762]">Pesan langsung via WhatsApp</p>
 					</div>
 				</div>
 				<div class="flex items-center gap-3">
 					<span class="text-xl text-[#D69A35]">♡</span>
 					<div>
 						<p class="text-xs font-semibold">Layanan personal</p>
-						<p class="mt-1 text-[11px] text-[#77736E]">Kami siap membantu pilihanmu</p>
+						<p class="mt-1 text-[11px] text-[#6B6762]">Kami siap membantu pilihanmu</p>
 					</div>
 				</div>
 			</div>
@@ -176,17 +177,26 @@
 					<h2 class="font-display text-4xl tracking-tight sm:text-5xl">
 						Koleksi pilihan<span class="text-[#D9534F]">.</span>
 					</h2>
-					<p class="mt-3 text-sm text-[#77736E]">
+					<p class="mt-3 text-sm text-[#6B6762]">
 						Temukan bentuk yang paling sesuai dengan ritme harimu.
 					</p>
 				</div>
-				<a
-					href="#pilihan"
-					class="self-start border-b border-[#242424]/40 pb-1 text-xs hover:border-[#D9534F] hover:text-[#D9534F] sm:self-auto"
-				>
-					Lihat panduan memilih
-					<ArrowUpRight class="inline h-3.5 w-3.5 align-[-2px]" strokeWidth={1.6} />
-				</a>
+				<div class="flex flex-col items-start gap-3 sm:items-end">
+					<a
+						href="#pilihan"
+						class="self-start border-b border-[#242424]/40 pb-1 text-xs hover:border-[#D9534F] hover:text-[#D9534F] sm:self-auto"
+					>
+						Lihat panduan memilih
+						<ArrowUpRight class="inline h-3.5 w-3.5 align-[-2px]" strokeWidth={1.6} />
+					</a>
+					<a
+						href={catalogHref()}
+						class="self-start border-b border-[#242424]/40 pb-1 text-xs hover:border-[#D9534F] hover:text-[#D9534F] sm:self-auto"
+					>
+						Lihat katalog lengkap
+						<ArrowUpRight class="inline h-3.5 w-3.5 align-[-2px]" strokeWidth={1.6} />
+					</a>
+				</div>
 			</div>
 
 			<div class="mb-7 flex gap-2 overflow-x-auto pb-2" role="group" aria-label="Filter kategori">
@@ -205,17 +215,17 @@
 			</div>
 
 			{#if filtered.length === 0}
-				<p class="py-10 text-center text-sm text-[#77736E]">
+				<p class="py-10 text-center text-sm text-[#6B6762]">
 					Belum ada produk pada kategori ini. Silakan cek kembali nanti.
 				</p>
 			{:else}
 				<div class="grid grid-cols-2 gap-x-3 gap-y-9 sm:gap-x-5 sm:gap-y-12 lg:grid-cols-4">
-					{#each filtered as p, i (p.id)}
-						<ProductCard product={p} index={i} />
+					{#each filtered as p (p.id)}
+						<ProductCard product={p} />
 					{/each}
 				</div>
 			{/if}
-			<p class="mt-8 text-center text-[10px] text-[#77736E]">
+			<p class="mt-8 text-center text-[10px] text-[#6B6762]">
 				*Katalog, harga, dan foto mengikuti data yang aktif di dashboard.
 			</p>
 		</section>
@@ -238,7 +248,7 @@
 					<h2 class="font-display text-4xl leading-[1.12] sm:text-5xl">
 						Bukan sekadar<br />pelengkap penampilan.
 					</h2>
-					<p class="mt-6 max-w-lg text-sm leading-7 text-[#77736E]">
+					<p class="mt-6 max-w-lg text-sm leading-7 text-[#6B6762]">
 						Kami percaya tas yang baik seharusnya terasa tepat—mudah dipadukan, nyaman digunakan,
 						dan cukup istimewa untuk menemani banyak cerita. Karena itu, setiap pilihan di Forma
 						mengutamakan siluet yang bersih dan fungsi sehari-hari.
@@ -261,7 +271,7 @@
 					Made for your rhythm
 				</p>
 				<h2 class="font-display text-4xl sm:text-5xl">Satu tas, banyak cerita.</h2>
-				<p class="mt-4 text-sm leading-6 text-[#77736E]">
+				<p class="mt-4 text-sm leading-6 text-[#6B6762]">
 					Mulai dari hari kerja yang padat hingga akhir pekan yang santai.
 				</p>
 			</div>

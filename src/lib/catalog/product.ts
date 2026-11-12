@@ -29,7 +29,8 @@ const COLOR_SWATCHES: Record<string, string> = {
 	green: '#5c7355'
 };
 
-function swatchFor(value: string): string {
+/** Hex swatch for a colour name, falling back to a neutral beige. */
+export function swatchFor(value: string): string {
 	return COLOR_SWATCHES[value.trim().toLowerCase()] ?? '#c9c5bb';
 }
 
@@ -121,9 +122,15 @@ export function variantLabel(product: Product, variant?: ProductVariant): string
 	return '—';
 }
 
-/** Label for a product card: the first in-stock variant, or the product itself. */
+/**
+ * Label for a product card.
+ *
+ * The colour alone reads better on a card than the full "Beige / M"
+ * combination — the shopper picks the size on the product page.
+ */
 export function cardVariantLabel(product: Product): string {
 	if (product.variants.length === 0) return '';
 	const v = product.variants.find((x) => x.available) ?? product.variants[0];
-	return v?.name ?? '';
+	if (!v) return '';
+	return variantAttribute(v, 'Color') ?? v.name;
 }

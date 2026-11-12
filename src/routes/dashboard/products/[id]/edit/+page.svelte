@@ -6,6 +6,7 @@
 	import { goto } from '$app/navigation';
 	import type { PageProps } from './$types';
 	import { resolvePath } from '#lib/admin/paths.ts';
+	import { Button } from '#lib/components/ui/button/index.ts';
 
 	let { params }: PageProps = $props();
 	let product = $derived(admin.products.find((p) => p.id === params.id));
@@ -18,15 +19,18 @@
 </script>
 
 <Topbar
-	crumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Products', href: '/dashboard/products' }, { label: 'Edit' }]}
+	crumbs={[
+		{ label: 'Dashboard', href: '/dashboard' },
+		{ label: 'Products', href: '/dashboard/products' },
+		{ label: 'Edit' }
+	]}
 	title="Edit Product"
 	subtitle="Update catalog item."
 >
 	{#snippet actions()}
-		<button
-			type="button"
-			class="h-10 sm:h-8 rounded-full border bg-white px-4 text-[12px] font-medium shrink-0"
-			style="border-color: var(--border);"
+		<Button
+			variant="outline"
+			class="shrink-0 px-4"
 			onclick={() => {
 				const to =
 					product && admin.products.some((p) => p.id === product.id)
@@ -36,10 +40,10 @@
 			}}
 		>
 			Cancel
-		</button>
+		</Button>
 	{/snippet}
 </Topbar>{#if product}
-	<ProductForm product={product} mode="edit" />
+	<ProductForm {product} mode="edit" />
 {:else}
-	<div class="mx-auto max-w-[1280px] px-4 py-6 text-[13px] text-[#777]">Loading…</div>
+	<div class="mx-auto max-w-[1280px] px-4 py-6 text-[13px] text-muted-foreground">Loading…</div>
 {/if}

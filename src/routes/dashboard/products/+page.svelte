@@ -11,6 +11,9 @@
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { effectiveStock, formatIDR, lowThreshold, stockStatus } from '#lib/admin/data.ts';
 	import type { Product, ProductStatus, StockLevel } from '#lib/admin/types.ts';
+	import { Button } from '#lib/components/ui/button/index.ts';
+	import { Checkbox } from '#lib/components/ui/checkbox/index.ts';
+	import { NativeSelect } from '#lib/components/ui/native-select/index.ts';
 	import {
 		Archive,
 		ArrowDown,
@@ -164,12 +167,8 @@
 	subtitle="Manage catalog • {admin.products.length} bags • IDR pricing"
 >
 	{#snippet actions()}
-		<button
-			type="button"
-			class="flex h-10 items-center gap-1.5 rounded-full border px-3 text-[12px] font-medium transition sm:h-8 {storefrontPreview
-				? 'border-transparent bg-[#242424] text-white'
-				: 'bg-white hover:border-[#242424]'}"
-			style="border-color: {storefrontPreview ? 'transparent' : 'var(--border)'};"
+		<Button
+			variant={storefrontPreview ? 'default' : 'outline'}
 			onclick={togglePreview}
 			aria-pressed={storefrontPreview}
 		>
@@ -181,16 +180,13 @@
 			<span class="hidden sm:inline"
 				>{storefrontPreview ? 'Exit Preview' : 'Storefront Preview'}</span
 			><span class="sm:hidden">{storefrontPreview ? 'Exit' : 'Preview'}</span>
-		</button>
-		<a
-			href={resolve('/dashboard/products/new')}
-			class="flex h-10 items-center gap-1.5 rounded-full bg-[#343434] px-3 text-[12px] font-medium text-white transition hover:bg-[#242424] sm:h-8 sm:px-4"
-		>
+		</Button>
+		<Button href={resolve('/dashboard/products/new')}>
 			<Plus class="h-4 w-4 shrink-0" />
 			<span class="hidden min-[420px]:inline">Add Product</span><span class="min-[420px]:hidden"
 				>Add</span
 			>
-		</a>
+		</Button>
 	{/snippet}
 </Topbar>
 
@@ -202,23 +198,23 @@
 	<!-- Stat cards -->
 	<div class="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
 		<div class="rounded-[12px] border bg-white p-3.5" style="border-color: var(--border);">
-			<div class="text-[11px] font-semibold tracking-[0.08em] text-[#999] uppercase">Total</div>
+			<div class="text-[11px] font-semibold tracking-[0.08em] text-[#636363] uppercase">Total</div>
 			<div class="mt-1 text-[22px] leading-none font-semibold">{stats.total}</div>
-			<div class="mt-1 text-[11px] text-[#777]">All catalog</div>
+			<div class="mt-1 text-[11px] text-[#5A5A5A]">All catalog</div>
 		</div>
 		<div class="rounded-[12px] border bg-white p-3.5" style="border-color: var(--border);">
 			<div
-				class="flex items-center gap-1 text-[11px] font-semibold tracking-[0.08em] text-[#999] uppercase"
+				class="flex items-center gap-1 text-[11px] font-semibold tracking-[0.08em] text-[#636363] uppercase"
 			>
 				<span class="h-1.5 w-1.5 rounded-full bg-[#269B65]"></span> Active
 			</div>
 			<div class="mt-1 text-[22px] leading-none font-semibold">{stats.active}</div>
-			<div class="mt-1 text-[11px] text-[#777]">In storefront</div>
+			<div class="mt-1 text-[11px] text-[#5A5A5A]">In storefront</div>
 		</div>
 		<div class="rounded-[12px] border bg-white p-3.5" style="border-color: var(--border);">
-			<div class="text-[11px] font-semibold tracking-[0.08em] text-[#999] uppercase">Draft</div>
+			<div class="text-[11px] font-semibold tracking-[0.08em] text-[#636363] uppercase">Draft</div>
 			<div class="mt-1 text-[22px] leading-none font-semibold">{stats.draft}</div>
-			<div class="mt-1 text-[11px] text-[#777]">Not visible</div>
+			<div class="mt-1 text-[11px] text-[#5A5A5A]">Not visible</div>
 		</div>
 		<div class="rounded-[12px] border bg-[#FFFDF3] p-3.5" style="border-color: #F0D99E;">
 			<div
@@ -236,60 +232,43 @@
 		<div class="flex flex-col gap-2 lg:flex-row">
 			<SearchInput bind:value={search} placeholder="Search by name, SKU..." />
 			<div class="flex flex-wrap items-center gap-2">
-				<select
-					class="h-10 rounded-full border bg-white px-3 text-[12px] font-medium sm:h-9"
-					style="border-color: var(--border);"
-					bind:value={statusFilter}
-				>
+				<NativeSelect shape="pill" class="font-medium" bind:value={statusFilter}>
 					<option value="all">All Status</option>
 					<option value="active">Active</option>
 					<option value="draft">Draft</option>
 					<option value="archived">Archived</option>
-				</select>
-				<select
-					class="h-10 rounded-full border bg-white px-3 text-[12px] font-medium sm:h-9"
-					style="border-color: var(--border);"
-					bind:value={categoryFilter}
-				>
+				</NativeSelect>
+				<NativeSelect shape="pill" class="font-medium" bind:value={categoryFilter}>
 					<option value="all">All Categories</option>
 					{#each admin.categories as c (c.id)}
 						<option value={c.id}>{c.name}</option>
 					{/each}
-				</select>
-				<select
-					class="h-10 rounded-full border bg-white px-3 text-[12px] font-medium sm:h-9"
-					style="border-color: var(--border);"
-					bind:value={stockFilter}
-				>
+				</NativeSelect>
+				<NativeSelect shape="pill" class="font-medium" bind:value={stockFilter}>
 					<option value="all">All Stock</option>
 					<option value="in-stock">In Stock</option>
 					<option value="low">Low</option>
 					<option value="out">Out</option>
-				</select>
-				<select
-					class="h-10 rounded-full border bg-white px-3 text-[12px] font-medium sm:h-9"
-					style="border-color: var(--border);"
-					bind:value={sortKey}
-				>
+				</NativeSelect>
+				<NativeSelect shape="pill" class="font-medium" bind:value={sortKey}>
 					<option value="updated">Sort: Updated</option>
 					<option value="name">Sort: Name</option>
 					<option value="price">Sort: Price</option>
 					<option value="stock">Sort: Stock</option>
-				</select>
-				<button
-					type="button"
-					class="flex h-10 w-10 items-center justify-center rounded-full border bg-white transition hover:border-[#242424] sm:h-9 sm:w-9"
-					style="border-color: var(--border);"
+				</NativeSelect>
+				<Button
+					variant="outline"
+					size="icon-lg"
 					onclick={() => (sortDir = sortDir === 'asc' ? 'desc' : 'asc')}
 					aria-label="Toggle sort direction"
 					title={sortDir === 'asc' ? 'Ascending' : 'Descending'}
 				>
 					{#if sortDir === 'asc'}
-						<ArrowUp class="h-4 w-4 text-[#777]" />
+						<ArrowUp class="h-4 w-4 text-muted-foreground" />
 					{:else}
-						<ArrowDown class="h-4 w-4 text-[#777]" />
+						<ArrowDown class="h-4 w-4 text-muted-foreground" />
 					{/if}
-				</button>
+				</Button>
 			</div>
 		</div>
 		{#if storefrontPreview}
@@ -313,29 +292,33 @@
 		>
 			<div class="text-[12px] font-medium">{selected.size} selected</div>
 			<div class="flex items-center gap-2">
-				<button
-					type="button"
-					class="h-10 rounded-full bg-white px-3 text-[12px] font-medium text-[#242424] sm:h-7 sm:text-[11px]"
-					onclick={() => bulkSet('active')}>Activate</button
+				<Button
+					variant="secondary"
+					size="sm"
+					class="h-10 text-[12px] sm:h-7 sm:text-[11px]"
+					onclick={() => bulkSet('active')}>Activate</Button
 				>
-				<button
-					type="button"
-					class="h-10 rounded-full border border-white/20 bg-white/10 px-3 text-[12px] font-medium hover:bg-white/20 sm:h-7 sm:text-[11px]"
-					onclick={() => bulkSet('archived')}>Archive</button
+				<Button
+					variant="secondary"
+					size="sm"
+					class="h-10 border border-white/20 bg-white/10 text-[12px] hover:bg-white/20 sm:h-7 sm:text-[11px]"
+					onclick={() => bulkSet('archived')}>Archive</Button
 				>
-				<button
-					type="button"
-					class="h-10 rounded-full bg-[#D9534F] px-3 text-[12px] font-medium sm:h-7 sm:text-[11px]"
-					onclick={() => (deleteMany = true)}>Delete</button
+				<Button
+					variant="destructive"
+					size="sm"
+					class="h-10 text-[12px] sm:h-7 sm:text-[11px]"
+					onclick={() => (deleteMany = true)}>Delete</Button
 				>
-				<button
-					type="button"
-					class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 sm:h-7 sm:w-7"
+				<Button
+					variant="secondary"
+					size="icon-lg"
+					class="h-10 w-10 bg-white/10 hover:bg-white/20 sm:h-7 sm:w-7"
 					onclick={() => selected.clear()}
 					aria-label="Clear selection"
 				>
 					<Trash2 class="h-4 w-4" />
-				</button>
+				</Button>
 			</div>
 		</div>
 	{/if}
@@ -360,50 +343,40 @@
 					class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border bg-[#F5F5F4]"
 					style="border-color: var(--border);"
 				>
-					<Package class="h-6 w-6 text-[#999]" />
+					<Package class="h-6 w-6 text-[#636363]" />
 				</div>
 				<h3 class="text-[14px] font-semibold">Empty catalog</h3>
-				<p class="mx-auto mt-1 max-w-[320px] text-[12px] text-[#777]">
+				<p class="mx-auto mt-1 max-w-[320px] text-[12px] text-[#5A5A5A]">
 					No products yet. Add your first bag to start managing catalog with full spec.
 				</p>
-				<a
-					href={resolve('/dashboard/products/new')}
-					class="mt-4 inline-flex h-10 items-center rounded-full bg-[#242424] px-5 text-[12px] font-medium text-white sm:h-9"
-				>
+				<Button href={resolve('/dashboard/products/new')} class="mt-4 px-5">
 					Add first product
-				</a>
+				</Button>
 			</div>
 		{:else if filtered.length === 0}
 			<div class="px-6 py-16 text-center">
 				<div
-					class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border bg-[#F5F5F4]"
-					style="border-color: var(--border);"
+					class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border bg-muted"
 				>
-					<Search class="h-6 w-6 text-[#999]" />
+					<Search class="h-6 w-6 text-muted-foreground" />
 				</div>
 				<h3 class="text-[14px] font-semibold">No search results</h3>
-				<p class="mt-1 text-[12px] text-[#777]">Try adjusting search or filters.</p>
-				<button
-					type="button"
-					class="mt-4 h-10 rounded-full border bg-white px-4 text-[12px] font-medium sm:h-8"
-					style="border-color: var(--border);"
-					onclick={clearFilters}>Clear filters</button
-				>
+				<p class="mt-1 text-[12px] text-muted-foreground">Try adjusting search or filters.</p>
+				<Button variant="outline" class="mt-4 px-4" onclick={clearFilters}>Clear filters</Button>
 			</div>
 		{:else if !isMobile}
 			<div class="overflow-x-auto">
 				<table class="w-full text-left">
 					<thead>
 						<tr
-							class="border-b bg-[#FBFBFA] text-[10px] font-semibold tracking-[0.08em] text-[#999] uppercase"
+							class="border-b bg-[#FBFBFA] text-[10px] font-semibold tracking-[0.08em] text-[#636363] uppercase"
 							style="border-color: var(--border);"
 						>
 							<th class="w-8 px-3 py-2.5">
-								<input
-									type="checkbox"
+								<Checkbox
 									checked={selected.size === pageItems.length && pageItems.length > 0}
-									onchange={toggleAll}
-									class="rounded"
+									indeterminate={selected.size > 0 && selected.size < pageItems.length}
+									onCheckedChange={toggleAll}
 									aria-label="Select all on page"
 								/>
 							</th>
@@ -425,11 +398,9 @@
 							{@const primary = p.images.find((i) => i.isPrimary) ?? p.images[0]}
 							<tr class="transition hover:bg-[#F8F8F7]">
 								<td class="px-3 py-3">
-									<input
-										type="checkbox"
+									<Checkbox
 										checked={selected.has(p.id)}
-										onchange={() => toggleSelect(p.id)}
-										class="rounded"
+										onCheckedChange={() => toggleSelect(p.id)}
 										aria-label="Select {p.name}"
 									/>
 								</td>
@@ -463,7 +434,7 @@
 										>
 									{/if}
 								</td>
-								<td class="mono max-w-[110px] truncate px-3 py-3 text-[11px] text-[#777]"
+								<td class="mono max-w-[110px] truncate px-3 py-3 text-[11px] text-[#5A5A5A]"
 									>{p.sku || '—'}</td
 								>
 								<td class="px-3 py-3 text-[12px] text-[#5A5A5A]">
@@ -472,19 +443,19 @@
 								<td class="px-3 py-3">
 									<div class="text-[12px] font-medium">{formatIDR(p.basePrice)}</div>
 									{#if p.compareAtPrice}
-										<div class="text-[11px] text-[#999] line-through">
+										<div class="text-[11px] text-[#636363] line-through">
 											{formatIDR(p.compareAtPrice)}
 										</div>
 									{/if}
 									{#if p.hasVariants}
-										<div class="text-[10px] text-[#777]">{p.variants.length} variants</div>
+										<div class="text-[10px] text-[#5A5A5A]">{p.variants.length} variants</div>
 									{/if}
 								</td>
 								<td class="px-3 py-3"
 									><StockBadge status={st} {stock} tracking={p.trackInventory} /></td
 								>
 								<td class="px-3 py-3"><StatusBadge status={p.status} /></td>
-								<td class="px-3 py-3 text-[11px] text-[#777]">
+								<td class="px-3 py-3 text-[11px] text-[#5A5A5A]">
 									{new Date(p.updatedAt).toLocaleDateString('id-ID', {
 										day: '2-digit',
 										month: 'short'
@@ -492,64 +463,60 @@
 								</td>
 								<td class="px-3 py-3 text-right">
 									<div class="flex items-center justify-end gap-1">
-										<a
+										<Button
 											href={resolvePath(`/dashboard/products/${p.id}/edit`)}
-											class="flex h-7 w-7 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]"
-											style="border-color: var(--border);"
+											variant="outline"
+											size="icon-sm"
 											aria-label="Edit"
 										>
-											<PenLine class="h-3.5 w-3.5 text-[#777]" />
-										</a>
-										<button
-											type="button"
-											class="flex h-7 w-7 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]"
-											style="border-color: var(--border);"
+											<PenLine class="h-3.5 w-3.5 text-muted-foreground" />
+										</Button>
+										<Button
+											variant="outline"
+											size="icon-sm"
 											onclick={() => toggleStatus(p)}
 											aria-label={p.status === 'archived' ? 'Reactivate' : 'Archive'}
 										>
-											<Archive class="h-3.5 w-3.5 text-[#777]" />
-										</button>
+											<Archive class="h-3.5 w-3.5 text-muted-foreground" />
+										</Button>
 										<div class="group/menu relative">
-											<button
-												type="button"
-												class="flex h-7 w-7 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]"
-												style="border-color: var(--border);"
-												aria-label="More actions"
-											>
-												<Ellipsis class="h-3.5 w-3.5 text-[#777]" />
-											</button>
+											<Button variant="outline" size="icon-sm" aria-label="More actions">
+												<Ellipsis class="h-3.5 w-3.5 text-muted-foreground" />
+											</Button>
 											<div
-												class="absolute top-8 right-0 z-20 hidden min-w-[160px] rounded-[10px] border bg-white p-1 shadow-lg group-hover/menu:block"
-												style="border-color: var(--border);"
+												class="absolute top-8 right-0 z-20 hidden min-w-[160px] rounded-[10px] border bg-card p-1 shadow-lg group-hover/menu:block"
 											>
-												<button
-													type="button"
-													class="flex w-full items-center gap-2 rounded-[6px] px-3 py-2 text-left text-[12px] hover:bg-[#F8F8F7]"
+												<Button
+													variant="ghost"
+													size="sm"
+													class="h-auto w-full justify-start gap-2 rounded-[6px] px-3 py-2 text-[12px]"
 													onclick={() => {
 														admin.duplicateProduct(p.id);
 														selected.clear();
 													}}
 												>
 													<Copy class="h-3.5 w-3.5" /> Duplicate
-												</button>
-												<button
-													type="button"
-													class="flex w-full items-center gap-2 rounded-[6px] px-3 py-2 text-left text-[12px] hover:bg-[#F8F8F7]"
+												</Button>
+												<Button
+													variant="ghost"
+													size="sm"
+													class="h-auto w-full justify-start gap-2 rounded-[6px] px-3 py-2 text-[12px]"
 													onclick={() => (waProduct = p)}
 												>
 													<MessageCircle class="h-3.5 w-3.5" /> WhatsApp enquiry
-												</button>
-												<button
-													type="button"
-													class="flex w-full items-center gap-2 rounded-[6px] px-3 py-2 text-left text-[12px] text-[#A33A37] hover:bg-[#FFF0F0]"
+												</Button>
+												<Button
+													variant="ghost"
+													size="sm"
+													class="h-auto w-full justify-start gap-2 rounded-[6px] px-3 py-2 text-[12px] text-destructive hover:bg-destructive/10 hover:text-destructive"
 													onclick={() => (deleteId = p.id)}
 												>
 													<Trash2 class="h-3.5 w-3.5" /> Delete
-												</button>
+												</Button>
 											</div>
 										</div>
-									</div>
-								</td>
+									</div></td
+								>
 							</tr>
 						{/each}
 					</tbody>
@@ -561,11 +528,10 @@
 					{@const stock = effectiveStock(p)}
 					{@const st = stockStatus(stock, lowThreshold(p), p.trackInventory)}
 					<div class="flex gap-3 p-4">
-						<input
-							type="checkbox"
+						<Checkbox
 							checked={selected.has(p.id)}
-							onchange={() => toggleSelect(p.id)}
-							class="mt-1 h-4 w-4 shrink-0 rounded"
+							class="mt-1"
+							onCheckedChange={() => toggleSelect(p.id)}
 							aria-label="Select {p.name}"
 						/>
 						<div
@@ -579,7 +545,7 @@
 								href={resolvePath(`/dashboard/products/${p.id}`)}
 								class="block truncate text-left text-[13px] font-medium">{p.name}</a
 							>
-							<div class="mt-0.5 flex items-center gap-1.5 text-[11px] text-[#777]">
+							<div class="mt-0.5 flex items-center gap-1.5 text-[11px] text-[#5A5A5A]">
 								<span class="mono">{p.sku || '—'}</span>
 								<span class="h-1 w-1 rounded-full bg-[#D9D9D9]"></span>
 								<span class="truncate"
@@ -599,7 +565,7 @@
 							style="border-color: var(--border);"
 							aria-label="Edit"
 						>
-							<PenLine class="h-4 w-4 text-[#777]" />
+							<PenLine class="h-4 w-4 text-[#5A5A5A]" />
 						</a>
 					</div>
 				{/each}
@@ -612,32 +578,30 @@
 				class="flex items-center justify-between gap-3 border-t bg-[#FBFBFA] px-4 py-3 md:px-5"
 				style="border-color: var(--border);"
 			>
-				<span class="text-[11px] text-[#777]">
+				<span class="text-[11px] text-[#5A5A5A]">
 					Showing <span class="font-medium text-[#242424]">{pageItems.length}</span> of
 					<span class="font-medium text-[#242424]">{filtered.length}</span> • Page {clampedPage}/{totalPages}
 				</span>
 				<div class="flex items-center gap-1">
-					<button
-						type="button"
+					<Button
+						variant="outline"
+						size="icon-lg"
 						disabled={page <= 1}
-						class="flex h-10 w-10 items-center justify-center rounded-full border bg-white disabled:opacity-40 sm:h-7 sm:w-7"
-						style="border-color: var(--border);"
 						onclick={() => (page = Math.max(1, page - 1))}
 						aria-label="Previous page"
 					>
 						<ChevronLeft class="h-3.5 w-3.5" />
-					</button>
+					</Button>
 					<span class="px-2 text-[11px]">{clampedPage}/{totalPages}</span>
-					<button
-						type="button"
+					<Button
+						variant="outline"
+						size="icon-lg"
 						disabled={page >= totalPages}
-						class="flex h-10 w-10 items-center justify-center rounded-full border bg-white disabled:opacity-40 sm:h-7 sm:w-7"
-						style="border-color: var(--border);"
 						onclick={() => (page = Math.min(totalPages, page + 1))}
 						aria-label="Next page"
 					>
 						<ChevronRight class="h-3.5 w-3.5" />
-					</button>
+					</Button>
 				</div>
 			</div>
 		{/if}

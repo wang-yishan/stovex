@@ -3,6 +3,7 @@
 	import { resolvePath } from '#lib/admin/paths.ts';
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { NAV_SECTIONS, ROUTE_BY_NAV_ID, navIdFromPath } from '#lib/admin/navSections.ts';
+	import { Button } from '#lib/components/ui/button/index.ts';
 	import { ChevronDown, PanelLeftClose, PanelLeftOpen, ShoppingBag } from '@lucide/svelte';
 
 	let collapsed = $derived(admin.sidebarCollapsed);
@@ -17,49 +18,58 @@
 -->
 
 <aside
-	class="hidden md:flex shrink-0 bg-white border-r flex-col sticky self-start"
-	style="width: {collapsed ? 72 : 248}px; border-color: var(--border); top: var(--safe-area-inset-top); height: calc(100vh - var(--safe-area-inset-top)); transition: width 200ms ease;"
+	class="sticky hidden shrink-0 flex-col self-start border-r bg-white md:flex"
+	style="width: {collapsed
+		? 72
+		: 248}px; border-color: var(--border); top: var(--safe-area-inset-top); height: calc(100vh - var(--safe-area-inset-top)); transition: width 200ms ease;"
 >
 	<!-- header -->
-	<div class="h-[64px] flex items-center px-3 border-b shrink-0" style="border-color: var(--border);">
-		<div class="flex items-center gap-2.5 w-full">
-			<div class="h-8 w-8 bg-[#111] rounded-[6px] flex items-center justify-center shrink-0">
+	<div
+		class="flex h-[64px] shrink-0 items-center border-b px-3"
+		style="border-color: var(--border);"
+	>
+		<div class="flex w-full items-center gap-2.5">
+			<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] bg-[#111]">
 				<ShoppingBag class="h-4 w-4 text-white" strokeWidth={1.5} />
 			</div>
 			{#if !collapsed}
 				<div class="flex-1">
-					<div class="text-[13px] font-bold tracking-[0.08em] leading-none text-[#242424]">
+					<div class="text-[13px] leading-none font-bold tracking-[0.08em] text-[#242424]">
 						BAG STORE
 					</div>
-					<div class="text-[10px] text-[#777] tracking-wide mt-0.5">ADMIN</div>
+					<div class="mt-0.5 text-[10px] tracking-wide text-[#5A5A5A]">ADMIN</div>
 				</div>
-				<button
-					type="button"
-					class="h-8 w-8 shrink-0 rounded-md flex items-center justify-center text-[#777] hover:bg-[#F8F8F7] hover:text-[#242424] transition"
+				<Button
+					variant="ghost"
+					size="icon-sm"
 					onclick={() => admin.toggleSidebar()}
 					aria-label="Collapse sidebar"
+					class="shrink-0 text-muted-foreground hover:text-foreground"
 				>
 					<PanelLeftClose class="h-4 w-4" />
-				</button>
+				</Button>
 			{:else}
-				<button
-					type="button"
-					class="mx-auto h-8 w-8 shrink-0 rounded-md flex items-center justify-center text-[#777] hover:bg-[#F8F8F7] hover:text-[#242424] transition"
+				<Button
+					variant="ghost"
+					size="icon-sm"
 					onclick={() => admin.toggleSidebar()}
 					aria-label="Expand sidebar"
+					class="mx-auto shrink-0 text-muted-foreground hover:text-foreground"
 				>
 					<PanelLeftOpen class="h-4 w-4" />
-				</button>
+				</Button>
 			{/if}
 		</div>
 	</div>
 
 	<!-- nav -->
-	<div class="flex-1 overflow-y-auto overflow-x-hidden py-3">
+	<div class="flex-1 overflow-x-hidden overflow-y-auto py-3">
 		{#each NAV_SECTIONS as section (section.label)}
 			<div class="mb-5 px-2">
 				{#if !collapsed}
-					<div class="px-2 mb-1.5 text-[10px] font-semibold tracking-[0.12em] text-[#999] uppercase">
+					<div
+						class="mb-1.5 px-2 text-[10px] font-semibold tracking-[0.12em] text-[#636363] uppercase"
+					>
 						{section.label}
 					</div>
 				{:else}
@@ -67,12 +77,13 @@
 				{/if}
 				<div class="space-y-0.5">
 					{#each section.items as item (item.id)}
-						{@const isActive = activeId === item.id || (item.id === 'products' && activeId.startsWith('products'))}
+						{@const isActive =
+							activeId === item.id || (item.id === 'products' && activeId.startsWith('products'))}
 						{@const href = routeHref(item.id)}
-						<div class="relative group/item">
+						<div class="group/item relative">
 							<a
-								href={href}
-								class="w-full flex items-center gap-2.5 px-2.5 h-10 rounded-md text-[13px] font-medium transition-colors relative {isActive
+								{href}
+								class="relative flex h-10 w-full items-center gap-2.5 rounded-md px-2.5 text-[13px] font-medium transition-colors {isActive
 									? 'bg-[#F0F0EF] text-[#242424]'
 									: 'text-[#5A5A5A] hover:bg-[#F8F8F7] hover:text-[#242424]'} {collapsed
 									? 'justify-center'
@@ -80,15 +91,15 @@
 							>
 								{#if isActive && !collapsed}
 									<span
-										class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[2px] bg-[#343434] rounded-full"
+										class="absolute top-1/2 left-0 h-5 w-[2px] -translate-y-1/2 rounded-full bg-[#343434]"
 									></span>
 								{/if}
 								<item.icon
-									class="h-5 w-5 shrink-0 {isActive ? 'text-[#242424]' : 'text-[#777]'}"
+									class="h-5 w-5 shrink-0 {isActive ? 'text-[#242424]' : 'text-[#5A5A5A]'}"
 									strokeWidth={1.6}
 								/>
 								{#if !collapsed}
-									<span class="truncate text-left flex-1">{item.label}</span>
+									<span class="flex-1 truncate text-left">{item.label}</span>
 									{#if isActive}
 										<span class="h-1.5 w-1.5 rounded-full bg-[#242424]"></span>
 									{/if}
@@ -96,10 +107,10 @@
 							</a>
 							{#if collapsed}
 								<div
-									class="pointer-events-none absolute left-[calc(100%+8px)] top-1/2 -translate-y-1/2 z-50 hidden group-hover/item:block"
+									class="pointer-events-none absolute top-1/2 left-[calc(100%+8px)] z-50 hidden -translate-y-1/2 group-hover/item:block"
 								>
 									<div
-										class="bg-[#242424] text-white text-[11px] font-medium px-2.5 py-1 rounded-md whitespace-nowrap shadow-lg"
+										class="rounded-md bg-[#242424] px-2.5 py-1 text-[11px] font-medium whitespace-nowrap text-white shadow-lg"
 									>
 										{item.label}
 									</div>
@@ -114,16 +125,21 @@
 
 	<!-- footer user card -->
 	{#if !collapsed}
-		<div class="p-3 border-t mt-auto" style="border-color: var(--border);">
-			<div class="rounded-lg border p-2.5 flex items-center gap-2.5 bg-[#FBFBFA]" style="border-color: var(--border);">
-				<div class="h-7 w-7 rounded-full bg-[#EDEDEB] flex items-center justify-center text-[11px] font-semibold">
+		<div class="mt-auto border-t p-3" style="border-color: var(--border);">
+			<div
+				class="flex items-center gap-2.5 rounded-lg border bg-[#FBFBFA] p-2.5"
+				style="border-color: var(--border);"
+			>
+				<div
+					class="flex h-7 w-7 items-center justify-center rounded-full bg-[#EDEDEB] text-[11px] font-semibold"
+				>
 					IK
 				</div>
-				<div class="flex-1 min-w-0">
-					<div class="text-[12px] font-medium truncate">I. Kim</div>
-					<div class="text-[10px] text-[#777] truncate">Owner</div>
+				<div class="min-w-0 flex-1">
+					<div class="truncate text-[12px] font-medium">I. Kim</div>
+					<div class="truncate text-[10px] text-[#5A5A5A]">Owner</div>
 				</div>
-				<ChevronDown class="h-4 w-4 text-[#999]" />
+				<ChevronDown class="h-4 w-4 text-[#636363]" />
 			</div>
 		</div>
 	{/if}

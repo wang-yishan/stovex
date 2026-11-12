@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { generalWaLink } from '#lib/catalog/wa.ts';
+	import { catalogHref } from '#lib/catalog/links.ts';
 	import IconInstagram from '#lib/components/IconInstagram.svelte';
 	import { ArrowUpRight, LayoutDashboard } from '@lucide/svelte';
 
@@ -21,7 +22,7 @@
 				<span class="text-[25px] font-semibold tracking-[0.18em]">
 					{admin.settings.logo}<span class="text-[#D9534F]">.</span>
 				</span>
-				<p class="mt-4 max-w-sm text-sm leading-7 text-[#77736E]">
+				<p class="mt-4 max-w-sm text-sm leading-7 text-[#6B6762]">
 					{admin.settings.footerText}
 				</p>
 				{#if admin.settings.social.instagram}
@@ -29,7 +30,7 @@
 						href={`https://instagram.com/${admin.settings.social.instagram.replace(/^@/, '')}`}
 						target="_blank"
 						rel="noopener"
-						class="mt-4 inline-flex items-center gap-2 text-sm text-[#77736E] hover:text-[#D9534F]"
+						class="mt-4 inline-flex items-center gap-2 text-sm text-[#6B6762] hover:text-[#D9534F]"
 					>
 						<IconInstagram class="h-4 w-4" strokeWidth={1.6} />
 						{admin.settings.social.instagram}
@@ -38,16 +39,16 @@
 			</div>
 			<div>
 				<p class="mb-5 text-xs font-semibold tracking-wider uppercase">Explore</p>
-				<div class="flex flex-col gap-3 text-sm text-[#77736E]">
+				<div class="flex flex-col gap-3 text-sm text-[#6B6762]">
 					<a class="hover:text-[#D9534F]" href={`${base}#koleksi`}>Koleksi tas</a>
-					<a class="hover:text-[#D9534F]" href={`${base}/catalog`}>Katalog lengkap</a>
+					<a class="hover:text-[#D9534F]" href={catalogHref()}>Katalog lengkap</a>
 					<a class="hover:text-[#D9534F]" href={`${base}#cerita`}>Tentang kami</a>
 					<a class="hover:text-[#D9534F]" href={`${base}#pilihan`}>Inspirasi gaya</a>
 				</div>
 			</div>
 			<div>
 				<p class="mb-5 text-xs font-semibold tracking-wider uppercase">Customer care</p>
-				<div class="flex flex-col gap-3 text-sm text-[#77736E]">
+				<div class="flex flex-col gap-3 text-sm text-[#6B6762]">
 					<a class="hover:text-[#D9534F]" href={`${base}#kontak`}>Bantuan &amp; FAQ</a>
 					<a class="hover:text-[#D9534F]" href={`${base}#kontak`}>Informasi pengiriman</a>
 					<a
@@ -63,7 +64,7 @@
 			</div>
 		</div>
 		<div
-			class="flex flex-col justify-between gap-3 border-t border-[#EAE8E4] pt-6 text-[10px] tracking-wide text-[#77736E] sm:flex-row"
+			class="flex flex-col justify-between gap-3 border-t border-[#EAE8E4] pt-6 text-[10px] tracking-wide text-[#6B6762] sm:flex-row"
 		>
 			<p>© {new Date().getFullYear()} {admin.settings.logo}. All rights reserved.</p>
 			<div class="flex items-center gap-4">

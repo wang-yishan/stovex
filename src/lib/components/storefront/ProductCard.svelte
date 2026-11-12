@@ -10,11 +10,9 @@
 
 	interface Props {
 		product: Product;
-		/** Position in the grid — picks the fallback photo for products without uploads. */
-		index?: number;
 	}
 
-	let { product, index = 0 }: Props = $props();
+	let { product }: Props = $props();
 
 	let out = $derived(
 		stockStatus(effectiveStock(product), product.lowStockThreshold || 5, product.trackInventory) ===
@@ -41,7 +39,7 @@
 		>
 			<img
 				class="h-full w-full object-cover"
-				src={photoFor(product, index)}
+				src={photoFor(product)}
 				alt={product.name}
 				loading="lazy"
 			/>
@@ -81,7 +79,7 @@
 			<a href={productHref(product.slug)} class="hover:text-[#D9534F]">
 				<p class="text-xs font-semibold sm:text-sm">{product.name}</p>
 			</a>
-			<p class="mt-1 text-[10px] text-[#77736E] sm:text-xs">
+			<p class="mt-1 text-[10px] text-[#6B6762] sm:text-xs">
 				{categoryName(product.categoryId)}{cardVariantLabel(product)
 					? ` · ${cardVariantLabel(product)}`
 					: ''}
@@ -90,7 +88,7 @@
 		<div class="text-right">
 			<p class="text-xs whitespace-nowrap sm:text-sm">{formatIDR(product.basePrice)}</p>
 			{#if product.compareAtPrice}
-				<p class="text-[10px] whitespace-nowrap text-[#999] line-through sm:text-xs">
+				<p class="text-[10px] whitespace-nowrap text-[#636363] line-through sm:text-xs">
 					{formatIDR(product.compareAtPrice)}
 				</p>
 			{/if}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Moon, Sun } from '@lucide/svelte';
 	import { mode, toggleMode } from 'mode-watcher';
+	import { Button } from '#lib/components/ui/button/index.ts';
 </script>
 
 <!--
@@ -10,26 +11,28 @@
 	localStorage and adds the `dark` class on <html>.
 -->
 
-<button
-	type="button"
+<Button
+	variant="outline"
+	size="icon"
 	onclick={toggleMode}
 	aria-label="Toggle theme"
-	class="relative h-9 w-9 rounded-full border bg-white flex items-center justify-center overflow-hidden hover:border-[#242424] transition shrink-0"
-	style="border-color: var(--border);"
+	class="relative shrink-0 overflow-hidden"
 >
 	<span
-		class="absolute inset-0 flex items-center justify-center transition-all duration-300 {mode.current === 'dark'
-			? 'rotate-90 scale-0 opacity-0'
-			: 'rotate-0 scale-100 opacity-100'}"
+		class="absolute inset-0 flex items-center justify-center transition-all duration-300 {mode.current ===
+		'dark'
+			? 'scale-0 rotate-90 opacity-0'
+			: 'scale-100 rotate-0 opacity-100'}"
 	>
 		<Sun class="h-4 w-4" strokeWidth={1.6} />
 	</span>
 	<span
-		class="absolute inset-0 flex items-center justify-center transition-all duration-300 {mode.current === 'dark'
-			? 'rotate-0 scale-100 opacity-100'
-			: '-rotate-90 scale-0 opacity-0'}"
+		class="absolute inset-0 flex items-center justify-center transition-all duration-300 {mode.current ===
+		'dark'
+			? 'scale-100 rotate-0 opacity-100'
+			: 'scale-0 -rotate-90 opacity-0'}"
 	>
 		<Moon class="h-4 w-4" strokeWidth={1.6} />
 	</span>
 	<span class="sr-only">Toggle theme</span>
-</button>
+</Button>

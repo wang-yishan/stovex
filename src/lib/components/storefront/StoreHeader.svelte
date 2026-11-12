@@ -3,6 +3,7 @@
 	import { cart } from '#lib/catalog/cart.svelte.ts';
 	import { formatIDR } from '#lib/admin/data.ts';
 	import { generalWaLink } from '#lib/catalog/wa.ts';
+	import { catalogHref } from '#lib/catalog/links.ts';
 	import { Menu, MessageCircle, Search, ShoppingBag, Trash2, X } from '@lucide/svelte';
 
 	interface Props {
@@ -67,12 +68,12 @@
 			{#each navLinks as link (link.id)}
 				<a class="nav-link" href={link.href}>{link.label}</a>
 			{/each}
-			<a class="nav-link" href={`${base}/catalog`}>Katalog</a>
+			<a class="nav-link" href={catalogHref()}>Katalog</a>
 		</nav>
 
 		<div class="flex items-center gap-4 sm:gap-5">
 			<a
-				href={`${base}#koleksi`}
+				href={catalogHref()}
 				class="hidden items-center gap-2 text-[13px] text-[#242424]/80 transition hover:text-[#D9534F] sm:flex"
 			>
 				<Search class="h-4 w-4" strokeWidth={1.6} />
@@ -112,10 +113,10 @@
 						class="absolute top-full right-0 z-50 mt-3 w-[300px] border border-[#EAE8E4] bg-white p-4 shadow-[0_14px_45px_rgba(36,36,36,0.12)]"
 					>
 						<div class="mb-3 flex items-center justify-between">
-							<p class="text-[11px] tracking-[0.18em] text-[#77736E] uppercase">Keranjang</p>
+							<p class="text-[11px] tracking-[0.18em] text-[#6B6762] uppercase">Keranjang</p>
 							<button
 								type="button"
-								class="text-[#77736E] hover:text-[#242424]"
+								class="text-[#6B6762] hover:text-[#242424]"
 								aria-label="Tutup keranjang"
 								onclick={() => (cart.open = false)}
 							>
@@ -124,20 +125,20 @@
 						</div>
 
 						{#if cart.lines.length === 0}
-							<p class="py-3 text-[12px] text-[#77736E]">Keranjang masih kosong.</p>
+							<p class="py-3 text-[12px] text-[#6B6762]">Keranjang masih kosong.</p>
 						{:else}
 							<ul class="flex max-h-[220px] flex-col gap-2 overflow-y-auto">
 								{#each cart.lines as line (line.id)}
 									<li class="flex items-start justify-between gap-3 text-[12px]">
 										<span class="leading-snug text-[#242424]">
 											{line.name}
-											{#if line.variant}<span class="text-[#77736E]">· {line.variant}</span>{/if}
+											{#if line.variant}<span class="text-[#6B6762]">· {line.variant}</span>{/if}
 										</span>
 										<span class="flex items-center gap-2 whitespace-nowrap">
 											<span>{formatIDR(line.price)}</span>
 											<button
 												type="button"
-												class="text-[#999] hover:text-[#D9534F]"
+												class="text-[#636363] hover:text-[#D9534F]"
 												aria-label={`Hapus ${line.name}`}
 												onclick={() => cart.remove(line.id)}
 											>
@@ -148,7 +149,7 @@
 								{/each}
 							</ul>
 							<div class="mt-3 flex items-center justify-between border-t border-[#EAE8E4] pt-3">
-								<span class="text-[11px] tracking-[0.18em] text-[#77736E] uppercase">Total</span>
+								<span class="text-[11px] tracking-[0.18em] text-[#6B6762] uppercase">Total</span>
 								<span class="text-[13px] font-semibold">{formatIDR(cart.total)}</span>
 							</div>
 							<button
@@ -174,11 +175,7 @@
 					{link.label}
 				</a>
 			{/each}
-			<a
-				href={`${base}/catalog`}
-				class="text-[#242424]/80"
-				onclick={() => (mobileMenuOpen = false)}
-			>
+			<a href={catalogHref()} class="text-[#242424]/80" onclick={() => (mobileMenuOpen = false)}>
 				Katalog
 			</a>
 		</nav>

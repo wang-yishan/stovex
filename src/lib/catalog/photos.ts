@@ -28,10 +28,15 @@ function hash(text: string): number {
 	return h;
 }
 
-/** Primary photo for a product (uploaded image first, fallback otherwise). */
-export function photoFor(product: Product, index: number): string {
+/**
+ * Primary photo for a product (uploaded image first, fallback otherwise).
+ * The fallback is derived from the product id rather than its position in a
+ * grid, so a product keeps the same photo while filters and sorting reorder
+ * the listing.
+ */
+export function photoFor(product: Product): string {
 	const primary = product.images.find((i) => i.isPrimary) ?? product.images[0];
-	return primary?.url || FALLBACK_PHOTOS[index % FALLBACK_PHOTOS.length];
+	return primary?.url || FALLBACK_PHOTOS[hash(product.id) % FALLBACK_PHOTOS.length];
 }
 
 /**

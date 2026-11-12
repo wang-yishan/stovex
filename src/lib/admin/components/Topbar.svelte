@@ -29,13 +29,13 @@
 -->
 
 <div
-	class="sticky z-30 bg-[#F8F8F7]/80 backdrop-blur-xl border-b"
+	class="sticky z-30 bg-[var(--chrome-bg)] backdrop-blur-xl border-b"
 	style="top: var(--safe-area-inset-top); border-color: var(--border);"
 >
 	<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8 py-3 sm:py-4">
 		<div class="flex items-center justify-between gap-3">
 			<div class="min-w-0 flex-1">
-				<div class="flex items-center gap-1.5 text-[11px] text-[#999] mb-1 whitespace-nowrap overflow-hidden">
+				<div class="flex items-center gap-1.5 text-[11px] text-[#636363] mb-1 whitespace-nowrap overflow-hidden">
 					{#each crumbs as crumb, i (i)}
 						{#if i > 0}
 							<span class="opacity-60 shrink-0">/</span>
@@ -60,7 +60,7 @@
 							{@render badge()}
 						{/if}
 					</div>
-					<span class="hidden md:inline text-[12px] text-[#777] shrink-0">{subtitle}</span>
+					<span class="hidden md:inline text-[12px] text-[#5A5A5A] shrink-0">{subtitle}</span>
 				</div>
 			</div>
 			<div class="flex items-center gap-2 shrink-0">
@@ -76,7 +76,7 @@
 					</div>
 					<div class="hidden lg:block leading-tight">
 						<div class="text-[12px] font-medium">I. Kim</div>
-						<div class="text-[10px] text-[#777] -mt-0.5">Owner</div>
+						<div class="text-[10px] text-[#5A5A5A] -mt-0.5">Owner</div>
 					</div>
 				</div>
 			</div>
@@ -84,12 +84,12 @@
 
 		<!-- mobile subtitle row -->
 		<div class="md:hidden mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
-			<span class="text-[12px] text-[#777]">{mobileSubtitle ?? subtitle}</span>
-			<span class="text-[11px] text-[#999] whitespace-nowrap">Last updated: 11:42 AM</span>
+			<span class="text-[12px] text-[#5A5A5A]">{mobileSubtitle ?? subtitle}</span>
+			<span class="text-[11px] text-[#636363] whitespace-nowrap">Last updated: 11:42 AM</span>
 		</div>
 
 		<!-- desktop status row -->
-		<div class="hidden md:flex mt-3 items-center gap-2 text-[11px] text-[#999]">
+		<div class="hidden md:flex mt-3 items-center gap-2 text-[11px] text-[#636363]">
 			<span>Last updated: 11:42 AM</span>
 			<span class="h-1 w-1 rounded-full bg-[#D9D9D9]"></span>
 			<span class="inline-flex items-center gap-1">

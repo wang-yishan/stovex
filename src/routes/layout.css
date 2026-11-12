@@ -1,12 +1,510 @@
+/*
+	Bag Store — global stylesheet (single source of truth).
+
+	Every global, Tailwind-related rule lives here: fonts, the Tailwind
+	core + plugins, the dark-mode variant, the design tokens (light +
+	dark), the theme mapping that exposes those tokens as utilities, the
+	base layer, and the app chrome that depends on them.
+
+	Token layers
+	------------
+	1. Brand tokens  — the raw Bag Store palette (`--bg`, `--surface`,
+	   `--text-*`, `--border`, `--success`, …). Light values in `:root`,
+	   dark values in `.dark` (mode-watcher toggles `.dark` on <html>).
+	2. Semantic tokens — the shadcn-svelte vocabulary (`--background`,
+	   `--primary`, `--muted-foreground`, …), each an alias of a brand
+	   token or a deliberate value, so the UI kit renders in the Bag
+	   Store design language instead of the preset's neutral defaults.
+	3. `@theme inline` — maps the semantic tokens onto Tailwind color
+	   utilities (`bg-background`, `text-foreground`, `border-border`, …).
+
+	Never re-declare a token in another file: change it here.
+
+	Contrast: text on light surfaces must reach 4.5:1 (AA). Verify with
+	  bun scripts/contrast.ts --audit
+*/
+
+/* ---------- 1. Fonts ---------- */
 @import '@fontsource-variable/inter';
 @import '@fontsource-variable/geist';
 @import '@fontsource-variable/jetbrains-mono';
 @import '@fontsource-variable/dm-sans';
 @import '@fontsource-variable/playfair-display';
+
+/* ---------- 2. Tailwind core ---------- */
 @import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn-svelte/tailwind.css';
+
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
+
+/* ---------- 3. Variants ---------- */
 /* Class-based dark mode (mode-watcher toggles .dark on <html>) */
 @custom-variant dark (&:where(.dark, .dark *));
-@import './admin.css';
-@import './storefront.css';
+
+/* ---------- 4. Design tokens ---------- */
+:root {
+	/* --- brand palette --- */
+	--bg: #f8f8f7; /* page background */
+	--surface: #ffffff; /* cards, panels, popovers */
+	--text-primary: #242424; /* 14.6:1 on --bg */
+	--text-secondary: #5a5a5a; /* 6.5:1 on --bg */
+	--text-muted: #636363; /* 5.7:1 on --bg */
+	--border: #eaeaea;
+	/* control border: interactive-control boundaries need 3:1 against the
+	   surface they sit on (WCAG 1.4.11), which --border does not reach */
+	--border-control: #8a8a8a; /* 3.45:1 on white, 4.94:1 on --surface dark */
+	--ink: #242424; /* primary button fill */
+	--ink-hover: #1a1a1a; /* primary button hover (darker in light mode) */
+	--ink-strong: #343434; /* active indicators, inverted surfaces */
+	--success: #269b65; /* indicator dot / border */
+	--warning: #d69a35; /* indicator dot / border */
+	--danger: #d9534f; /* indicator dot / border */
+	--success-text: #1a7a52; /* 5.3:1 on white */
+	--warning-text: #8a6a24; /* 5.0:1 on white */
+	--danger-text: #a33a37; /* 6.5:1 on white */
+	--chrome-bg: rgba(248, 248, 247, 0.92); /* frosted sticky chrome */
+	/* form fields (shadcn Input / Select / Textarea) */
+	--field-bg: #fbfbfa; /* resting field fill */
+	--field-bg-focus: #ffffff; /* field fill on focus */
+	--safe-area-inset-top: env(safe-area-inset-top, 0px);
+	--safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+
+	/* --- semantic tokens (shadcn-svelte) --- */
+	--background: var(--bg);
+	--foreground: var(--text-primary);
+	--card: var(--surface);
+	--card-foreground: var(--text-primary);
+	--popover: var(--surface);
+	--popover-foreground: var(--text-primary);
+	--primary: var(--ink);
+	--primary-foreground: #ffffff;
+	--secondary: #f5f5f4;
+	--secondary-foreground: var(--text-primary);
+	--muted: #f5f5f4;
+	--muted-foreground: var(--text-secondary);
+	--accent: #f0f0ef;
+	--accent-foreground: var(--text-primary);
+	--destructive: var(--danger-text);
+	--destructive-foreground: #ffffff;
+	--input: var(--border-control);
+	--ring: var(--text-primary);
+	--primary-hover: var(--ink-hover);
+	--field: var(--field-bg);
+	--field-focus: var(--field-bg-focus);
+	--chart-1: #242424;
+	--chart-2: #5a5a5a;
+	--chart-3: #8a8a8a;
+	--chart-4: #269b65;
+	--chart-5: #d69a35;
+	--sidebar: var(--surface);
+	--sidebar-foreground: var(--text-primary);
+	--sidebar-primary: var(--ink);
+	--sidebar-primary-foreground: #ffffff;
+	--sidebar-accent: #f0f0ef;
+	--sidebar-accent-foreground: var(--text-primary);
+	--sidebar-border: var(--border);
+	--sidebar-ring: var(--ring);
+
+	/* --- radii --- */
+	--radius: 0.5rem; /* lg = 8px, xl = 12px (card radius) */
+}
+
+.dark {
+	/* --- brand palette --- */
+	--bg: #101010;
+	--surface: #1c1c1c;
+	--text-primary: #f0f0f0; /* 16.7:1 on --bg */
+	--text-secondary: #a8a8a8; /* 7.2:1 on --surface */
+	--text-muted: #8a8a8a; /* 4.9:1 on --surface */
+	--border: #2b2b2b;
+	--border-control: #8a8a8a; /* 4.94:1 on --surface */
+	--ink: #f0f0f0; /* primary button inverts in dark */
+	--ink-hover: #ffffff; /* primary button hover (lighter in dark mode) */
+	--ink-strong: #f5f5f5;
+	--success: #269b65; /* 4.8:1 on --bg */
+	--warning: #d69a35; /* 6.9:1 on --bg */
+	--danger: #d9534f; /* 4.8:1 on --bg */
+	--success-text: #7ed3ab; /* 9.6:1 on --surface */
+	--warning-text: #e8b95c; /* 9.4:1 on --surface */
+	--danger-text: #f0a3a0; /* 8.5:1 on --surface */
+	--chrome-bg: rgba(16, 16, 16, 0.92);
+	/* form fields (shadcn Input / Select / Textarea) */
+	--field-bg: #161616; /* resting field fill */
+	--field-bg-focus: #1c1c1c; /* field fill on focus */
+
+	/* --- semantic tokens (shadcn-svelte) --- */
+	--background: var(--bg);
+	--foreground: var(--text-primary);
+	--card: var(--surface);
+	--card-foreground: var(--text-primary);
+	--popover: var(--surface);
+	--popover-foreground: var(--text-primary);
+	--primary: var(--ink);
+	--primary-foreground: #111111;
+	--secondary: #242424;
+	--secondary-foreground: var(--text-primary);
+	--muted: #242424;
+	--muted-foreground: var(--text-secondary);
+	--accent: #242424;
+	--accent-foreground: var(--text-primary);
+	--destructive: var(--danger-text);
+	--destructive-foreground: #1c1c1c;
+	--input: var(--border-control);
+	--ring: var(--text-primary);
+	--primary-hover: var(--ink-hover);
+	--field: var(--field-bg);
+	--field-focus: var(--field-bg-focus);
+	--chart-1: #f0f0f0;
+	--chart-2: #a8a8a8;
+	--chart-3: #8a8a8a;
+	--chart-4: #7ed3ab;
+	--chart-5: #e8b95c;
+	--sidebar: var(--surface);
+	--sidebar-foreground: var(--text-primary);
+	--sidebar-primary: var(--ink);
+	--sidebar-primary-foreground: #111111;
+	--sidebar-accent: #242424;
+	--sidebar-accent-foreground: var(--text-primary);
+	--sidebar-border: var(--border);
+	--sidebar-ring: var(--ring);
+}
+
+/* ---------- 5. Theme mapping ---------- */
+@theme inline {
+	--font-sans:
+		'Inter Variable', 'Inter', 'Geist Variable', 'Geist', system-ui, -apple-system,
+		BlinkMacSystemFont, sans-serif;
+	--font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+	--font-display: 'Playfair Display Variable', 'Playfair Display', Georgia, serif;
+
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-border-control: var(--border-control);
+	--color-ring: var(--ring);
+	--color-primary-hover: var(--primary-hover);
+	--color-field: var(--field);
+	--color-field-focus: var(--field-focus);
+	--color-success: var(--success);
+	--color-warning: var(--warning);
+	--color-danger: var(--danger);
+	--color-success-text: var(--success-text);
+	--color-warning-text: var(--warning-text);
+	--color-danger-text: var(--danger-text);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+	--radius-3xl: calc(var(--radius) * 2.2);
+	--radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ---------- 6. Base layer ---------- */
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+
+	body {
+		@apply bg-background text-foreground;
+	}
+
+	html {
+		@apply font-sans;
+	}
+}
+
+/* ---------- 7. Bag Store chrome ---------- */
+/*
+	Chrome rules from the ref bundle:
+	- font/scrollbar defaults
+	- Tailwind v4 preflight patch (v4 defaults border-color to
+	  currentColor, ref bundle assumed #EAEAEA)
+	- dark-mode remaps for the hardcoded hex classes used in the app
+
+	Scope note: the dashboard is `.admin-root`, the storefront is
+	`.forma-root`. The storefront is a light-only, warm-palette surface
+	with its own DM Sans face (section 8), so it is deliberately NOT
+	covered by the dashboard's font stack or its dark-mode remaps.
+*/
+.admin-root * {
+	font-family:
+		'Inter Variable',
+		'Inter',
+		'Geist Variable',
+		'Geist',
+		-apple-system,
+		BlinkMacSystemFont,
+		sans-serif;
+}
+
+.admin-root .mono {
+	font-family: 'JetBrains Mono Variable', 'JetBrains Mono', monospace;
+}
+
+/*
+	Preflight patch (v4 defaults border-color to currentColor, ref bundle
+	assumed #EAEAEA).
+
+	Kept inside `@layer base` so Tailwind utilities still win — an unlayered
+	rule would beat every `@layer utilities` border class regardless of
+	specificity, killing focus rings (`focus-visible:border-ring`) and
+	invalid states (`aria-invalid:border-destructive`).
+*/
+@layer base {
+	.admin-root :where(*, ::before, ::after) {
+		border-color: var(--border);
+	}
+}
+
+/* Scrollbar (ref global) */
+.admin-root ::-webkit-scrollbar {
+	width: 4px;
+	height: 4px;
+}
+
+.admin-root ::-webkit-scrollbar-thumb {
+	background: #e0e0e0;
+	border-radius: 4px;
+}
+
+/* ---- Mobile responsiveness & icon system (375px-first) ---- */
+/* Prevent horizontal scroll / iOS text inflation on the dashboard */
+.admin-root {
+	-webkit-tap-highlight-color: transparent;
+	overflow-x: clip;
+}
+.admin-root img {
+	max-width: 100%;
+}
+.admin-root * {
+	min-width: 0;
+}
+html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
+
+/* Icon scale — one system, used by all Lucide icons in chrome.
+   .icon-* keeps every icon legible on a 375px viewport:
+   body/action icons 16-18px, tab/primary icons 20px, hero 24px. */
+.admin-root svg {
+	flex-shrink: 0;
+	display: block;
+}
+.icon-sm {
+	width: 14px;
+	height: 14px;
+}
+.icon-md {
+	width: 16px;
+	height: 16px;
+}
+.icon-lg {
+	width: 20px;
+	height: 20px;
+}
+.icon-xl {
+	width: 24px;
+	height: 24px;
+}
+.admin-root .table-scroll {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+.admin-root h1,
+.admin-root h2 {
+	text-wrap: balance;
+}
+
+@media (max-width: 767px) {
+	/* iOS zooms on focus when input text < 16px; keep tap targets ≥40px */
+	.admin-root input,
+	.admin-root select,
+	.admin-root textarea {
+		font-size: 16px;
+	}
+	.admin-root button,
+	.admin-root a {
+		-webkit-tap-highlight-color: transparent;
+	}
+	/* Lift the smallest action icons (12–14px) to a legible 16px on mobile */
+	.admin-root svg[class*='h-3 '],
+	.admin-root svg[class*='w-3 '] {
+		width: 16px;
+		height: 16px;
+	}
+}
+
+/* Used by mobile "More" sheet entry animation (ref: animate-[slideUp_260ms_cubic-bezier(0.16,1,0.3,1)]) */
+@keyframes slideUp {
+	from {
+		transform: translateY(100%);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+
+/* ---- Dark mode (mode-watcher toggles .dark on <html>) ----
+   Tokens flip via CSS variables; the hardcoded chrome hexes used across
+   .admin-root are remapped here so dark stays readable.
+
+   Scoped to .admin-root only: the storefront is a light-only, warm-palette
+   surface (see section 8) and pins its own light token values. */
+.dark body {
+	background-color: var(--bg);
+	color: var(--text-primary);
+}
+
+.dark .admin-root {
+	color: var(--text-primary);
+}
+
+.dark .admin-root .bg-white {
+	background-color: var(--surface);
+}
+
+.dark .admin-root .bg-\[\#F8F8F7\] {
+	background-color: var(--bg);
+}
+
+.dark .admin-root .bg-\[\#FBFBFA\] {
+	background-color: #161616;
+}
+
+.dark .admin-root .bg-\[\#F5F5F4\] {
+	background-color: #242424;
+}
+
+.dark .admin-root .bg-\[\#F0F0EF\] {
+	background-color: #242424;
+}
+
+/* Primary dark buttons invert to light in dark mode */
+.dark .admin-root .bg-\[\#343434\] {
+	background-color: #f0f0f0;
+	color: #111111;
+}
+
+.dark .admin-root .bg-\[\#242424\] {
+	background-color: #f0f0f0;
+	color: #111111;
+}
+
+.dark .admin-root .text-\[\#242424\] {
+	color: var(--text-primary);
+}
+
+/* Secondary text role (light: #5a5a5a on #f8f8f7 = 6.5:1) */
+.dark .admin-root .text-\[\#5A5A5A\] {
+	color: var(--text-secondary);
+}
+
+/* Muted text role (light: #636363 on #f8f8f7 = 5.7:1) */
+.dark .admin-root .text-\[\#636363\] {
+	color: var(--text-muted);
+}
+
+.dark .admin-root input,
+.dark .admin-root select,
+.dark .admin-root textarea {
+	color: var(--text-primary);
+}
+
+/* Placeholders keep the muted role in dark mode too */
+.dark .admin-root ::placeholder {
+	color: var(--text-muted);
+}
+
+.dark .admin-root ::-webkit-scrollbar-thumb {
+	background: #333333;
+}
+
+/* ---------- 8. Storefront typography ---------- */
+/*
+	Storefront display face (landing page + /catalog routes).
+	Kept global so every storefront component can use the same display face,
+	whatever component it lives in.
+
+	The storefront is a light-only, warm-palette surface (the reference bundle
+	has no dark variant), so it pins the tokens it consumes to their light
+	values. That keeps shadcn kit components used here — the catalogue
+	search field, the filter price inputs, the sort select — readable
+	instead of inheriting the dashboard's flipped dark palette.
+*/
+.forma-root {
+	--font-display: 'Playfair Display Variable', 'Playfair Display', Georgia, serif;
+	font-family:
+		'DM Sans Variable',
+		'DM Sans',
+		system-ui,
+		-apple-system,
+		'Segoe UI',
+		sans-serif;
+	-webkit-font-smoothing: antialiased;
+
+	/* pinned light tokens (see :root for the dark-mode counterparts) */
+	--bg: #fbfbfa;
+	--surface: #ffffff;
+	--text-primary: #242424;
+	--text-secondary: #5a5a5a;
+	--text-muted: #636363;
+	--border: #eae8e4;
+	--border-control: #8a8a8a;
+	--field-bg: #ffffff;
+	--field-bg-focus: #ffffff;
+	--background: var(--bg);
+	--foreground: var(--text-primary);
+	--card: var(--surface);
+	--card-foreground: var(--text-primary);
+	--popover: var(--surface);
+	--popover-foreground: var(--text-primary);
+	--primary: #242424;
+	--primary-foreground: #ffffff;
+	--primary-hover: #1a1a1a;
+	--secondary: #f5f3ef;
+	--secondary-foreground: var(--text-primary);
+	--muted: #f5f3ef;
+	--muted-foreground: var(--text-secondary);
+	--accent: #f0efec;
+	--accent-foreground: var(--text-primary);
+	--destructive: #a33a37;
+	--destructive-foreground: #ffffff;
+	--input: var(--border-control);
+	--ring: var(--text-primary);
+	--field: var(--field-bg);
+	--field-focus: var(--field-bg-focus);
+}

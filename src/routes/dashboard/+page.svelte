@@ -2,6 +2,7 @@
 	import { innerWidth } from 'svelte/reactivity/window';
 	import { page } from '$app/state';
 	import Topbar from '#lib/admin/components/Topbar.svelte';
+	import { Button } from '#lib/components/ui/button/index.ts';
 	import {
 		SEED_ORDERS,
 		SEED_ACTIVITY,
@@ -40,134 +41,142 @@
 	Full Overview dashboard (KPIs, seed orders table/cards, activity stream).
 -->
 
-<Topbar
-	crumbs={[{ label: 'Dashboard' }]}
-	title="Overview"
-	subtitle="Monitor your store activity."
->
+<Topbar crumbs={[{ label: 'Dashboard' }]} title="Overview" subtitle="Monitor your store activity.">
 	{#snippet actions()}
-		<button
-			type="button"
-			class="h-10 sm:h-8 rounded-full border bg-white px-3 text-[12px] font-medium flex items-center gap-1.5 hover:border-[#242424] transition"
-			style="border-color: var(--border);"
-		>
+		<Button variant="outline">
 			Today
-			<ChevronDown class="h-4 w-4 text-[#777]" />
-		</button>
-		<button
-			type="button"
-			class="h-10 w-10 sm:h-8 sm:w-8 rounded-full border bg-white flex items-center justify-center relative hover:border-[#242424] transition"
-			style="border-color: var(--border);"
-			aria-label="Notifications"
-		>
-			<Bell class="h-5 w-5 text-[#242424]" strokeWidth={1.6} />
+			<ChevronDown class="h-4 w-4 text-muted-foreground" />
+		</Button>
+		<Button variant="outline" size="icon" aria-label="Notifications" class="relative">
+			<Bell class="h-5 w-5 text-foreground" strokeWidth={1.6} />
 			<span
-				class="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#D9534F] border-2 border-white"
+				class="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-card bg-[#D9534F]"
 			></span>
-		</button>
+		</Button>
 	{/snippet}
 </Topbar>
 
-<div class="mx-auto max-w-[1280px] w-full {isMobile ? 'px-4 py-4 pb-[112px]' : 'px-4 md:px-6 lg:px-8 py-6'}">
+<div
+	class="mx-auto w-full max-w-[1280px] {isMobile
+		? 'px-4 py-4 pb-[112px]'
+		: 'px-4 py-6 md:px-6 lg:px-8'}"
+>
 	<!-- KPI cards -->
-	<div class="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4">
+	<div class="mb-4 grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 md:gap-4 lg:grid-cols-4">
 		<!-- Orders KPI -->
-		<div class="bg-white border rounded-[12px] p-4 min-w-0" style="border-color: var(--border);">
-			<div class="flex items-start justify-between gap-2 mb-3">
-				<div class="h-9 w-9 rounded-[8px] bg-[#FFF8E6] border flex items-center justify-center shrink-0" style="border-color: #F3D9A0;">
+		<div class="min-w-0 rounded-[12px] border border-border bg-card p-4">
+			<div class="mb-3 flex items-start justify-between gap-2">
+				<div
+					class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border bg-[#FFF8E6]"
+					style="border-color: #F3D9A0;"
+				>
 					<ShoppingCart class="h-5 w-5 text-[#8A6A24]" strokeWidth={1.6} />
 				</div>
 				<span
-					class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#FFF8E6] text-[#8A6A24] border shrink-0 max-w-[92px] truncate"
+					class="inline-flex max-w-[92px] shrink-0 items-center gap-1 truncate rounded-full border bg-[#FFF8E6] px-2 py-0.5 text-[10px] font-medium text-[#8A6A24]"
 					style="border-color: #F3D9A0;"
 				>
-					<span class="h-1 w-1 rounded-full bg-[#D69A35] shrink-0"></span>
+					<span class="h-1 w-1 shrink-0 rounded-full bg-[#D69A35]"></span>
 					Needs action
 				</span>
 			</div>
-			<div class="text-[24px] sm:text-[28px] font-semibold leading-none tracking-tight text-[#242424]">
+			<div
+				class="text-[24px] leading-none font-semibold tracking-tight text-foreground sm:text-[28px]"
+			>
 				{ordersNeedingAction}
 			</div>
-			<div class="mt-1 text-[11px] text-[#777]">Orders awaiting confirmation</div>
+			<div class="mt-1 text-[11px] text-muted-foreground">Orders awaiting confirmation</div>
 		</div>
 
 		<!-- Active products KPI -->
-		<div class="bg-white border rounded-[12px] p-4 min-w-0" style="border-color: var(--border);">
-			<div class="flex items-start justify-between gap-2 mb-3">
-				<div class="h-9 w-9 rounded-[8px] bg-[#F0FAF6] border flex items-center justify-center shrink-0" style="border-color: #C7EBDB;">
+		<div class="min-w-0 rounded-[12px] border border-border bg-card p-4">
+			<div class="mb-3 flex items-start justify-between gap-2">
+				<div
+					class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border bg-[#F0FAF6]"
+					style="border-color: #C7EBDB;"
+				>
 					<Package class="h-5 w-5 text-[#1A7A52]" strokeWidth={1.6} />
 				</div>
 				<span
-					class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#F0FAF6] text-[#1A7A52] border shrink-0 max-w-[92px] truncate"
+					class="inline-flex max-w-[92px] shrink-0 items-center gap-1 truncate rounded-full border bg-[#F0FAF6] px-2 py-0.5 text-[10px] font-medium text-[#1A7A52]"
 					style="border-color: #C7EBDB;"
 				>
-					<span class="h-1 w-1 rounded-full bg-[#269B65] shrink-0"></span>
+					<span class="h-1 w-1 shrink-0 rounded-full bg-[#269B65]"></span>
 					Live
 				</span>
 			</div>
-			<div class="text-[24px] sm:text-[28px] font-semibold leading-none tracking-tight text-[#242424]">
+			<div
+				class="text-[24px] leading-none font-semibold tracking-tight text-foreground sm:text-[28px]"
+			>
 				{activeCount}
 			</div>
-			<div class="mt-1 text-[11px] text-[#777]">Active in storefront</div>
+			<div class="mt-1 text-[11px] text-muted-foreground">Active in storefront</div>
 		</div>
 
 		<!-- Low stock KPI -->
-		<div class="bg-white border rounded-[12px] p-4 min-w-0" style="border-color: var(--border);">
-			<div class="flex items-start justify-between gap-2 mb-3">
-				<div class="h-9 w-9 rounded-[8px] bg-[#FFF0F0] border flex items-center justify-center shrink-0" style="border-color: #F2C2C0;">
+		<div class="min-w-0 rounded-[12px] border border-border bg-card p-4">
+			<div class="mb-3 flex items-start justify-between gap-2">
+				<div
+					class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border bg-[#FFF0F0]"
+					style="border-color: #F2C2C0;"
+				>
 					<TriangleAlert class="h-5 w-5 text-[#A33A37]" strokeWidth={1.6} />
 				</div>
 				<span
-					class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#FFF0F0] text-[#A33A37] border shrink-0 max-w-[92px] truncate"
+					class="inline-flex max-w-[92px] shrink-0 items-center gap-1 truncate rounded-full border bg-[#FFF0F0] px-2 py-0.5 text-[10px] font-medium text-[#A33A37]"
 					style="border-color: #F2C2C0;"
 				>
-					<span class="h-1 w-1 rounded-full bg-[#D9534F] shrink-0"></span>
+					<span class="h-1 w-1 shrink-0 rounded-full bg-[#D9534F]"></span>
 					Attention
 				</span>
 			</div>
-			<div class="text-[24px] sm:text-[28px] font-semibold leading-none tracking-tight text-[#242424]">
+			<div
+				class="text-[24px] leading-none font-semibold tracking-tight text-foreground sm:text-[28px]"
+			>
 				{lowCount}
 			</div>
-			<div class="mt-1 text-[11px] text-[#777]">Low stock items</div>
+			<div class="mt-1 text-[11px] text-muted-foreground">Low stock items</div>
 		</div>
 
 		<!-- Store health KPI -->
-		<div class="bg-white border rounded-[12px] p-4 min-w-0" style="border-color: var(--border);">
-			<div class="flex items-start justify-between gap-2 mb-3">
-				<div class="h-9 w-9 rounded-[8px] bg-[#F5F5F4] border flex items-center justify-center shrink-0" style="border-color: var(--border);">
-					<LayoutDashboard class="h-5 w-5 text-[#5A5A5A]" strokeWidth={1.6} />
+		<div class="min-w-0 rounded-[12px] border border-border bg-card p-4">
+			<div class="mb-3 flex items-start justify-between gap-2">
+				<div
+					class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border border-border bg-muted"
+				>
+					<LayoutDashboard class="h-5 w-5 text-muted-foreground" strokeWidth={1.6} />
 				</div>
 				<span
-					class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#F5F5F4] text-[#5A5A5A] border shrink-0 max-w-[92px] truncate"
-					style="border-color: var(--border);"
+					class="inline-flex max-w-[92px] shrink-0 items-center gap-1 truncate rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
 				>
-					<span class="h-1 w-1 rounded-full bg-[#269B65] shrink-0"></span>
+					<span class="h-1 w-1 shrink-0 rounded-full bg-[#269B65]"></span>
 					Healthy
 				</span>
 			</div>
-			<div class="text-[24px] sm:text-[28px] font-semibold leading-none tracking-tight text-[#242424]">
+			<div
+				class="text-[24px] leading-none font-semibold tracking-tight text-foreground sm:text-[28px]"
+			>
 				<CircleCheck class="h-6 w-6 text-[#269B65]" strokeWidth={1.6} />
 			</div>
-			<div class="mt-1 text-[11px] text-[#777]">All systems operational</div>
+			<div class="mt-1 text-[11px] text-muted-foreground">All systems operational</div>
 		</div>
 	</div>
 
 	<!-- Orders -->
-	<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-		<div
-			class="bg-white border rounded-[12px] overflow-hidden"
-			style="border-color: var(--border);"
-		>
-			<div class="px-4 md:px-5 py-3 border-b flex items-center justify-between" style="border-color: var(--border);">
+	<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+		<div class="overflow-hidden rounded-[12px] border border-border bg-card">
+			<div class="flex items-center justify-between border-b border-border px-4 py-3 md:px-5">
 				<h3 class="text-[13px] font-semibold">Recent orders</h3>
-				<span class="text-[11px] text-[#777]">Latest {SEED_ORDERS.length}</span>
+				<span class="text-[11px] text-muted-foreground">Latest {SEED_ORDERS.length}</span>
 			</div>
 
 			{#if ordersView}
 				<div class="overflow-x-auto">
 					<table class="w-full text-left">
 						<thead>
-							<tr class="bg-[#FBFBFA] border-b text-[10px] font-semibold tracking-[0.08em] uppercase text-[#999]" style="border-color: var(--border);">
+							<tr
+								class="border-b border-border bg-field text-[10px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
+							>
 								<th class="px-4 py-2">Order</th>
 								<th class="px-4 py-2">Customer</th>
 								<th class="px-4 py-2">Date</th>
@@ -175,18 +184,19 @@
 								<th class="px-4 py-2 text-right">Status</th>
 							</tr>
 						</thead>
-						<tbody class="divide-y" style="border-color: var(--border);">
+						<tbody class="divide-y divide-border">
 							{#each SEED_ORDERS as order (order.id)}
-								<tr class="hover:bg-[#F8F8F7]">
-									<td class="px-4 py-2.5 mono text-[11px] text-[#777]">{order.id}</td>
+								<tr class="hover:bg-muted">
+									<td class="mono px-4 py-2.5 text-[11px] text-muted-foreground">{order.id}</td>
 									<td class="px-4 py-2.5 text-[12px]">{order.customer}</td>
-									<td class="px-4 py-2.5 text-[11px] text-[#777]">{order.date}</td>
+									<td class="px-4 py-2.5 text-[11px] text-muted-foreground">{order.date}</td>
 									<td class="px-4 py-2.5 text-[12px] font-medium">{order.total}</td>
 									<td class="px-4 py-2.5 text-right">
 										<span
-											class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium border {order.statusTone === 'amber'
-												? 'bg-[#FFF8E6] text-[#8A6A24] border-[#F3D9A0]'
-												: 'bg-[#F5F5F4] text-[#5A5A5A] border-[#EAEAEA]'}"
+											class="inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium {order.statusTone ===
+											'amber'
+												? 'border-[#F3D9A0] bg-[#FFF8E6] text-[#8A6A24]'
+												: 'border-border bg-muted text-muted-foreground'}"
 										>
 											{order.status}
 										</span>
@@ -197,22 +207,23 @@
 					</table>
 				</div>
 			{:else}
-				<div class="divide-y" style="border-color: var(--border);">
+				<div class="divide-y divide-border">
 					{#each SEED_ORDERS as order (order.id)}
 						<div class="p-4">
 							<div class="flex items-center justify-between">
-								<span class="mono text-[11px] text-[#777]">{order.id}</span>
+								<span class="mono text-[11px] text-muted-foreground">{order.id}</span>
 								<span
-									class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium border {order.statusTone === 'amber'
-										? 'bg-[#FFF8E6] text-[#8A6A24] border-[#F3D9A0]'
-										: 'bg-[#F5F5F4] text-[#5A5A5A] border-[#EAEAEA]'}"
+									class="inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium {order.statusTone ===
+									'amber'
+										? 'border-[#F3D9A0] bg-[#FFF8E6] text-[#8A6A24]'
+										: 'border-border bg-muted text-muted-foreground'}"
 								>
 									{order.status}
 								</span>
 							</div>
-							<div class="text-[13px] font-medium mt-1">{order.customer}</div>
-							<div class="flex items-center justify-between mt-1">
-								<span class="text-[11px] text-[#777]">{order.date}</span>
+							<div class="mt-1 text-[13px] font-medium">{order.customer}</div>
+							<div class="mt-1 flex items-center justify-between">
+								<span class="text-[11px] text-muted-foreground">{order.date}</span>
 								<span class="text-[12px] font-semibold">{order.total}</span>
 							</div>
 						</div>
@@ -222,24 +233,28 @@
 		</div>
 
 		<!-- Activity stream: matches ref Recent store activity (timeline + footer) -->
-		<div class="bg-white border rounded-[12px] overflow-hidden" style="border-color: var(--border);">
-			<div class="px-4 md:px-5 py-3.5 border-b flex items-center justify-between" style="border-color: var(--border);">
-				<h2 class="text-[13px] font-semibold tracking-tight text-[#242424]">Recent store activity</h2>
+		<div class="overflow-hidden rounded-[12px] border border-border bg-card">
+			<div class="flex items-center justify-between border-b border-border px-4 py-3.5 md:px-5">
+				<h2 class="text-[13px] font-semibold tracking-tight text-foreground">
+					Recent store activity
+				</h2>
 			</div>
 			<div class="p-4 md:p-5">
 				<div class="relative">
-					<div class="absolute left-[4px] top-1 bottom-1 w-px bg-[#EAEAEA]"></div>
+					<div class="absolute top-1 bottom-1 left-[4px] w-px bg-border"></div>
 					<div class="space-y-5">
 						{#each SEED_ACTIVITY as item (item.time + item.title)}
 							<div class="relative flex gap-3">
-								<span class="mt-1 h-2 w-2 rounded-full shrink-0 {item.dot} ring-4 ring-white relative z-10"></span>
-								<div class="flex-1 min-w-0 -mt-0.5">
+								<span
+									class="mt-1 h-2 w-2 shrink-0 rounded-full {item.dot} relative z-10 ring-4 ring-card"
+								></span>
+								<div class="-mt-0.5 min-w-0 flex-1">
 									<div class="flex items-center gap-2">
-										<span class="text-[11px] text-[#999]">{item.time}</span>
+										<span class="text-[11px] text-muted-foreground">{item.time}</span>
 									</div>
 									<div class="mt-1 text-[12px] leading-snug">
-										<span class="text-[#5A5A5A]">{item.title}</span>{' '}
-										<span class="font-medium text-[#242424]">{item.entity}</span>
+										<span class="text-muted-foreground">{item.title}</span>{' '}
+										<span class="font-medium text-foreground">{item.entity}</span>
 									</div>
 								</div>
 							</div>
@@ -248,8 +263,7 @@
 				</div>
 			</div>
 			<div
-				class="px-5 py-3 bg-[#FBFBFA] border-t text-[11px] text-[#777] flex items-center justify-between"
-				style="border-color: var(--border);"
+				class="flex items-center justify-between border-t border-border bg-field px-5 py-3 text-[11px] text-muted-foreground"
 			>
 				<span>Showing last 6 events</span>
 			</div>

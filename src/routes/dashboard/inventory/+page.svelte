@@ -10,6 +10,9 @@
 	import type { StockLevel } from '#lib/admin/types.ts';
 	import { Eye, PenLine, TriangleAlert } from '@lucide/svelte';
 	import { resolvePath } from '#lib/admin/paths.ts';
+	import { Button } from '#lib/components/ui/button/index.ts';
+	import { Input } from '#lib/components/ui/input/index.ts';
+	import { NativeSelect } from '#lib/components/ui/native-select/index.ts';
 
 	const isMobile = $derived((innerWidth.current ?? 1024) < 768);
 
@@ -134,41 +137,55 @@
 	subtitle="Stock levels & movements."
 />
 
-<div class="mx-auto max-w-[1280px] w-full {isMobile ? 'px-4 py-4 pb-[112px]' : 'px-4 md:px-6 lg:px-8 py-6'}">
+<div
+	class="mx-auto w-full max-w-[1280px] {isMobile
+		? 'px-4 py-4 pb-[112px]'
+		: 'px-4 py-6 md:px-6 lg:px-8'}"
+>
 	{#if lowRows.length > 0}
-		<div class="bg-[#FFFDF3] border rounded-[12px] p-3 mb-4 flex items-start gap-2" style="border-color: #F0D99E;">
-			<TriangleAlert class="h-5 w-5 text-[#D69A35] mt-0.5 shrink-0" />
+		<div
+			class="mb-4 flex items-start gap-2 rounded-[12px] border bg-[#FFFDF3] p-3"
+			style="border-color: #F0D99E;"
+		>
+			<TriangleAlert class="mt-0.5 h-5 w-5 shrink-0 text-[#D69A35]" />
 			<div>
-				<p class="text-[12px] font-medium text-[#7A5A1A]">Low-stock alerts — {lowRows.length} items need attention</p>
-				<p class="text-[11px] text-[#8A6A24] mt-0.5">
-					{lowRows.slice(0, 3).map((r) => `${r.productName}${r.variantName ? ` / ${r.variantName}` : ''} (${r.stock})`).join(', ')}
+				<p class="text-[12px] font-medium text-[#7A5A1A]">
+					Low-stock alerts — {lowRows.length} items need attention
+				</p>
+				<p class="mt-0.5 text-[11px] text-[#8A6A24]">
+					{lowRows
+						.slice(0, 3)
+						.map(
+							(r) => `${r.productName}${r.variantName ? ` / ${r.variantName}` : ''} (${r.stock})`
+						)
+						.join(', ')}
 				</p>
 			</div>
 		</div>
 	{/if}
 
-	<div class="bg-white border rounded-[12px] p-3 md:p-4 mb-4 flex flex-col md:flex-row gap-3 justify-between" style="border-color: var(--border);">
+	<div
+		class="mb-4 flex flex-col justify-between gap-3 rounded-[12px] border border-border bg-card p-3 md:flex-row md:p-4"
+	>
 		<SearchInput bind:value={search} placeholder="Search by name/SKU..." />
-		<div class="flex gap-2">
-			<select
-				class="h-10 sm:h-9 w-full sm:w-auto rounded-full border bg-white px-3 pr-7 text-[12px] font-medium appearance-none"
-				style="border-color: var(--border);"
-				bind:value={statusFilter}
-			>
+		<div class="flex gap-2 [&>div]:w-full sm:[&>div]:w-auto">
+			<NativeSelect shape="pill" class="font-medium" bind:value={statusFilter}>
 				<option value="All">All Stock</option>
 				<option value="in-stock">In Stock</option>
 				<option value="low">Low</option>
 				<option value="out">Out</option>
-			</select>
+			</NativeSelect>
 		</div>
 	</div>
 
-	<div class="bg-white border rounded-[12px] overflow-hidden mb-6" style="border-color: var(--border);">
+	<div class="mb-6 overflow-hidden rounded-[12px] border border-border bg-card">
 		{#if !isMobile}
 			<div class="overflow-x-auto">
 				<table class="w-full text-left">
 					<thead>
-						<tr class="bg-[#FBFBFA] border-b text-[10px] font-semibold tracking-[0.08em] uppercase text-[#999]" style="border-color: var(--border);">
+						<tr
+							class="border-b border-border bg-field text-[10px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
+						>
 							<th class="px-5 py-2.5">Product / Variant</th>
 							<th class="px-5 py-2.5">SKU</th>
 							<th class="px-5 py-2.5">Current stock</th>
@@ -178,60 +195,90 @@
 							<th class="px-5 py-2.5 text-right">Actions</th>
 						</tr>
 					</thead>
-					<tbody class="divide-y" style="border-color: var(--border);">
+					<tbody class="divide-y divide-border">
 						{#each rows as r, i (`${r.productId}-${r.variantId || 'prod'}-${i}`)}
-							<tr class="hover:bg-[#F8F8F7]">
+							<tr class="hover:bg-muted">
 								<td class="px-5 py-3">
 									<div class="text-[13px] font-medium">{r.productName}</div>
-									{#if r.variantName}<div class="text-[11px] text-[#777]">{r.variantName}</div>{/if}
+									{#if r.variantName}<div class="text-[11px] text-muted-foreground">
+											{r.variantName}
+										</div>{/if}
 								</td>
-								<td class="px-5 py-3 mono text-[11px] text-[#777]">{r.sku || '—'}</td>
+								<td class="mono px-5 py-3 text-[11px] text-muted-foreground">{r.sku || '—'}</td>
 								<td class="px-5 py-3 text-[13px] font-medium">{r.tracking ? r.stock : '—'}</td>
 								<td class="px-5 py-3 text-[12px]">{r.threshold}</td>
-								<td class="px-5 py-3"><StockBadge status={r.status} stock={r.stock} tracking={r.tracking} /></td>
-								<td class="px-5 py-3 text-[11px] text-[#777]">{new Date(r.updatedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}</td>
+								<td class="px-5 py-3"
+									><StockBadge status={r.status} stock={r.stock} tracking={r.tracking} /></td
+								>
+								<td class="px-5 py-3 text-[11px] text-muted-foreground"
+									>{new Date(r.updatedAt).toLocaleDateString('id-ID', {
+										day: '2-digit',
+										month: 'short'
+									})}</td
+								>
 								<td class="px-5 py-3 text-right">
 									<div class="flex justify-end gap-1">
-										<button type="button" class="flex h-7 w-7 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]" style="border-color: var(--border);" onclick={() => void goto(resolvePath(`/dashboard/products/${r.productId}`))} aria-label="View product"><Eye class="h-3.5 w-3.5 text-[#777]" /></button>
-										<button type="button" class="h-8 px-2.5 rounded-full border bg-white text-[12px] font-medium flex items-center gap-1" style="border-color: var(--border);" onclick={() => openAdjust(r)}><PenLine class="h-4 w-4 shrink-0" /> Adjust</button>
+										<Button
+											variant="outline"
+											size="icon-sm"
+											onclick={() => void goto(resolvePath(`/dashboard/products/${r.productId}`))}
+											aria-label="View product"
+											><Eye class="h-3.5 w-3.5 text-muted-foreground" /></Button
+										>
+										<Button variant="outline" size="xs" class="px-2.5" onclick={() => openAdjust(r)}
+											><PenLine class="h-4 w-4 shrink-0" /> Adjust</Button
+										>
 									</div>
 								</td>
 							</tr>
 						{/each}
 						{#if rows.length === 0}
-							<tr><td colspan="7" class="px-5 py-12 text-center text-[13px]">No inventory items</td></tr>
+							<tr
+								><td colspan="7" class="px-5 py-12 text-center text-[13px]">No inventory items</td
+								></tr
+							>
 						{/if}
 					</tbody>
 				</table>
 			</div>
 		{:else}
-			<div class="divide-y" style="border-color: var(--border);">
+			<div class="divide-y divide-border">
 				{#each rows as r, i (`${r.productId}-${r.variantId}-${i}`)}
-					<div class="p-4 flex justify-between gap-3">
+					<div class="flex justify-between gap-3 p-4">
 						<div>
 							<div class="text-[13px] font-medium">{r.productName}</div>
-							<div class="text-[11px] text-[#777]">{r.variantName || '—'} • <span class="mono">{r.sku}</span></div>
-							<div class="flex gap-2 mt-1">
+							<div class="text-[11px] text-muted-foreground">
+								{r.variantName || '—'} • <span class="mono">{r.sku}</span>
+							</div>
+							<div class="mt-1 flex gap-2">
 								<StockBadge status={r.status} stock={r.stock} tracking={r.tracking} />
-								<span class="text-[11px] text-[#777]">Thr {r.threshold}</span>
+								<span class="text-[11px] text-muted-foreground">Thr {r.threshold}</span>
 							</div>
 						</div>
-						<button type="button" class="h-10 rounded-full border bg-white px-4 text-[12px] font-medium self-center shrink-0" style="border-color: var(--border);" onclick={() => openAdjust(r)}>Adjust</button>
+						<Button
+							variant="outline"
+							class="shrink-0 self-center px-4 sm:h-10"
+							onclick={() => openAdjust(r)}>Adjust</Button
+						>
 					</div>
 				{/each}
 			</div>
 		{/if}
 	</div>
 
-	<div class="bg-white border rounded-[12px] overflow-hidden" style="border-color: var(--border);">
-		<div class="px-4 md:px-5 py-3 border-b flex items-center justify-between" style="border-color: var(--border);">
+	<div class="overflow-hidden rounded-[12px] border border-border bg-card">
+		<div class="flex items-center justify-between border-b border-border px-4 py-3 md:px-5">
 			<h3 class="text-[13px] font-semibold">Movement history — traceable</h3>
-			<span class="text-[11px] text-[#777]">{admin.movements.length} records • never silently overwrite</span>
+			<span class="text-[11px] text-muted-foreground"
+				>{admin.movements.length} records • never silently overwrite</span
+			>
 		</div>
 		<div class="overflow-x-auto">
 			<table class="w-full text-left">
 				<thead>
-					<tr class="bg-[#FBFBFA] border-b text-[10px] font-semibold tracking-[0.08em] uppercase text-[#999]" style="border-color: var(--border);">
+					<tr
+						class="border-b border-border bg-field text-[10px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
+					>
 						<th class="px-5 py-2.5">Date</th>
 						<th class="px-5 py-2.5">Product</th>
 						<th class="px-5 py-2.5">SKU</th>
@@ -241,20 +288,40 @@
 						<th class="px-5 py-2.5">Reason</th>
 					</tr>
 				</thead>
-				<tbody class="divide-y" style="border-color: var(--border);">
+				<tbody class="divide-y divide-border">
 					{#each admin.movements as m (m.id)}
-						<tr class="hover:bg-[#F8F8F7]">
-							<td class="px-5 py-2.5 text-[11px] text-[#777]">{new Date(m.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</td>
-							<td class="px-5 py-2.5 text-[12px]">{m.productName}{m.variantName ? ` / ${m.variantName}` : ''}</td>
-							<td class="px-5 py-2.5 mono text-[11px] text-[#777]">{m.sku}</td>
-							<td class="px-5 py-2.5"><span class="text-[10px] px-2 py-0.5 rounded-full border {chipClass(m.type)}">{m.type}</span></td>
-							<td class="px-5 py-2.5 text-[12px] font-medium"><span class={m.quantityChange >= 0 ? 'text-[#269B65]' : 'text-[#D9534F]'}>{m.quantityChange > 0 ? `+${m.quantityChange}` : m.quantityChange}</span></td>
+						<tr class="hover:bg-muted">
+							<td class="px-5 py-2.5 text-[11px] text-muted-foreground"
+								>{new Date(m.createdAt).toLocaleDateString('id-ID', {
+									day: '2-digit',
+									month: 'short',
+									hour: '2-digit',
+									minute: '2-digit'
+								})}</td
+							>
+							<td class="px-5 py-2.5 text-[12px]"
+								>{m.productName}{m.variantName ? ` / ${m.variantName}` : ''}</td
+							>
+							<td class="mono px-5 py-2.5 text-[11px] text-muted-foreground">{m.sku}</td>
+							<td class="px-5 py-2.5"
+								><span class="rounded-full border px-2 py-0.5 text-[10px] {chipClass(m.type)}"
+									>{m.type}</span
+								></td
+							>
+							<td class="px-5 py-2.5 text-[12px] font-medium"
+								><span class={m.quantityChange >= 0 ? 'text-[#269B65]' : 'text-destructive'}
+									>{m.quantityChange > 0 ? `+${m.quantityChange}` : m.quantityChange}</span
+								></td
+							>
 							<td class="px-5 py-2.5 text-[11px]">{m.previousStock} → {m.newStock}</td>
-							<td class="px-5 py-2.5 text-[11px] text-[#777] max-w-[200px] truncate">{m.reason}</td>
+							<td class="max-w-[200px] truncate px-5 py-2.5 text-[11px] text-muted-foreground"
+								>{m.reason}</td
+							>
 						</tr>
 					{/each}
 					{#if admin.movements.length === 0}
-						<tr><td colspan="7" class="px-5 py-12 text-center text-[13px]">No movements yet</td></tr>
+						<tr><td colspan="7" class="px-5 py-12 text-center text-[13px]">No movements yet</td></tr
+						>
 					{/if}
 				</tbody>
 			</table>
@@ -264,36 +331,64 @@
 
 {#if target}
 	<Modal title="Adjust stock">
-		<p class="text-[12px] text-[#777] mt-1">
-			{target.productName}{target.variantName ? ` / ${target.variantName}` : ''} — current {target.currentStock} • SKU {target.sku || '—'}
+		<p class="mt-1 text-[12px] text-muted-foreground">
+			{target.productName}{target.variantName ? ` / ${target.variantName}` : ''} — current {target.currentStock}
+			• SKU {target.sku || '—'}
 		</p>
 		<div class="mt-3 space-y-3">
 			<div>
-				<label for="adj-delta" class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#777]">Quantity change (+/-)</label>
-				<input id="adj-delta" type="number" class="mt-1 w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px]" style="border-color: var(--border);" placeholder="e.g. 5 or -2" bind:value={delta} />
-				<p class="text-[10px] text-[#777] mt-1">Never silently overwrite — creates movement record traceable. Inventory never negative via manual adjustment.</p>
+				<label
+					for="adj-delta"
+					class="text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
+					>Quantity change (+/-)</label
+				>
+				<Input
+					id="adj-delta"
+					type="number"
+					class="mt-1"
+					placeholder="e.g. 5 or -2"
+					bind:value={delta}
+				/>
+				<p class="mt-1 text-[10px] text-muted-foreground">
+					Never silently overwrite — creates movement record traceable. Inventory never negative via
+					manual adjustment.
+				</p>
 			</div>
-			<div>
-				<label for="adj-reason" class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#777]">Reason required</label>
-				<select id="adj-reason" class="mt-1 w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px] bg-white" style="border-color: var(--border);" bind:value={reason}>
+			<div class="[&>div]:w-full">
+				<label
+					for="adj-reason"
+					class="text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
+					>Reason required</label
+				>
+				<NativeSelect id="adj-reason" bind:value={reason}>
 					<option value="">Select reason</option>
 					<option value="Restock">Restock</option>
 					<option value="Correction">Correction</option>
 					<option value="Damaged">Damaged</option>
-				</select>
+				</NativeSelect>
 			</div>
 			<div>
-				<label for="adj-note" class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#777]">Note</label>
-				<input id="adj-note" class="mt-1 w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px]" style="border-color: var(--border);" placeholder="Optional note" bind:value={note} />
+				<label
+					for="adj-note"
+					class="text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
+					>Note</label
+				>
+				<Input id="adj-note" class="mt-1" placeholder="Optional note" bind:value={note} />
 			</div>
-			<div class="bg-[#FBFBFA] border rounded-[8px] p-2 text-[11px] text-[#777]" style="border-color: var(--border);">
+			<div
+				class="rounded-[8px] border border-border bg-field p-2 text-[11px] text-muted-foreground"
+			>
 				New stock will be: <b>{Math.max(0, target.currentStock + delta)}</b>
-				{#if target.currentStock + delta < 0}<span class="text-[#D9534F]"> — will be clamped to 0, never negative</span>{/if}
+				{#if target.currentStock + delta < 0}<span class="text-destructive">
+						— will be clamped to 0, never negative</span
+					>{/if}
 			</div>
 		</div>
-		<div class="flex gap-2 mt-4">
-			<button type="button" class="flex-1 h-10 rounded-full bg-[#242424] text-white text-[12px]" onclick={confirmAdjust}>Confirm adjust</button>
-			<button type="button" class="flex-1 h-10 rounded-full border bg-white text-[12px]" style="border-color: var(--border);" onclick={() => (target = null)}>Cancel</button>
+		<div class="mt-4 flex gap-2">
+			<Button class="flex-1 sm:h-10" onclick={confirmAdjust}>Confirm adjust</Button>
+			<Button variant="outline" class="flex-1 sm:h-10" onclick={() => (target = null)}
+				>Cancel</Button
+			>
 		</div>
 	</Modal>
 {/if}

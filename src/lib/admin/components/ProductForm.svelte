@@ -34,6 +34,11 @@
 		uid
 	} from '#lib/admin/data.ts';
 	import type { AttributeDraft, Product } from '#lib/admin/types.ts';
+	import { Button } from '#lib/components/ui/button/index.ts';
+	import { Checkbox } from '#lib/components/ui/checkbox/index.ts';
+	import { Input } from '#lib/components/ui/input/index.ts';
+	import { NativeSelect } from '#lib/components/ui/native-select/index.ts';
+	import { Textarea } from '#lib/components/ui/textarea/index.ts';
 
 	let {
 		product: initial,
@@ -110,9 +115,15 @@
 		setTimeout(() => {
 			clearInterval(tick);
 			uploadProgress = null;
-			const added = urls.map((url, i) => ({ id: uid('img'), url, isPrimary: false, alt: ok[i]?.name }));
+			const added = urls.map((url, i) => ({
+				id: uid('img'),
+				url,
+				isPrimary: false,
+				alt: ok[i]?.name
+			}));
 			const images = [...draft.images, ...added];
-			if (images.length > 0 && !images.some((i) => i.isPrimary)) images[0] = { ...images[0]!, isPrimary: true };
+			if (images.length > 0 && !images.some((i) => i.isPrimary))
+				images[0] = { ...images[0]!, isPrimary: true };
 			draft.images = images;
 			admin.showToast('Images added (reference only, not binary stored)', 'success');
 			input.value = '';
@@ -133,7 +144,8 @@
 	}
 	function removeImage(id: string) {
 		const rest = draft.images.filter((i) => i.id !== id);
-		if (rest.length > 0 && !rest.some((i) => i.isPrimary)) rest[0] = { ...rest[0]!, isPrimary: true };
+		if (rest.length > 0 && !rest.some((i) => i.isPrimary))
+			rest[0] = { ...rest[0]!, isPrimary: true };
 		draft.images = rest;
 	}
 
@@ -154,7 +166,11 @@
 					map.get(a.name)!.add(a.value);
 				}
 			}
-			attrs = [...map.entries()].map(([name, set]) => ({ id: uid('attr-'), name, values: [...set] }));
+			attrs = [...map.entries()].map(([name, set]) => ({
+				id: uid('attr-'),
+				name,
+				values: [...set]
+			}));
 		} else {
 			attrs = structuredClone(ATTRIBUTE_SEED).map((a) => ({ ...a, id: uid('attr-') }));
 		}
@@ -211,7 +227,11 @@
 	let combos = $derived.by(() => {
 		const clean = attrs
 			.filter((a) => a.name.trim())
-			.map((a) => ({ id: a.id, name: a.name.trim(), values: a.values.map((v) => v.trim()).filter(Boolean) }))
+			.map((a) => ({
+				id: a.id,
+				name: a.name.trim(),
+				values: a.values.map((v) => v.trim()).filter(Boolean)
+			}))
 			.filter((a) => a.values.length > 0);
 		return generateCombinations(clean);
 	});
@@ -222,7 +242,10 @@
 			return;
 		}
 		if (combos.length > VARIANTS_MAX) {
-			admin.showToast(`Too many combinations (${combos.length}) — reduce values (max ${VARIANTS_MAX})`, 'error');
+			admin.showToast(
+				`Too many combinations (${combos.length}) — reduce values (max ${VARIANTS_MAX})`,
+				'error'
+			);
 			return;
 		}
 		const existingByName = new Map(draft.variants.map((v) => [v.name, v]));
@@ -272,7 +295,11 @@
 			admin.showToast('Invalid or duplicate slug', 'error');
 			return;
 		}
-		const c = admin.createCategory({ name: catDraft.name.trim(), slug, description: catDraft.description });
+		const c = admin.createCategory({
+			name: catDraft.name.trim(),
+			slug,
+			description: catDraft.description
+		});
 		draft.categoryId = c.id;
 		catModal = false;
 		catDraft = { name: '', slug: '', description: '' };
@@ -305,7 +332,8 @@
 		const e: Record<string, string> = {};
 		if (!draft.name.trim()) e.name = 'Name required';
 		if (!slug.trim()) e.slug = 'Slug required';
-		else if (!admin.slugUnique(slug, mode === 'edit' ? draft.id : undefined)) e.slug = 'Slug must be unique';
+		else if (!admin.slugUnique(slug, mode === 'edit' ? draft.id : undefined))
+			e.slug = 'Slug must be unique';
 		if (draft.basePrice <= 0) e.basePrice = 'Price must be positive';
 		if (draft.compareAtPrice !== undefined && draft.compareAtPrice <= draft.basePrice)
 			e.compareAtPrice = 'Compare-at must be > regular price';
@@ -316,7 +344,8 @@
 			if (draft.variants.length === 0) e.variants = 'Generate variants before publishing';
 			for (const v of draft.variants) {
 				if (v.stock < 0) e[`var-${v.id}-stock`] = 'Stock cannot be negative';
-				if (v.sku && !admin.skuUnique(v.sku, draft.id, v.id)) e[`var-${v.id}-sku`] = 'SKU duplicate';
+				if (v.sku && !admin.skuUnique(v.sku, draft.id, v.id))
+					e[`var-${v.id}-sku`] = 'SKU duplicate';
 			}
 		}
 		return e;
@@ -332,7 +361,8 @@
 	});
 
 	function backfillSeo() {
-		if (!draft.seoTitle?.trim()) draft.seoTitle = draft.name.trim() ? `${draft.name} - Bag Store` : draft.seoTitle;
+		if (!draft.seoTitle?.trim())
+			draft.seoTitle = draft.name.trim() ? `${draft.name} - Bag Store` : draft.seoTitle;
 		if (!draft.seoDescription?.trim() && draft.shortDescription)
 			draft.seoDescription = draft.shortDescription.slice(0, 160);
 	}
@@ -395,49 +425,58 @@
 	}}
 />
 
-<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8 py-4 md:py-6 pb-[120px] md:pb-6">
-	<div class="flex items-center gap-2 mb-4">
+<div class="mx-auto w-full max-w-[1280px] px-4 py-4 pb-[120px] md:px-6 md:py-6 md:pb-6 lg:px-8">
+	<div class="mb-4 flex items-center gap-2">
 		<a
 			href={resolve('/dashboard/products')}
-			class="h-10 w-10 shrink-0 rounded-full border bg-white flex items-center justify-center hover:border-[#242424] transition"
+			class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]"
 			style="border-color: var(--border);"
 			aria-label="Back to products"
 		>
 			<ChevronLeft class="h-5 w-5" />
 		</a>
-		<h2 class="text-[16px] sm:text-[18px] font-semibold">{mode === 'create' ? 'New product' : `Edit ${draft.name || 'product'}`}</h2>
+		<h2 class="text-[16px] font-semibold sm:text-[18px]">
+			{mode === 'create' ? 'New product' : `Edit ${draft.name || 'product'}`}
+		</h2>
 	</div>
 
-	<div class="flex flex-col lg:flex-row gap-6">
+	<div class="flex flex-col gap-6 lg:flex-row">
 		<!-- Main column -->
-		<div class="flex-1 min-w-0 space-y-4">
+		<div class="min-w-0 flex-1 space-y-4">
 			<!-- Basic Info -->
-			<div class="bg-white border rounded-[12px] p-4 md:p-5" style="border-color: var(--border);">
-				<h3 class="text-[13px] font-semibold mb-3 flex items-center gap-2"><Info class="h-4 w-4 shrink-0" />Basic Info</h3>
+			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+				<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold">
+					<Info class="h-4 w-4 shrink-0" />Basic Info
+				</h3>
 				<div class="space-y-3">
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]">Name *</span>
-						<input
-							class="mt-1 w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px] bg-[#FBFBFA] focus:bg-white focus:outline-none focus:border-[#242424]"
-							style="border-color: {errors.name ? '#D9534F' : 'var(--border)'}"
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+							>Name *</span
+						>
+						<Input
+							class="mt-1"
+							aria-invalid={Boolean(errors.name)}
 							bind:value={draft.name}
 							placeholder="Everyday Canvas Tote"
 						/>
-						{#if errors.name}<p class="text-[11px] text-[#D9534F] mt-1">{errors.name}</p>{/if}
+						{#if errors.name}<p class="mt-1 text-[11px] text-[#D9534F]">{errors.name}</p>{/if}
 					</div>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+					<div class="grid grid-cols-1 gap-3 md:grid-cols-2">
 						<div>
-							<span class="flex items-center gap-1 text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]"
+							<span
+								class="flex items-center gap-1 text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
 								>Slug *
-								<button
-									type="button"
-									class="text-[10px] normal-case tracking-normal underline"
-									onclick={toggleSlugLock}>{slugManual ? 'Auto' : 'Edit'}</button
+								<Button
+									variant="link"
+									size="xs"
+									class="h-auto px-0 text-[10px] tracking-normal normal-case underline"
+									onclick={toggleSlugLock}>{slugManual ? 'Auto' : 'Edit'}</Button
 								>
 							</span>
-							<input
-								class="mt-1 w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px] mono bg-[#FBFBFA] focus:bg-white focus:outline-none focus:border-[#242424] disabled:opacity-60"
-								style="border-color: {errors.slug ? '#D9534F' : 'var(--border)'}"
+							<Input
+								font="mono"
+								class="mt-1"
+								aria-invalid={Boolean(errors.slug)}
 								value={slug}
 								disabled={!slugManual}
 								oninput={(e) => {
@@ -445,47 +484,55 @@
 									draft.slug = slugify((e.currentTarget as HTMLInputElement).value);
 								}}
 							/>
-							{#if errors.slug}<p class="text-[11px] text-[#D9534F] mt-1">{errors.slug}</p>{/if}
+							{#if errors.slug}<p class="mt-1 text-[11px] text-[#D9534F]">{errors.slug}</p>{/if}
 						</div>
 						<div>
-							<span class="block text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]">SKU (unique)</span>
-							<input
-								class="mt-1 w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px] mono bg-[#FBFBFA] focus:bg-white focus:outline-none focus:border-[#242424]"
-								style="border-color: {errors.sku ? '#D9534F' : 'var(--border)'}"
+							<span
+								class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+								>SKU (unique)</span
+							>
+							<Input
+								font="mono"
+								class="mt-1"
+								aria-invalid={Boolean(errors.sku)}
 								bind:value={draft.sku}
 								placeholder="ECT-BGE-M"
 							/>
-							{#if errors.sku}<p class="text-[11px] text-[#D9534F] mt-1">{errors.sku}</p>{/if}
+							{#if errors.sku}<p class="mt-1 text-[11px] text-[#D9534F]">{errors.sku}</p>{/if}
 						</div>
 					</div>
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]">Short Description</span>
-						<textarea
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+							>Short Description</span
+						>
+						<Textarea
+							class="mt-1 resize-none"
 							rows="2"
-							class="mt-1 w-full rounded-[8px] border px-3 py-2 text-[13px] resize-none bg-[#FBFBFA] focus:bg-white focus:outline-none focus:border-[#242424]"
-							style="border-color: var(--border);"
 							bind:value={draft.shortDescription}
 							placeholder="Lightweight canvas tote for daily essentials."
-						></textarea>
+						></Textarea>
 					</div>
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]">Full Description</span>
-						<textarea
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+							>Full Description</span
+						>
+						<Textarea
+							class="mt-1"
 							rows="4"
-							class="mt-1 w-full rounded-[8px] border px-3 py-2 text-[13px] bg-[#FBFBFA] focus:bg-white focus:outline-none focus:border-[#242424]"
-							style="border-color: var(--border);"
 							bind:value={draft.fullDescription}
 							placeholder="Made from organic canvas with reinforced handles..."
-						></textarea>
+						></Textarea>
 					</div>
 				</div>
 			</div>
 
 			<!-- Media -->
-			<div class="bg-white border rounded-[12px] p-4 md:p-5" style="border-color: var(--border);">
-				<h3 class="text-[13px] font-semibold mb-3 flex items-center gap-2"><Image class="h-4 w-4 shrink-0" />Media — upload, reorder, primary</h3>
+			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+				<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold">
+					<Image class="h-4 w-4 shrink-0" />Media — upload, reorder, primary
+				</h3>
 				<div
-					class="border border-dashed rounded-[10px] p-4 text-center bg-[#FBFBFA]"
+					class="rounded-[10px] border border-dashed bg-[#FBFBFA] p-4 text-center"
 					style="border-color: var(--border);"
 				>
 					<input
@@ -496,81 +543,95 @@
 						bind:this={fileInput}
 						onchange={onFiles}
 					/>
-					<button
-						type="button"
-						class="h-10 sm:h-8 rounded-full border bg-white px-4 text-[12px] font-medium hover:border-[#242424] transition inline-flex items-center gap-1.5"
-						style="border-color: var(--border);"
-						onclick={() => fileInput?.click()}
-					>
+					<Button variant="outline" size="default" type="button" onclick={() => fileInput?.click()}>
 						<Upload class="h-4 w-4 shrink-0" />Upload images
-					</button>
-					<p class="text-[11px] text-[#999] mt-2">jpg/png/webp max 5MB • Store references not binary • Primary required for publish</p>
+					</Button>
+					<p class="mt-2 text-[11px] text-[#636363]">
+						jpg/png/webp max 5MB • Store references not binary • Primary required for publish
+					</p>
 					{#if uploadProgress !== null}
-						<div class="mt-3 h-1.5 w-full bg-[#EAEAEA] rounded-full overflow-hidden">
-							<div class="h-full bg-[#242424] transition-all" style="width: {uploadProgress}%"></div>
+						<div class="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#EAEAEA]">
+							<div
+								class="h-full bg-[#242424] transition-all"
+								style="width: {uploadProgress}%"
+							></div>
 						</div>
 					{/if}
-					{#if uploadError}<p class="text-[11px] text-[#D9534F] mt-2">{uploadError}</p>{/if}
+					{#if uploadError}<p class="mt-2 text-[11px] text-[#D9534F]">{uploadError}</p>{/if}
 				</div>
 				{#if draft.images.length > 0}
-					<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+					<div class="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
 						{#each draft.images as img (img.id)}
 							<div
-								class="relative border rounded-[10px] overflow-hidden bg-[#F5F5F4] {img.isPrimary ? 'ring-2 ring-[#242424]' : ''}"
+								class="relative overflow-hidden rounded-[10px] border bg-[#F5F5F4] {img.isPrimary
+									? 'ring-2 ring-[#242424]'
+									: ''}"
 								style="border-color: {img.isPrimary ? '#242424' : 'var(--border)'};"
 							>
-								<div class="aspect-square flex items-center justify-center text-[10px] font-bold">
+								<div class="flex aspect-square items-center justify-center text-[10px] font-bold">
 									{#if img.url}
-										<img src={img.url} alt={img.alt ?? draft.name} class="h-full w-full object-cover" />
+										<img
+											src={img.url}
+											alt={img.alt ?? draft.name}
+											class="h-full w-full object-cover"
+										/>
 									{:else}
 										IMG
 									{/if}
 								</div>
 								<div class="absolute top-1 left-1 flex gap-1">
-									<button
-										type="button"
-										class="h-8 w-8 sm:h-6 sm:w-6 rounded-full flex items-center justify-center border {img.isPrimary
-											? 'bg-[#242424] text-white border-[#242424]'
-											: 'bg-white/80'}"
-										style="border-color: {img.isPrimary ? '#242424' : 'var(--border)'};"
+									<Button
+										variant="outline"
+										size="icon-xs"
+										class="flex h-8 w-8 items-center justify-center rounded-full border sm:h-6 sm:w-6 {img.isPrimary
+											? 'border-primary bg-primary text-primary-foreground'
+											: 'bg-card/80'}"
 										onclick={() => setPrimary(img.id)}
 										aria-label={img.isPrimary ? 'Primary image' : 'Set as primary image'}
 									>
-										<Star class="h-4 sm:h-3 w-4 sm:w-3" fill={img.isPrimary ? 'currentColor' : 'none'} />
-									</button>
+										<Star
+											class="h-4 w-4 sm:h-3 sm:w-3"
+											fill={img.isPrimary ? 'currentColor' : 'none'}
+										/>
+									</Button>
 								</div>
 								<div class="absolute top-1 right-1 flex gap-1">
-									<button
+									<Button
+										variant="outline"
+										size="icon-xs"
+										class="bg-card/80"
 										type="button"
-										class="h-8 w-8 sm:h-6 sm:w-6 rounded-full bg-white/80 border flex items-center justify-center"
-										style="border-color: var(--border);"
 										onclick={() => moveImage(img.id, -1)}
 										aria-label="Move image left"
 									>
-										<ChevronLeft class="h-4 sm:h-3 w-4 sm:w-3" />
-									</button>
-									<button
+										<ChevronLeft class="h-4 w-4 sm:h-3 sm:w-3" />
+									</Button>
+									<Button
+										variant="outline"
+										size="icon-xs"
+										class="bg-card/80"
 										type="button"
-										class="h-8 w-8 sm:h-6 sm:w-6 rounded-full bg-white/80 border flex items-center justify-center"
-										style="border-color: var(--border);"
 										onclick={() => moveImage(img.id, 1)}
 										aria-label="Move image right"
 									>
-										<ChevronRight class="h-4 sm:h-3 w-4 sm:w-3" />
-									</button>
-									<button
+										<ChevronRight class="h-4 w-4 sm:h-3 sm:w-3" />
+									</Button>
+									<Button
+										variant="outline"
+										size="icon-xs"
+										class="bg-card hover:bg-destructive/10!"
 										type="button"
-										class="h-8 w-8 sm:h-6 sm:w-6 rounded-full bg-white border flex items-center justify-center hover:bg-[#FFF0F0]"
-										style="border-color: var(--border);"
 										onclick={() => removeImage(img.id)}
 										aria-label="Remove image"
 									>
-										<X class="h-4 sm:h-3 w-4 sm:w-3" />
-									</button>
+										<X class="h-4 w-4 sm:h-3 sm:w-3" />
+									</Button>
 								</div>
 								{#if img.isPrimary}
-									<div class="absolute bottom-1 left-1 right-1 text-center">
-										<span class="text-[9px] bg-[#242424] text-white px-2 py-0.5 rounded-full">Primary</span>
+									<div class="absolute right-1 bottom-1 left-1 text-center">
+										<span class="rounded-full bg-[#242424] px-2 py-0.5 text-[9px] text-white"
+											>Primary</span
+										>
 									</div>
 								{/if}
 							</div>
@@ -580,29 +641,41 @@
 			</div>
 
 			<!-- Pricing IDR -->
-			<div class="bg-white border rounded-[12px] p-4 md:p-5" style="border-color: var(--border);">
-				<h3 class="text-[13px] font-semibold mb-3 flex items-center gap-2"><DollarSign class="h-4 w-4 shrink-0" />Pricing — IDR</h3>
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+				<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold">
+					<DollarSign class="h-4 w-4 shrink-0" />Pricing — IDR
+				</h3>
+				<div class="grid grid-cols-1 gap-3 md:grid-cols-2">
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]">Regular Price *</span>
-						<input
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+							>Regular Price *</span
+						>
+						<Input
+							class="mt-1"
 							type="number"
 							min="0"
-							class="mt-1 w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px] bg-[#FBFBFA] focus:bg-white focus:outline-none focus:border-[#242424]"
-							style="border-color: {errors.basePrice ? '#D9534F' : 'var(--border)'}"
+							aria-invalid={Boolean(errors.basePrice)}
 							value={draft.basePrice || ''}
-							oninput={(e) => (draft.basePrice = Math.max(0, Number((e.currentTarget as HTMLInputElement).value) || 0))}
+							oninput={(e) =>
+								(draft.basePrice = Math.max(
+									0,
+									Number((e.currentTarget as HTMLInputElement).value) || 0
+								))}
 						/>
-						<div class="text-[11px] text-[#777] mt-1">{formatIDR(draft.basePrice)}</div>
-						{#if errors.basePrice}<p class="text-[11px] text-[#D9534F] mt-1">{errors.basePrice}</p>{/if}
+						<div class="mt-1 text-[11px] text-[#5A5A5A]">{formatIDR(draft.basePrice)}</div>
+						{#if errors.basePrice}<p class="mt-1 text-[11px] text-[#D9534F]">
+								{errors.basePrice}
+							</p>{/if}
 					</div>
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]">Compare-at (optional, &gt; regular)</span>
-						<input
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+							>Compare-at (optional, &gt; regular)</span
+						>
+						<Input
+							class="mt-1"
 							type="number"
 							min="0"
-							class="mt-1 w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px] bg-[#FBFBFA] focus:bg-white focus:outline-none focus:border-[#242424]"
-							style="border-color: {errors.compareAtPrice ? '#D9534F' : 'var(--border)'}"
+							aria-invalid={Boolean(errors.compareAtPrice)}
 							value={draft.compareAtPrice ?? ''}
 							placeholder="1150000"
 							oninput={(e) => {
@@ -612,90 +685,131 @@
 							}}
 						/>
 						{#if draft.compareAtPrice !== undefined}
-							<div class="text-[11px] text-[#777] mt-1 line-through">{formatIDR(draft.compareAtPrice)}</div>
+							<div class="mt-1 text-[11px] text-[#5A5A5A] line-through">
+								{formatIDR(draft.compareAtPrice)}
+							</div>
 						{/if}
-						{#if errors.compareAtPrice}<p class="text-[11px] text-[#D9534F] mt-1">{errors.compareAtPrice}</p>{/if}
+						{#if errors.compareAtPrice}<p class="mt-1 text-[11px] text-[#D9534F]">
+								{errors.compareAtPrice}
+							</p>{/if}
 					</div>
 				</div>
 			</div>
 
 			<!-- Inventory -->
-			<div class="bg-white border rounded-[12px] p-4 md:p-5" style="border-color: var(--border);">
-				<h3 class="text-[13px] font-semibold mb-3 flex items-center gap-2"><Box class="h-4 w-4 shrink-0" />Inventory</h3>
-				<div class="flex items-center gap-2 mb-3">
+			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+				<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold">
+					<Box class="h-4 w-4 shrink-0" />Inventory
+				</h3>
+				<div class="mb-3 flex items-center gap-2">
 					<span class="text-[12px] font-medium">Track inventory</span>
-					<button
-						type="button"
-						class="h-6 w-11 rounded-full shrink-0 p-0.5 transition {draft.trackInventory ? 'bg-[#242424]' : 'bg-[#EAEAEA]'}"
+					<Button
+						variant="ghost"
+						size="default"
+						class="h-6 w-11 shrink-0 rounded-full p-0.5 transition {draft.trackInventory
+							? 'bg-primary'
+							: 'bg-muted'}"
 						onclick={() => (draft.trackInventory = !draft.trackInventory)}
 						aria-label="Toggle inventory tracking"
 					>
-						<span class="block h-5 w-5 rounded-full bg-white transition-transform {draft.trackInventory ? 'translate-x-5' : ''}"></span>
-					</button>
+						<span
+							class="block h-5 w-5 rounded-full bg-card transition-transform {draft.trackInventory
+								? 'translate-x-5'
+								: ''}"
+						></span>
+					</Button>
 					{#if !draft.trackInventory}
-						<span class="text-[11px] text-[#777]">Stock not tracked — hide misleading quantities</span>
+						<span class="text-[11px] text-[#5A5A5A]"
+							>Stock not tracked — hide misleading quantities</span
+						>
 					{/if}
 				</div>
 				<div class="grid grid-cols-2 gap-3">
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]">Stock quantity</span>
-						<input
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+							>Stock quantity</span
+						>
+						<Input
+							class="mt-1"
 							type="number"
 							min="0"
 							disabled={!draft.trackInventory || draft.hasVariants}
-							class="mt-1 w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px] bg-[#FBFBFA] focus:bg-white focus:outline-none focus:border-[#242424] disabled:opacity-50"
-							style="border-color: {errors.stock ? '#D9534F' : 'var(--border)'}"
+							aria-invalid={Boolean(errors.stock)}
 							value={draft.stock}
-							oninput={(e) => (draft.stock = Math.max(0, Number((e.currentTarget as HTMLInputElement).value) || 0))}
+							oninput={(e) =>
+								(draft.stock = Math.max(
+									0,
+									Number((e.currentTarget as HTMLInputElement).value) || 0
+								))}
 						/>
 						{#if draft.hasVariants}
-							<p class="text-[10px] text-[#777] mt-1">Sum of variants used when variants enabled</p>
+							<p class="mt-1 text-[10px] text-[#5A5A5A]">
+								Sum of variants used when variants enabled
+							</p>
 						{/if}
-						{#if errors.stock}<p class="text-[11px] text-[#D9534F] mt-1">{errors.stock}</p>{/if}
+						{#if errors.stock}<p class="mt-1 text-[11px] text-[#D9534F]">{errors.stock}</p>{/if}
 					</div>
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]">Low-stock threshold</span>
-						<input
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+							>Low-stock threshold</span
+						>
+						<Input
+							class="mt-1"
 							type="number"
 							min="0"
-							class="mt-1 w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px] bg-[#FBFBFA] focus:bg-white focus:outline-none focus:border-[#242424]"
-							style="border-color: {errors.lowStockThreshold ? '#D9534F' : 'var(--border)'}"
+							aria-invalid={Boolean(errors.lowStockThreshold)}
 							value={draft.lowStockThreshold}
 							oninput={(e) =>
-								(draft.lowStockThreshold = Number((e.currentTarget as HTMLInputElement).value) || 0)}
+								(draft.lowStockThreshold =
+									Number((e.currentTarget as HTMLInputElement).value) || 0)}
 						/>
-						{#if errors.lowStockThreshold}<p class="text-[11px] text-[#D9534F] mt-1">{errors.lowStockThreshold}</p>{/if}
+						{#if errors.lowStockThreshold}<p class="mt-1 text-[11px] text-[#D9534F]">
+								{errors.lowStockThreshold}
+							</p>{/if}
 					</div>
 				</div>
 			</div>
 
 			<!-- Variants -->
-			<div class="bg-white border rounded-[12px] p-4 md:p-5" style="border-color: var(--border);">
-				<div class="flex items-center justify-between mb-3">
-					<h3 class="text-[13px] font-semibold flex items-center gap-2"><Layers class="h-4 w-4 shrink-0" />Variants</h3>
+			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+				<div class="mb-3 flex items-center justify-between">
+					<h3 class="flex items-center gap-2 text-[13px] font-semibold">
+						<Layers class="h-4 w-4 shrink-0" />Variants
+					</h3>
 					<div class="flex items-center gap-2">
 						<span class="text-[12px]">Enable variants</span>
-						<button
-							type="button"
-							class="h-6 w-11 rounded-full shrink-0 p-0.5 transition {draft.hasVariants ? 'bg-[#242424]' : 'bg-[#EAEAEA]'}"
+						<Button
+							variant="ghost"
+							size="default"
+							class="h-6 w-11 shrink-0 rounded-full p-0.5 transition {draft.hasVariants
+								? 'bg-primary'
+								: 'bg-muted'}"
 							onclick={toggleVariants}
 							aria-label="Toggle variants"
 						>
-							<span class="block h-5 w-5 rounded-full bg-white transition-transform {draft.hasVariants ? 'translate-x-5' : ''}"></span>
-						</button>
+							<span
+								class="block h-5 w-5 rounded-full bg-card transition-transform {draft.hasVariants
+									? 'translate-x-5'
+									: ''}"
+							></span>
+						</Button>
 					</div>
 				</div>
 
 				{#if draft.hasVariants}
 					<div class="space-y-4">
-						<div class="bg-[#FBFBFA] border rounded-[10px] p-3" style="border-color: var(--border);">
-							<p class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#777] mb-2">Attribute builder (Color/Size)</p>
+						<div
+							class="rounded-[10px] border bg-[#FBFBFA] p-3"
+							style="border-color: var(--border);"
+						>
+							<p class="mb-2 text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase">
+								Attribute builder (Color/Size)
+							</p>
 							{#each attrs as a (a.id)}
-								<div class="flex items-center gap-2 mb-2">
-									<div class="flex-1 grid grid-cols-2 gap-2">
-										<input
-											class="h-8 rounded-[6px] border px-2 text-[12px] bg-white"
-											style="border-color: var(--border);"
+								<div class="mb-2 flex items-center gap-2">
+									<div class="grid flex-1 grid-cols-2 gap-2">
+										<Input
+											size="sm"
 											placeholder="Attribute name"
 											value={a.name}
 											oninput={(e) => {
@@ -704,87 +818,90 @@
 											}}
 										/>
 										<div
-											class="flex flex-wrap gap-1 items-center border rounded-[6px] px-2 py-1 bg-white min-h-[32px]"
+											class="flex min-h-[32px] flex-wrap items-center gap-1 rounded-[6px] border bg-white px-2 py-1"
 											style="border-color: var(--border);"
 										>
 											{#each a.values as v, i (i)}
 												<span
-													class="text-[10px] px-1.5 py-0.5 rounded-full bg-[#F0F0EF] border flex items-center gap-1"
+													class="flex items-center gap-1 rounded-full border bg-[#F0F0EF] px-1.5 py-0.5 text-[10px]"
 													style="border-color: var(--border);"
 												>
 													{v}
-													<button
-														type="button"
-														class="ml-1"
+													<Button
+														variant="ghost"
+														size="xs"
+														class="ml-1 size-4 rounded-full p-0"
 														onclick={() => removeValue(a.id, i)}
 														aria-label="Remove value {v}"
 													>
 														<X class="h-2.5 w-2.5" />
-													</button>
+													</Button>
 												</span>
 											{/each}
 											<input
-												class="flex-1 text-[11px] outline-none min-w-[80px] bg-transparent"
+												class="min-w-[80px] flex-1 bg-transparent text-[11px] outline-none"
 												placeholder="comma separated"
 												value={chipInputs[a.id] ?? ''}
-												oninput={(e) => (chipInputs = { ...chipInputs, [a.id]: (e.currentTarget as HTMLInputElement).value })}
+												oninput={(e) =>
+													(chipInputs = {
+														...chipInputs,
+														[a.id]: (e.currentTarget as HTMLInputElement).value
+													})}
 												onkeydown={(e) => chipKeyDown(e, a.id)}
 											/>
 										</div>
 									</div>
-									<button
+									<Button
+										variant="outline"
+										size="icon-sm"
+										class="shrink-0"
 										type="button"
-										class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]"
-										style="border-color: var(--border);"
 										onclick={() => removeAttr(a.id)}
 										aria-label="Remove attribute {a.name}"
 									>
-										<Trash2 class="h-3.5 w-3.5 text-[#777]" />
-									</button>
+										<Trash2 class="h-3.5 w-3.5 text-[#5A5A5A]" />
+									</Button>
 								</div>
 							{/each}
-							<div class="flex gap-2 mt-3">
-								<input
-									class="h-10 sm:h-8 rounded-[6px] border px-2 text-[12px] bg-white flex-1"
-									style="border-color: var(--border);"
+							<div class="mt-3 flex gap-2">
+								<Input
+									size="sm"
+									class="flex-1"
 									placeholder="New attribute e.g. Material"
 									bind:value={newAttrName}
 								/>
-								<input
-									class="h-10 sm:h-8 rounded-[6px] border px-2 text-[12px] bg-white flex-1"
-									style="border-color: var(--border);"
+								<Input
+									size="sm"
+									class="flex-1"
 									placeholder="Values comma e.g. Cotton, Leather"
 									bind:value={newAttrValues}
 								/>
-								<button
-									type="button"
-									class="h-10 sm:h-8 rounded-full bg-[#242424] text-white px-3 text-[11px]"
-									onclick={addAttr}
-								>
+								<Button variant="default" size="default" type="button" onclick={addAttr}>
 									Add
-								</button>
+								</Button>
 							</div>
 							<div class="mt-3 flex flex-wrap items-center justify-between gap-2">
-								<span class="text-[11px] text-[#777]">
+								<span class="text-[11px] text-[#5A5A5A]">
 									Combinations preview: <b>{combos.length}</b>
-									{#if combos.length > VARIANTS_MAX}<span class="text-[#D9534F]"> — Warn if &gt;{VARIANTS_MAX}, excessive</span>{/if}
+									{#if combos.length > VARIANTS_MAX}<span class="text-[#D9534F]">
+											— Warn if &gt;{VARIANTS_MAX}, excessive</span
+										>{/if}
 								</span>
-								<button
-									type="button"
-									class="h-9 sm:h-7 rounded-full bg-[#343434] text-white px-3 text-[11px] font-medium"
-									onclick={generateVariants}
-								>
+								<Button variant="default" size="sm" type="button" onclick={generateVariants}>
 									Generate
-								</button>
+								</Button>
 							</div>
 						</div>
 
 						{#if draft.variants.length > 0}
-							<div class="overflow-x-auto border rounded-[10px]" style="border-color: var(--border);">
+							<div
+								class="overflow-x-auto rounded-[10px] border"
+								style="border-color: var(--border);"
+							>
 								<table class="w-full text-left">
 									<thead>
 										<tr
-											class="bg-[#FBFBFA] border-b text-[10px] font-semibold tracking-[0.08em] uppercase text-[#999]"
+											class="border-b bg-[#FBFBFA] text-[10px] font-semibold tracking-[0.08em] text-[#636363] uppercase"
 											style="border-color: var(--border);"
 										>
 											<th class="px-3 py-2">Variant</th>
@@ -800,69 +917,92 @@
 											<tr class={v.stock === 0 ? 'bg-[#FFFDF3]' : ''}>
 												<td class="px-3 py-2">
 													<div class="text-[12px] font-medium">{v.name}</div>
-													<div class="text-[10px] text-[#777]">{v.attributes.map((a) => `${a.name}:${a.value}`).join(', ')}</div>
+													<div class="text-[10px] text-[#5A5A5A]">
+														{v.attributes.map((a) => `${a.name}:${a.value}`).join(', ')}
+													</div>
 													{#if v.stock === 0}
-														<span class="text-[9px] px-1.5 py-0.5 rounded-full bg-[#FFF0F0] border text-[#A33A37]" style="border-color: #F2C2C0;">Out</span>
+														<span
+															class="rounded-full border bg-[#FFF0F0] px-1.5 py-0.5 text-[9px] text-[#A33A37]"
+															style="border-color: #F2C2C0;">Out</span
+														>
 													{/if}
 												</td>
 												<td class="px-3 py-2">
-													<input
-														class="h-8 w-[110px] rounded-[6px] border px-2 text-[11px] mono"
-														style="border-color: {errors[`var-${v.id}-sku`] ? '#D9534F' : 'var(--border)'}"
+													<Input
+														size="sm"
+														font="mono"
+														class="w-[110px]"
+														aria-invalid={Boolean(errors[`var-${v.id}-sku`])}
 														bind:value={v.sku}
 													/>
-													{#if errors[`var-${v.id}-sku`]}<p class="text-[9px] text-[#D9534F]">{errors[`var-${v.id}-sku`]}</p>{/if}
+													{#if errors[`var-${v.id}-sku`]}<p class="text-[9px] text-[#D9534F]">
+															{errors[`var-${v.id}-sku`]}
+														</p>{/if}
 												</td>
 												<td class="px-3 py-2">
-													<input
+													<Input
+														size="sm"
+														class="w-[90px]"
 														type="number"
 														min="0"
-														class="h-8 w-[90px] rounded-[6px] border px-2 text-[11px]"
-														style="border-color: var(--border);"
 														value={v.priceOverride ?? ''}
 														placeholder={String(draft.basePrice)}
 														oninput={(e) => {
 															const el = e.currentTarget as HTMLInputElement;
 															updateVariant(v.id, {
-																priceOverride: el.value === '' ? undefined : Math.max(0, Number(el.value) || 0)
+																priceOverride:
+																	el.value === '' ? undefined : Math.max(0, Number(el.value) || 0)
 															});
 														}}
 													/>
 												</td>
 												<td class="px-3 py-2">
-													<input
+													<Input
+														size="sm"
+														class="w-[60px]"
 														type="number"
 														min="0"
-														class="h-8 w-[60px] rounded-[6px] border px-2 text-[11px]"
-														style="border-color: {errors[`var-${v.id}-stock`] ? '#D9534F' : 'var(--border)'}"
+														aria-invalid={Boolean(errors[`var-${v.id}-stock`])}
 														value={v.stock}
 														oninput={(e) =>
 															updateVariant(v.id, {
-																stock: Math.max(0, Number((e.currentTarget as HTMLInputElement).value) || 0)
+																stock: Math.max(
+																	0,
+																	Number((e.currentTarget as HTMLInputElement).value) || 0
+																)
 															})}
 													/>
-													{#if errors[`var-${v.id}-stock`]}<p class="text-[9px] text-[#D9534F]">{errors[`var-${v.id}-stock`]}</p>{/if}
+													{#if errors[`var-${v.id}-stock`]}<p class="text-[9px] text-[#D9534F]">
+															{errors[`var-${v.id}-stock`]}
+														</p>{/if}
 												</td>
 												<td class="px-3 py-2">
-													<button
-														type="button"
-														class="h-6 w-11 rounded-full shrink-0 p-0.5 transition {v.available ? 'bg-[#269B65]' : 'bg-[#EAEAEA]'}"
+													<Button
+														variant="ghost"
+														size="default"
+														class="h-6 w-11 shrink-0 rounded-full p-0.5 transition {v.available
+															? 'bg-success'
+															: 'bg-muted'}"
 														onclick={() => updateVariant(v.id, { available: !v.available })}
 														aria-label="Toggle availability for {v.name}"
 													>
-														<span class="block h-5 w-5 rounded-full bg-white transition-transform {v.available ? 'translate-x-5' : ''}"></span>
-													</button>
+														<span
+															class="block h-5 w-5 rounded-full bg-card transition-transform {v.available
+																? 'translate-x-5'
+																: ''}"
+														></span>
+													</Button>
 												</td>
 												<td class="px-3 py-2">
-													<button
+													<Button
+														variant="outline"
+														size="icon-sm"
 														type="button"
-														class="flex h-7 w-7 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]"
-														style="border-color: var(--border);"
 														onclick={() => removeVariant(v.id)}
 														aria-label="Remove variant {v.name}"
 													>
-														<Trash2 class="h-3.5 w-3.5 text-[#777]" />
-													</button>
+														<Trash2 class="h-3.5 w-3.5 text-[#5A5A5A]" />
+													</Button>
 												</td>
 											</tr>
 										{/each}
@@ -873,112 +1013,151 @@
 						{#if errors.variants}<p class="text-[11px] text-[#D9534F]">{errors.variants}</p>{/if}
 					</div>
 				{:else}
-					<p class="text-[11px] text-[#777]">Enable variants to manage Color/Size combinations. When disabled, product-level pricing/inventory used.</p>
+					<p class="text-[11px] text-[#5A5A5A]">
+						Enable variants to manage Color/Size combinations. When disabled, product-level
+						pricing/inventory used.
+					</p>
 				{/if}
 			</div>
 
 			<!-- Organization -->
-			<div class="bg-white border rounded-[12px] p-4 md:p-5" style="border-color: var(--border);">
-				<h3 class="text-[13px] font-semibold mb-3 flex items-center gap-2"><Tag class="h-4 w-4 shrink-0" />Organization</h3>
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+				<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold">
+					<Tag class="h-4 w-4 shrink-0" />Organization
+				</h3>
+				<div class="grid grid-cols-1 gap-3 md:grid-cols-2">
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]">Category *</span>
-						<div class="flex gap-2 mt-1">
-							<select
-								class="flex-1 h-10 sm:h-9 rounded-[8px] border px-3 text-[13px] bg-[#FBFBFA] focus:bg-white focus:outline-none focus:border-[#242424]"
-								style="border-color: {errors.categoryId ? '#D9534F' : 'var(--border)'}"
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+							>Category *</span
+						>
+						<div class="mt-1 flex gap-2">
+							<NativeSelect
+								class="flex-1"
+								aria-invalid={Boolean(errors.categoryId)}
 								bind:value={draft.categoryId}
 							>
 								<option value="">Select category</option>
 								{#each admin.categories as c (c.id)}
 									<option value={c.id}>{c.name}</option>
 								{/each}
-							</select>
-							<button
+							</NativeSelect>
+							<Button
+								variant="outline"
+								size="icon-lg"
+								class="shrink-0"
 								type="button"
-								class="h-10 w-10 sm:h-9 sm:w-9 shrink-0 rounded-[8px] border bg-white flex items-center justify-center hover:border-[#242424]"
-								style="border-color: var(--border);"
 								onclick={() => (catModal = true)}
 								aria-label="Create category inline"
 							>
 								<Plus class="h-4 w-4" />
-							</button>
+							</Button>
 						</div>
-						{#if errors.categoryId}<p class="text-[11px] text-[#D9534F] mt-1">{errors.categoryId}</p>{/if}
+						{#if errors.categoryId}<p class="mt-1 text-[11px] text-[#D9534F]">
+								{errors.categoryId}
+							</p>{/if}
 					</div>
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]">Featured</span>
-						<div class="flex items-center gap-2 mt-2">
-							<button
-								type="button"
-								class="h-6 w-11 rounded-full shrink-0 p-0.5 transition {draft.featured ? 'bg-[#242424]' : 'bg-[#EAEAEA]'}"
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+							>Featured</span
+						>
+						<div class="mt-2 flex items-center gap-2">
+							<Button
+								variant="ghost"
+								size="default"
+								class="h-6 w-11 shrink-0 rounded-full p-0.5 transition {draft.featured
+									? 'bg-primary'
+									: 'bg-muted'}"
 								onclick={() => (draft.featured = !draft.featured)}
 								aria-label="Toggle featured"
 							>
-								<span class="block h-5 w-5 rounded-full bg-white transition-transform {draft.featured ? 'translate-x-5' : ''}"></span>
-							</button>
-							<span class="text-[12px]">{draft.featured ? 'Featured in storefront' : 'Not featured'}</span>
+								<span
+									class="block h-5 w-5 rounded-full bg-card transition-transform {draft.featured
+										? 'translate-x-5'
+										: ''}"
+								></span>
+							</Button>
+							<span class="text-[12px]"
+								>{draft.featured ? 'Featured in storefront' : 'Not featured'}</span
+							>
 						</div>
 					</div>
 				</div>
 				<div class="mt-3">
-					<span class="block text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]">Collections</span>
-					<div class="mt-1 border rounded-[8px] p-2 max-h-[120px] overflow-y-auto bg-[#FBFBFA]" style="border-color: var(--border);">
+					<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+						>Collections</span
+					>
+					<div
+						class="mt-1 max-h-[120px] overflow-y-auto rounded-[8px] border bg-[#FBFBFA] p-2"
+						style="border-color: var(--border);"
+					>
 						{#each admin.collections as c (c.id)}
 							<label class="flex items-center gap-2 py-1 text-[12px]">
-								<input
-									type="checkbox"
+								<Checkbox
 									checked={draft.collectionIds.includes(c.id)}
-									onchange={(e) => {
-										const on = (e.currentTarget as HTMLInputElement).checked;
+									onCheckedChange={(on) => {
 										draft.collectionIds = on
 											? [...draft.collectionIds, c.id]
 											: draft.collectionIds.filter((id) => id !== c.id);
 									}}
-									class="rounded"
 								/>
 								{c.name}
-								<span class="text-[10px] text-[#999]">({c.slug})</span>
+								<span class="text-[10px] text-[#636363]">({c.slug})</span>
 							</label>
 						{/each}
 					</div>
-					<button type="button" class="mt-2 text-[11px] underline" onclick={() => (colModal = true)}>
+					<Button
+						variant="link"
+						size="xs"
+						class="mt-2 h-auto px-0 text-[11px] underline"
+						onclick={() => (colModal = true)}
+					>
 						+ Create new collection inline (auto-selects)
-					</button>
+					</Button>
 				</div>
 			</div>
 
 			<!-- SEO -->
-			<div class="bg-white border rounded-[12px] p-4 md:p-5" style="border-color: var(--border);">
-				<button type="button" class="w-full flex items-center justify-between" onclick={() => (seoOpen = !seoOpen)}>
-					<span class="text-[13px] font-semibold flex items-center gap-2"><Search class="h-4 w-4 shrink-0" />SEO (optional)</span>
+			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+				<Button
+					variant="ghost"
+					size="default"
+					class="h-auto w-full justify-between px-0"
+					onclick={() => (seoOpen = !seoOpen)}
+				>
+					<span class="flex items-center gap-2 text-[13px] font-semibold"
+						><Search class="h-4 w-4 shrink-0" />SEO (optional)</span
+					>
 					{#if seoOpen}<ChevronUp class="h-4 w-4" />{:else}<ChevronDown class="h-4 w-4" />{/if}
-				</button>
+				</Button>
 				{#if seoOpen}
 					<div class="mt-3 space-y-3">
 						<div>
-							<span class="block text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]">SEO Title</span>
-							<input
-								class="mt-1 w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px] bg-[#FBFBFA] focus:bg-white focus:outline-none focus:border-[#242424]"
-								style="border-color: var(--border);"
-								bind:value={draft.seoTitle}
-								placeholder="60 chars recommended"
-							/>
+							<span
+								class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+								>SEO Title</span
+							>
+							<Input class="mt-1" bind:value={draft.seoTitle} placeholder="60 chars recommended" />
 						</div>
 						<div>
-							<span class="block text-[11px] font-semibold tracking-[0.08em] uppercase text-[#777]">SEO Description</span>
-							<textarea
+							<span
+								class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+								>SEO Description</span
+							>
+							<Textarea
+								class="mt-1"
 								rows="2"
-								class="mt-1 w-full rounded-[8px] border px-3 py-2 text-[13px] bg-[#FBFBFA] focus:bg-white focus:outline-none focus:border-[#242424]"
-								style="border-color: var(--border);"
 								bind:value={draft.seoDescription}
 								placeholder="155 chars"
-							></textarea>
+							></Textarea>
 						</div>
-						<div class="border rounded-[8px] p-3 bg-[#FBFBFA]" style="border-color: var(--border);">
-							<div class="text-[11px] text-[#1A0DAB] font-medium truncate">{draft.seoTitle || draft.name || 'Your product title'}</div>
-							<div class="text-[10px] text-[#006621] truncate">https://bagstore.com/products/{slug || 'your-slug'}</div>
-							<div class="text-[11px] text-[#545454] mt-1 line-clamp-2">
+						<div class="rounded-[8px] border bg-[#FBFBFA] p-3" style="border-color: var(--border);">
+							<div class="truncate text-[11px] font-medium text-[#1A0DAB]">
+								{draft.seoTitle || draft.name || 'Your product title'}
+							</div>
+							<div class="truncate text-[10px] text-[#006621]">
+								https://bagstore.com/products/{slug || 'your-slug'}
+							</div>
+							<div class="mt-1 line-clamp-2 text-[11px] text-[#545454]">
 								{draft.seoDescription || draft.shortDescription || 'Search preview Google-style'}
 							</div>
 						</div>
@@ -988,22 +1167,36 @@
 		</div>
 
 		<!-- Publishing rail -->
-		<div class="lg:w-[320px] shrink-0 space-y-4 lg:sticky lg:top-[88px] self-start">
-			<div class="bg-white border rounded-[12px] p-4" style="border-color: var(--border);">
-				<h3 class="text-[12px] font-semibold tracking-[0.08em] uppercase text-[#777]">Publishing</h3>
+		<div class="shrink-0 space-y-4 self-start lg:sticky lg:top-[88px] lg:w-[320px]">
+			<div class="rounded-[12px] border bg-white p-4" style="border-color: var(--border);">
+				<h3 class="text-[12px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase">
+					Publishing
+				</h3>
 				<div class="mt-3 space-y-2 text-[12px]">
-					<div class="flex justify-between"><span class="text-[#777]">Status</span><StatusBadge status={draft.status} /></div>
-					<div class="flex justify-between"><span class="text-[#777]">Featured</span><span>{draft.featured ? 'Yes' : 'No'}</span></div>
 					<div class="flex justify-between">
-						<span class="text-[#777]">Inventory</span>
+						<span class="text-[#5A5A5A]">Status</span><StatusBadge status={draft.status} />
+					</div>
+					<div class="flex justify-between">
+						<span class="text-[#5A5A5A]">Featured</span><span>{draft.featured ? 'Yes' : 'No'}</span>
+					</div>
+					<div class="flex justify-between">
+						<span class="text-[#5A5A5A]">Inventory</span>
 						<span>{draft.trackInventory ? `${inventoryTotal} total` : 'Not tracked'}</span>
 					</div>
-					<div class="flex justify-between"><span class="text-[#777]">Variants</span><span>{draft.hasVariants ? `${draft.variants.length}` : 'No'}</span></div>
+					<div class="flex justify-between">
+						<span class="text-[#5A5A5A]">Variants</span><span
+							>{draft.hasVariants ? `${draft.variants.length}` : 'No'}</span
+						>
+					</div>
 				</div>
 				<div class="mt-4">
-					<p class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#777] mb-2">Validation summary</p>
+					<p class="mb-2 text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase">
+						Validation summary
+					</p>
 					{#if Object.keys(publishErrors).length === 0}
-						<p class="text-[11px] text-[#269B65] flex items-center gap-1"><CircleCheck class="h-3.5 w-3.5 shrink-0" /> No errors</p>
+						<p class="flex items-center gap-1 text-[11px] text-[#269B65]">
+							<CircleCheck class="h-3.5 w-3.5 shrink-0" /> No errors
+						</p>
 					{:else}
 						<ul class="space-y-1">
 							{#each Object.entries(publishErrors) as [k, v] (k)}
@@ -1011,36 +1204,46 @@
 							{/each}
 						</ul>
 					{/if}
-					<p class="text-[10px] text-[#777] mt-2">Business rules: publish requires name, valid price, category, primary image. Variants must have valid configs. SKU unique. Inventory never negative. Archived/Draft not in storefront. No inaccurate stock when tracking off.</p>
+					<p class="mt-2 text-[10px] text-[#5A5A5A]">
+						Business rules: publish requires name, valid price, category, primary image. Variants
+						must have valid configs. SKU unique. Inventory never negative. Archived/Draft not in
+						storefront. No inaccurate stock when tracking off.
+					</p>
 				</div>
 				<div class="mt-4 space-y-2">
-					<button
+					<Button
+						variant="default"
+						size="default"
+						class="w-full"
 						type="button"
-						class="w-full h-10 sm:h-9 rounded-full bg-[#343434] text-white text-[12px] font-medium hover:bg-[#242424] transition"
 						onclick={() => saveAs('active')}
 					>
 						Publish Product
-					</button>
-					<button
+					</Button>
+					<Button
+						variant="outline"
+						size="default"
+						class="w-full"
 						type="button"
-						class="w-full h-10 sm:h-9 rounded-full border bg-white text-[12px] font-medium hover:border-[#242424] transition"
-						style="border-color: var(--border);"
 						onclick={() => saveAs('draft')}
 					>
 						Save as Draft
-					</button>
-					<button
+					</Button>
+					<Button
+						variant="outline"
+						size="default"
+						class="w-full"
 						type="button"
-						class="w-full h-10 sm:h-9 rounded-full border bg-[#FFF8E6] text-[12px] font-medium hover:border-[#D69A35] transition"
-						style="border-color: #F3D9A0;"
 						onclick={() => saveAs('archived')}
 					>
 						Archive
-					</button>
+					</Button>
 				</div>
 			</div>
-			<div class="bg-[#FBFBFA] border rounded-[12px] p-3" style="border-color: var(--border);">
-				<p class="text-[11px] text-[#777]">In-memory draft mode — changes not persisted to server. Server-side validation simulated.</p>
+			<div class="rounded-[12px] border bg-[#FBFBFA] p-3" style="border-color: var(--border);">
+				<p class="text-[11px] text-[#5A5A5A]">
+					In-memory draft mode — changes not persisted to server. Server-side validation simulated.
+				</p>
 			</div>
 		</div>
 	</div>
@@ -1048,52 +1251,77 @@
 
 {#if catModal}
 	<Modal title="Create category inline">
-		<p class="text-[11px] text-[#777] mt-1">Auto-selects new category without losing form data.</p>
+		<p class="mt-1 text-[11px] text-[#5A5A5A]">
+			Auto-selects new category without losing form data.
+		</p>
 		<div class="mt-3 space-y-2">
-			<input
-				class="w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px]"
-				style="border-color: var(--border);"
+			<Input
 				placeholder="Name"
 				bind:value={catDraft.name}
 				oninput={() => (catDraft.slug = slugify(catDraft.name))}
 			/>
-			<input class="w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px] mono" style="border-color: var(--border);" placeholder="Slug" bind:value={catDraft.slug} />
-			<input class="w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px]" style="border-color: var(--border);" placeholder="Description" bind:value={catDraft.description} />
+			<Input font="mono" placeholder="Slug" bind:value={catDraft.slug} />
+			<Input placeholder="Description" bind:value={catDraft.description} />
 		</div>
-		<div class="flex gap-2 mt-4">
-			<button type="button" class="flex-1 h-10 rounded-full bg-[#242424] text-white text-[12px]" onclick={createCategoryInline}>Create &amp; Select</button>
-			<button type="button" class="flex-1 h-10 rounded-full border bg-white text-[12px]" style="border-color: var(--border);" onclick={() => (catModal = false)}>Cancel</button>
+		<div class="mt-4 flex gap-2">
+			<Button
+				variant="default"
+				size="lg"
+				class="flex-1"
+				type="button"
+				onclick={createCategoryInline}>Create &amp; Select</Button
+			>
+			<Button
+				variant="outline"
+				size="lg"
+				class="flex-1"
+				type="button"
+				onclick={() => (catModal = false)}>Cancel</Button
+			>
 		</div>
 	</Modal>
 {/if}
 
 {#if colModal}
 	<Modal title="Create collection inline">
-		<p class="text-[11px] text-[#777] mt-1">Auto-selects new collection without losing form data.</p>
+		<p class="mt-1 text-[11px] text-[#5A5A5A]">
+			Auto-selects new collection without losing form data.
+		</p>
 		<div class="mt-3 space-y-2">
-			<input
-				class="w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px]"
-				style="border-color: var(--border);"
+			<Input
 				placeholder="Name"
 				bind:value={colDraft.name}
 				oninput={() => (colDraft.slug = slugify(colDraft.name))}
 			/>
-			<input class="w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px] mono" style="border-color: var(--border);" placeholder="Slug" bind:value={colDraft.slug} />
-			<input class="w-full h-10 sm:h-9 rounded-[8px] border px-3 text-[13px]" style="border-color: var(--border);" placeholder="Description" bind:value={colDraft.description} />
+			<Input font="mono" placeholder="Slug" bind:value={colDraft.slug} />
+			<Input placeholder="Description" bind:value={colDraft.description} />
 		</div>
-		<div class="flex gap-2 mt-4">
-			<button type="button" class="flex-1 h-10 rounded-full bg-[#242424] text-white text-[12px]" onclick={createCollectionInline}>Create &amp; Select</button>
-			<button type="button" class="flex-1 h-10 rounded-full border bg-white text-[12px]" style="border-color: var(--border);" onclick={() => (colModal = false)}>Cancel</button>
+		<div class="mt-4 flex gap-2">
+			<Button
+				variant="default"
+				size="lg"
+				class="flex-1"
+				type="button"
+				onclick={createCollectionInline}>Create &amp; Select</Button
+			>
+			<Button
+				variant="outline"
+				size="lg"
+				class="flex-1"
+				type="button"
+				onclick={() => (colModal = false)}>Cancel</Button
+			>
 		</div>
 	</Modal>
 {/if}
 
 {#if guardOpen}
 	<Modal title="Leave form?">
-		<p class="text-[12px] text-[#777] mt-1">You have unsaved changes. Leave without saving?</p>
-		<div class="flex gap-2 mt-4">
-			<button type="button" class="flex-1 h-10 rounded-full bg-[#242424] text-white text-[12px]" onclick={leave}>Leave</button>
-			<button type="button" class="flex-1 h-10 rounded-full border bg-white text-[12px]" style="border-color: var(--border);" onclick={stay}>Stay</button>
+		<p class="mt-1 text-[12px] text-[#5A5A5A]">You have unsaved changes. Leave without saving?</p>
+		<div class="mt-4 flex gap-2">
+			<Button variant="default" size="lg" class="flex-1" type="button" onclick={leave}>Leave</Button
+			>
+			<Button variant="outline" size="lg" class="flex-1" type="button" onclick={stay}>Stay</Button>
 		</div>
 	</Modal>
 {/if}

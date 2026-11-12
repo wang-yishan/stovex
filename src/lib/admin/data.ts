@@ -22,7 +22,12 @@ import type {
 export const SEED_CATEGORIES: Category[] = [
 	{ id: 'cat-tote', name: 'Tote', slug: 'tote', description: 'Everyday carryall totes' },
 	{ id: 'cat-shoulder', name: 'Shoulder', slug: 'shoulder', description: 'Shoulder silhouettes' },
-	{ id: 'cat-crossbody', name: 'Crossbody', slug: 'crossbody', description: 'Hands-free crossbody' },
+	{
+		id: 'cat-crossbody',
+		name: 'Crossbody',
+		slug: 'crossbody',
+		description: 'Hands-free crossbody'
+	},
 	{ id: 'cat-clutch', name: 'Clutch', slug: 'clutch', description: 'Evening clutches' },
 	{ id: 'cat-bucket', name: 'Bucket', slug: 'bucket', description: 'Relaxed bucket bags' }
 ];
@@ -134,11 +139,25 @@ export const SEED_PRODUCTS: Product[] = [
 		seoDescription: 'Cream mini shoulder',
 		createdAt: '2024-11-12T08:00:00Z',
 		updatedAt: '2024-11-18T09:00:00Z',
-		hasVariants: false,
+		hasVariants: true,
 		trackInventory: true,
-		stock: 3,
+		stock: 0,
 		lowStockThreshold: 5,
-		variants: []
+		variants: [
+			{
+				id: 'var-2a',
+				productId: 'prod-2',
+				name: 'Cream / One Size',
+				attributes: [
+					{ name: 'Color', value: 'Cream' },
+					{ name: 'Size', value: 'One Size' }
+				],
+				sku: 'MSB-CRM-OS',
+				stock: 3,
+				available: true,
+				lowThreshold: 5
+			}
+		]
 	},
 	{
 		id: 'prod-3',
@@ -208,11 +227,25 @@ export const SEED_PRODUCTS: Product[] = [
 		seoDescription: 'Beige canvas shopper',
 		createdAt: '2024-11-08T08:00:00Z',
 		updatedAt: '2024-11-16T10:00:00Z',
-		hasVariants: false,
+		hasVariants: true,
 		trackInventory: true,
-		stock: 42,
+		stock: 0,
 		lowStockThreshold: 8,
-		variants: []
+		variants: [
+			{
+				id: 'var-4a',
+				productId: 'prod-4',
+				name: 'Beige / L',
+				attributes: [
+					{ name: 'Color', value: 'Beige' },
+					{ name: 'Size', value: 'L' }
+				],
+				sku: 'CSB-BGE-L',
+				stock: 42,
+				available: true,
+				lowThreshold: 8
+			}
+		]
 	},
 	{
 		id: 'prod-5',
@@ -232,11 +265,25 @@ export const SEED_PRODUCTS: Product[] = [
 		seoDescription: 'Leather clutch noir',
 		createdAt: '2024-11-07T08:00:00Z',
 		updatedAt: '2024-11-15T12:00:00Z',
-		hasVariants: false,
+		hasVariants: true,
 		trackInventory: true,
-		stock: 12,
+		stock: 0,
 		lowStockThreshold: 3,
-		variants: []
+		variants: [
+			{
+				id: 'var-5a',
+				productId: 'prod-5',
+				name: 'Noir / One Size',
+				attributes: [
+					{ name: 'Color', value: 'Noir' },
+					{ name: 'Size', value: 'One Size' }
+				],
+				sku: 'LCN-BLK-OS',
+				stock: 12,
+				available: true,
+				lowThreshold: 3
+			}
+		]
 	},
 	{
 		id: 'prod-6',
@@ -255,11 +302,25 @@ export const SEED_PRODUCTS: Product[] = [
 		seoDescription: 'Woven bucket tan',
 		createdAt: '2024-11-06T08:00:00Z',
 		updatedAt: '2024-11-14T16:00:00Z',
-		hasVariants: false,
+		hasVariants: true,
 		trackInventory: true,
-		stock: 6,
+		stock: 0,
 		lowStockThreshold: 5,
-		variants: []
+		variants: [
+			{
+				id: 'var-6a',
+				productId: 'prod-6',
+				name: 'Tan / L',
+				attributes: [
+					{ name: 'Color', value: 'Tan' },
+					{ name: 'Size', value: 'L' }
+				],
+				sku: 'WBB-TAN-L',
+				stock: 6,
+				available: true,
+				lowThreshold: 5
+			}
+		]
 	},
 	{
 		id: 'prod-7',
@@ -551,9 +612,21 @@ const SECTION_DEFAULTS: Record<string, Record<string, unknown>> = {
 	benefits: {
 		heading: 'Why Bag Store',
 		items: [
-			{ icon: 'Shield', title: 'Quality checked', description: 'Every bag is inspected before it ships.' },
-			{ icon: 'Truck', title: 'Fast delivery', description: 'Carefully packed and shipped in 1–2 days.' },
-			{ icon: 'Refresh', title: 'Easy enquiries', description: 'Ask on WhatsApp before you decide.' }
+			{
+				icon: 'Shield',
+				title: 'Quality checked',
+				description: 'Every bag is inspected before it ships.'
+			},
+			{
+				icon: 'Truck',
+				title: 'Fast delivery',
+				description: 'Carefully packed and shipped in 1–2 days.'
+			},
+			{
+				icon: 'Refresh',
+				title: 'Easy enquiries',
+				description: 'Ask on WhatsApp before you decide.'
+			}
 		]
 	},
 	gallery: { heading: 'In the wild', layout: 'grid', images: ['', '', ''] },
@@ -579,17 +652,53 @@ export function newSection(type: SectionType, order: number): PageSection {
 	};
 }
 
-export function seedSection(type: SectionType, order: number, overrides?: Record<string, unknown>): PageSection {
+export function seedSection(
+	type: SectionType,
+	order: number,
+	overrides?: Record<string, unknown>
+): PageSection {
 	const s = newSection(type, order);
 	s.content = { ...s.content, ...(overrides ?? {}) };
 	return s;
 }
 
 export const SEED_MEDIA: MediaItem[] = [
-	{ id: 'med-1', name: 'hero-tote.jpg', url: '', type: 'image/jpeg', size: 184000, createdAt: '2024-11-10T08:00:00Z', alt: 'Hero tote' },
-	{ id: 'med-2', name: 'summer-edit.jpg', url: '', type: 'image/jpeg', size: 212000, createdAt: '2024-11-12T08:00:00Z', alt: 'Summer edit' },
-	{ id: 'med-3', name: 'atelier.jpg', url: '', type: 'image/jpeg', size: 156000, createdAt: '2024-11-13T08:00:00Z', alt: 'Atelier' },
-	{ id: 'med-4', name: 'gallery-look.jpg', url: '', type: 'image/jpeg', size: 98000, createdAt: '2024-11-14T08:00:00Z', alt: 'Gallery look' }
+	{
+		id: 'med-1',
+		name: 'hero-tote.jpg',
+		url: '',
+		type: 'image/jpeg',
+		size: 184000,
+		createdAt: '2024-11-10T08:00:00Z',
+		alt: 'Hero tote'
+	},
+	{
+		id: 'med-2',
+		name: 'summer-edit.jpg',
+		url: '',
+		type: 'image/jpeg',
+		size: 212000,
+		createdAt: '2024-11-12T08:00:00Z',
+		alt: 'Summer edit'
+	},
+	{
+		id: 'med-3',
+		name: 'atelier.jpg',
+		url: '',
+		type: 'image/jpeg',
+		size: 156000,
+		createdAt: '2024-11-13T08:00:00Z',
+		alt: 'Atelier'
+	},
+	{
+		id: 'med-4',
+		name: 'gallery-look.jpg',
+		url: '',
+		type: 'image/jpeg',
+		size: 98000,
+		createdAt: '2024-11-14T08:00:00Z',
+		alt: 'Gallery look'
+	}
 ];
 
 export const SEED_SETTINGS: StoreSettings = {
@@ -694,7 +803,11 @@ export function emptyPage(): StorePage {
 }
 
 /** WhatsApp message builder (ref Jy / O2). */
-export function waMessage(settings: StoreSettings, product: Product, variant?: ProductVariant): string {
+export function waMessage(
+	settings: StoreSettings,
+	product: Product,
+	variant?: ProductVariant
+): string {
 	const price = formatIDR(variant?.priceOverride ?? product.basePrice);
 	return settings.whatsappTemplate
 		.replaceAll('{{productName}}', product.name)
@@ -704,7 +817,11 @@ export function waMessage(settings: StoreSettings, product: Product, variant?: P
 		.replaceAll('{{url}}', `https://bagstore.example/products/${product.slug}`);
 }
 
-export function waLink(settings: StoreSettings, product: Product, variant?: ProductVariant): string {
+export function waLink(
+	settings: StoreSettings,
+	product: Product,
+	variant?: ProductVariant
+): string {
 	const digits = settings.whatsappNumber.replace(/[^0-9]/g, '');
 	return `https://wa.me/${digits}?text=${encodeURIComponent(waMessage(settings, product, variant))}`;
 }

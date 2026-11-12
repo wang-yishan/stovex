@@ -5,6 +5,9 @@
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { Archive, Copy, Ellipsis, Home, Plus, Search, Trash2 } from '@lucide/svelte';
 	import { resolvePath } from '#lib/admin/paths.ts';
+	import { Button } from '#lib/components/ui/button/index.ts';
+	import { Input } from '#lib/components/ui/input/index.ts';
+	import { NativeSelect } from '#lib/components/ui/native-select/index.ts';
 
 	let search = $state('');
 	let typeFilter = $state<'all' | 'homepage' | 'campaign'>('all');
@@ -41,86 +44,142 @@
 	mobileSubtitle="Manage landing pages"
 >
 	{#snippet actions()}
-		<a href={resolve('/dashboard/storefront')} class="h-10 sm:h-8 rounded-full border bg-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:border-[#242424] transition" style="border-color: var(--border);">
+		<Button variant="outline" href={resolve('/dashboard/storefront')}>
 			<Ellipsis class="h-4 w-4 shrink-0" /> Storefront
-		</a>
-		<a href={resolve('/dashboard/pages/new')} class="h-10 sm:h-8 rounded-full bg-[#343434] text-white px-4 text-[12px] font-medium flex items-center gap-1.5 hover:bg-[#242424] transition">
+		</Button>
+		<Button href={resolve('/dashboard/pages/new')}>
 			<Plus class="h-4 w-4 shrink-0" /> New Page
-		</a>
+		</Button>
 	{/snippet}
 </Topbar>
 
-<div class="mx-auto max-w-[1280px] w-full px-4 md:px-6 lg:px-8 py-6">
-	<div class="grid grid-cols-3 gap-3 mb-4">
-		<div class="bg-white border rounded-[12px] p-3.5" style="border-color: var(--border);">
-			<div class="text-[11px] uppercase tracking-[0.08em] text-[#999]">Total pages</div>
-			<div class="text-[22px] font-semibold mt-1">{admin.pages.length}</div>
+<div class="mx-auto w-full max-w-[1280px] px-4 py-6 md:px-6 lg:px-8">
+	<div class="mb-4 grid grid-cols-3 gap-3">
+		<div class="rounded-[12px] border border-border bg-card p-3.5">
+			<div class="text-[11px] tracking-[0.08em] text-muted-foreground uppercase">Total pages</div>
+			<div class="mt-1 text-[22px] font-semibold">{admin.pages.length}</div>
 		</div>
-		<div class="bg-white border rounded-[12px] p-3.5" style="border-color: var(--border);">
-			<div class="text-[11px] uppercase tracking-[0.08em] text-[#999]">Published</div>
-			<div class="text-[22px] font-semibold mt-1">{publishedCount}</div>
+		<div class="rounded-[12px] border border-border bg-card p-3.5">
+			<div class="text-[11px] tracking-[0.08em] text-muted-foreground uppercase">Published</div>
+			<div class="mt-1 text-[22px] font-semibold">{publishedCount}</div>
 		</div>
-		<div class="bg-[#FFFDF3] border rounded-[12px] p-3.5" style="border-color: #F0D99E;">
-			<div class="text-[11px] uppercase tracking-[0.08em] text-[#8A6A24]">Homepage</div>
-			<div class="text-[13px] font-semibold mt-1.5 truncate">{homepageTitle}</div>
+		<div class="rounded-[12px] border bg-[#FFFDF3] p-3.5" style="border-color: #F0D99E;">
+			<div class="text-[11px] tracking-[0.08em] text-[#8A6A24] uppercase">Homepage</div>
+			<div class="mt-1.5 truncate text-[13px] font-semibold">{homepageTitle}</div>
 		</div>
 	</div>
 
-	<div class="bg-white border rounded-[12px] p-3 md:p-4 mb-4" style="border-color: var(--border);">
-		<div class="flex flex-col md:flex-row gap-3 justify-between">
-			<div class="flex-1 relative">
-				<Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#999]" />
-				<input value={search} oninput={(e) => (search = (e.currentTarget as HTMLInputElement).value)} placeholder="Search pages by title or slug…" class="w-full h-9 pl-9 pr-3 rounded-full border bg-[#FBFBFA] text-[13px] focus:outline-none focus:border-[#242424]" style="border-color: var(--border);" />
+	<div class="mb-4 rounded-[12px] border border-border bg-card p-3 md:p-4">
+		<div class="flex flex-col justify-between gap-3 md:flex-row">
+			<div class="relative flex-1">
+				<Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+				<Input
+					shape="pill"
+					value={search}
+					oninput={(e) => (search = (e.currentTarget as HTMLInputElement).value)}
+					placeholder="Search pages by title or slug…"
+					class="pl-9"
+				/>
 			</div>
 			<div class="flex flex-wrap gap-2">
-				<select value={typeFilter} onchange={(e) => (typeFilter = (e.currentTarget as HTMLSelectElement).value as typeof typeFilter)} class="h-9 rounded-full border bg-white px-3 text-[12px]" style="border-color: var(--border);">
+				<NativeSelect
+					shape="pill"
+					size="md"
+					value={typeFilter}
+					onchange={(e) =>
+						(typeFilter = (e.currentTarget as HTMLSelectElement).value as typeof typeFilter)}
+				>
 					<option value="all">All types</option>
 					<option value="homepage">Homepage</option>
 					<option value="campaign">Campaign</option>
-				</select>
-				<select value={statusFilter} onchange={(e) => (statusFilter = (e.currentTarget as HTMLSelectElement).value as typeof statusFilter)} class="h-9 rounded-full border bg-white px-3 text-[12px]" style="border-color: var(--border);">
+				</NativeSelect>
+				<NativeSelect
+					shape="pill"
+					size="md"
+					value={statusFilter}
+					onchange={(e) =>
+						(statusFilter = (e.currentTarget as HTMLSelectElement).value as typeof statusFilter)}
+				>
 					<option value="all">All status</option>
 					<option value="draft">Draft</option>
 					<option value="published">Published</option>
 					<option value="archived">Archived</option>
-				</select>
+				</NativeSelect>
 			</div>
 		</div>
 	</div>
 
-	<div class="bg-white border rounded-[12px] overflow-hidden" style="border-color: var(--border);">
+	<div class="overflow-hidden rounded-[12px] border border-border bg-card">
 		{#if filtered.length === 0}
-			<div class="py-12 text-center px-6">
+			<div class="px-6 py-12 text-center">
 				<h3 class="text-[14px] font-semibold">No pages match</h3>
-				<p class="text-[12px] text-[#777] mt-1">Adjust search or filters, or create a page.</p>
-				<a href={resolve('/dashboard/pages/new')} class="mt-4 h-9 rounded-full bg-[#242424] text-white px-5 text-[12px] inline-flex items-center">Create page</a>
+				<p class="mt-1 text-[12px] text-muted-foreground">
+					Adjust search or filters, or create a page.
+				</p>
+				<Button href={resolve('/dashboard/pages/new')} class="mt-4 h-9 px-5 text-[12px] sm:h-8"
+					>Create page</Button
+				>
 			</div>
 		{:else}
-			<div class="divide-y" style="border-color: var(--border);">
+			<div class="divide-y divide-border">
 				{#each filtered as p (p.id)}
-					<div class="p-4 flex flex-col md:flex-row md:items-center gap-3">
-						<div class="flex-1 min-w-0">
-							<a href={resolvePath(`/dashboard/pages/${p.id}`)} class="text-[14px] font-medium hover:underline text-left">{p.title}</a>
-							<div class="text-[11px] text-[#777] mt-0.5 mono">/{p.slug} • {p.sections.length} sections • updated {fmtDate(p.updatedAt)}</div>
-							<div class="flex flex-wrap gap-1.5 mt-2">
-								<span class="text-[10px] px-2 py-0.5 rounded-full border bg-[#F5F5F4]" style="border-color: var(--border);">{p.type}</span>
+					<div class="flex flex-col gap-3 p-4 md:flex-row md:items-center">
+						<div class="min-w-0 flex-1">
+							<a
+								href={resolvePath(`/dashboard/pages/${p.id}`)}
+								class="text-left text-[14px] font-medium hover:underline">{p.title}</a
+							>
+							<div class="mono mt-0.5 text-[11px] text-muted-foreground">
+								/{p.slug} • {p.sections.length} sections • updated {fmtDate(p.updatedAt)}
+							</div>
+							<div class="mt-2 flex flex-wrap gap-1.5">
+								<span class="rounded-full border border-border bg-muted px-2 py-0.5 text-[10px]"
+									>{p.type}</span
+								>
 								<PageStatusBadge status={p.status} />
 								{#if p.isHomepage}
-									<span class="text-[10px] px-2 py-0.5 rounded-full bg-[#F0FAF6] border text-[#1A7A52]" style="border-color: #C7EBDB;">Homepage</span>
+									<span
+										class="rounded-full border bg-[#F0FAF6] px-2 py-0.5 text-[10px] text-[#1A7A52]"
+										style="border-color: #C7EBDB;">Homepage</span
+									>
 								{/if}
 							</div>
 						</div>
 						<div class="flex flex-wrap gap-1.5">
-							<a href={resolvePath(`/dashboard/pages/${p.id}`)} class="h-8 px-3 rounded-full border bg-white text-[11px] font-medium inline-flex items-center" style="border-color: var(--border);">View</a>
-							<a href={resolvePath(`/dashboard/pages/${p.id}/edit`)} class="h-8 px-3 rounded-full border bg-white text-[11px] font-medium inline-flex items-center" style="border-color: var(--border);">Edit</a>
+							<Button variant="outline" size="xs" href={resolvePath(`/dashboard/pages/${p.id}`)}
+								>View</Button
+							>
+							<Button
+								variant="outline"
+								size="xs"
+								href={resolvePath(`/dashboard/pages/${p.id}/edit`)}>Edit</Button
+							>
 							{#if !p.isHomepage}
-								<button type="button" onclick={() => admin.setHomepage(p.id)} class="h-8 px-3 rounded-full border bg-white text-[11px] font-medium inline-flex items-center gap-1" style="border-color: var(--border);">
-									<Home class="h-3.5 w-3.5 inline" /> Set homepage
-								</button>
+								<Button variant="outline" size="xs" onclick={() => admin.setHomepage(p.id)}>
+									<Home class="inline h-3.5 w-3.5" /> Set homepage
+								</Button>
 							{/if}
-							<button type="button" onclick={() => admin.duplicatePage(p.id)} class="h-8 w-8 rounded-full border bg-white flex items-center justify-center" style="border-color: var(--border);" aria-label="Duplicate page"><Copy class="h-3.5 w-3.5" /></button>
-							<button type="button" onclick={() => admin.archivePage(p.id)} class="h-8 w-8 rounded-full border bg-white flex items-center justify-center" style="border-color: var(--border);" aria-label="Archive page"><Archive class="h-3.5 w-3.5" /></button>
-							<button type="button" onclick={() => (deleteId = p.id)} class="h-8 w-8 rounded-full border bg-white flex items-center justify-center hover:bg-[#FFF0F0]" style="border-color: var(--border);" aria-label="Delete page"><Trash2 class="h-3.5 w-3.5" /></button>
+							<Button
+								variant="outline"
+								size="icon-xs"
+								class="size-8 sm:size-8"
+								onclick={() => admin.duplicatePage(p.id)}
+								aria-label="Duplicate page"><Copy class="h-3.5 w-3.5" /></Button
+							>
+							<Button
+								variant="outline"
+								size="icon-xs"
+								class="size-8 sm:size-8"
+								onclick={() => admin.archivePage(p.id)}
+								aria-label="Archive page"><Archive class="h-3.5 w-3.5" /></Button
+							>
+							<Button
+								variant="outline"
+								size="icon-xs"
+								class="size-8 hover:bg-destructive/10 sm:size-8"
+								onclick={() => (deleteId = p.id)}
+								aria-label="Delete page"><Trash2 class="h-3.5 w-3.5" /></Button
+							>
 						</div>
 					</div>
 				{/each}
@@ -131,13 +190,29 @@
 
 {#if deleteId}
 	{@const target = admin.pages.find((p) => p.id === deleteId)}
-	<div class="fixed inset-0 z-[120] bg-black/40 flex items-center justify-center p-4">
-		<div class="bg-white rounded-[12px] border max-w-[380px] w-full p-5" style="border-color: var(--border);">
+	<div class="fixed inset-0 z-[120] flex items-center justify-center bg-black/40 p-4">
+		<div class="w-full max-w-[380px] rounded-[12px] border border-border bg-card p-5">
 			<h3 class="text-[14px] font-semibold">Delete page?</h3>
-			<p class="text-[12px] text-[#777] mt-1">This removes “{target?.title}” and its draft sections from this session. Published versions stay listed in History until the page is gone.</p>
-			<div class="flex gap-2 mt-4">
-				<button type="button" onclick={() => { admin.deletePage(deleteId!); deleteId = null; }} class="flex-1 h-8 rounded-full bg-[#D9534F] text-white text-[12px]">Delete</button>
-				<button type="button" onclick={() => (deleteId = null)} class="flex-1 h-8 rounded-full border bg-white text-[12px]" style="border-color: var(--border);">Cancel</button>
+			<p class="mt-1 text-[12px] text-muted-foreground">
+				This removes “{target?.title}” and its draft sections from this session. Published versions
+				stay listed in History until the page is gone.
+			</p>
+			<div class="mt-4 flex gap-2">
+				<Button
+					variant="destructive"
+					size="xs"
+					class="flex-1 text-[12px]"
+					onclick={() => {
+						admin.deletePage(deleteId!);
+						deleteId = null;
+					}}>Delete</Button
+				>
+				<Button
+					variant="outline"
+					size="xs"
+					class="flex-1 text-[12px]"
+					onclick={() => (deleteId = null)}>Cancel</Button
+				>
 			</div>
 		</div>
 	</div>

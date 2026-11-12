@@ -5,16 +5,25 @@
 	import PageEditor from '#lib/admin/components/PageEditor.svelte';
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { resolvePath } from '#lib/admin/paths.ts';
+	import { Button } from '#lib/components/ui/button/index.ts';
 </script>
 
 <Topbar
-	crumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Pages & Landing Pages', href: '/dashboard/pages' }, { label: 'New' }]}
+	crumbs={[
+		{ label: 'Dashboard', href: '/dashboard' },
+		{ label: 'Pages & Landing Pages', href: '/dashboard/pages' },
+		{ label: 'New' }
+	]}
 	title="New Page"
 	subtitle="Create a landing page with sections, SEO and homepage flag."
 	mobileSubtitle="Create landing page"
 >
 	{#snippet actions()}
-		<button type="button" onclick={() => void goto(resolve('/dashboard/pages'))} class="h-10 sm:h-8 rounded-full border bg-white px-4 text-[12px] font-medium shrink-0" style="border-color: var(--border);">Cancel</button>
+		<Button
+			variant="outline"
+			class="shrink-0 px-4"
+			onclick={() => void goto(resolve('/dashboard/pages'))}>Cancel</Button
+		>
 	{/snippet}
 </Topbar>
 

@@ -11,7 +11,7 @@
 -->
 
 {#if !tracking}
-	<span class="text-[11px] text-[#777]">Stock not tracked</span>
+	<span class="text-[11px] text-[#5A5A5A]">Stock not tracked</span>
 {:else if status === 'out'}
 	<span
 		class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium border bg-[#FFF0F0] text-[#A33A37] border-[#F2C2C0]"

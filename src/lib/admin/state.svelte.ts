@@ -3,7 +3,21 @@
    Note: module singleton is shared per server process under SSR; acceptable for
    this local prototype (ref parity — everything was in-memory anyway). */
 
-import { SEED_CATEGORIES, SEED_COLLECTIONS, SEED_MEDIA, SEED_MOVEMENTS, SEED_PRODUCTS, SEED_SETTINGS, emptyPage, lowThreshold, nowISO, seedPages, seedVersions, slugify, uid } from './data';
+import {
+	SEED_CATEGORIES,
+	SEED_COLLECTIONS,
+	SEED_MEDIA,
+	SEED_MOVEMENTS,
+	SEED_PRODUCTS,
+	SEED_SETTINGS,
+	emptyPage,
+	lowThreshold,
+	nowISO,
+	seedPages,
+	seedVersions,
+	slugify,
+	uid
+} from './data';
 import type {
 	Category,
 	Collection,
@@ -55,11 +69,7 @@ class AdminStore {
 
 	/* --- uniqueness --- */
 
-	slugUnique(
-		slug: string,
-		excludeId?: string,
-		kind: SlugKind = 'product'
-	): boolean {
+	slugUnique(slug: string, excludeId?: string, kind: SlugKind = 'product'): boolean {
 		if (!slug) return false;
 		const list =
 			kind === 'product'
@@ -204,7 +214,9 @@ class AdminStore {
 
 	deleteCategory(id: string, reassignTo?: string): void {
 		if (reassignTo) {
-			this.products = this.products.map((p) => (p.categoryId === id ? { ...p, categoryId: reassignTo } : p));
+			this.products = this.products.map((p) =>
+				p.categoryId === id ? { ...p, categoryId: reassignTo } : p
+			);
 		}
 		this.categories = this.categories.filter((c) => c.id !== id);
 	}
@@ -268,17 +280,12 @@ class AdminStore {
 			...snapshot,
 			updatedAt: nowISO(),
 			status: action === 'publish' ? 'published' : action === 'archive' ? 'archived' : 'draft',
-			publishedAt:
-				action === 'publish'
-					? nowISO()
-					: snapshot.publishedAt
+			publishedAt: action === 'publish' ? nowISO() : snapshot.publishedAt
 		};
 		if (!next.seo.canonical) next.seo.canonical = `/${next.slug}`;
 		const exists = this.pages.some((p) => p.id === next.id);
 		if (next.isHomepage) {
-			this.pages = this.pages.map((p) =>
-				p.id === next.id ? next : { ...p, isHomepage: false }
-			);
+			this.pages = this.pages.map((p) => (p.id === next.id ? next : { ...p, isHomepage: false }));
 		} else if (!exists) {
 			this.pages = [next, ...this.pages];
 		} else {
@@ -306,7 +313,7 @@ class AdminStore {
 				: action === 'archive'
 					? 'Page archived'
 					: 'Draft saved',
-			'action' === 'archive' ? 'info' : 'success'
+			action === 'archive' ? 'info' : 'success'
 		);
 	}
 

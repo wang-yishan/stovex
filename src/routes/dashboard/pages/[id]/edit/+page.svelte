@@ -6,6 +6,7 @@
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import type { PageProps } from './$types';
 	import { resolvePath } from '#lib/admin/paths.ts';
+	import { Button } from '#lib/components/ui/button/index.ts';
 
 	let { params }: PageProps = $props();
 	let page = $derived(admin.pages.find((p) => p.id === params.id));
@@ -18,13 +19,21 @@
 </script>
 
 <Topbar
-	crumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Pages & Landing Pages', href: '/dashboard/pages' }, { label: 'Edit' }]}
+	crumbs={[
+		{ label: 'Dashboard', href: '/dashboard' },
+		{ label: 'Pages & Landing Pages', href: '/dashboard/pages' },
+		{ label: 'Edit' }
+	]}
 	title="Edit Page"
 	subtitle="Update sections, settings and SEO."
 	mobileSubtitle="Edit landing page"
 >
 	{#snippet actions()}
-		<button type="button" onclick={() => void goto(resolvePath(`/dashboard/pages/${params.id}`))} class="h-10 sm:h-8 rounded-full border bg-white px-4 text-[12px] font-medium shrink-0" style="border-color: var(--border);">Cancel</button>
+		<Button
+			variant="outline"
+			class="shrink-0 px-4"
+			onclick={() => void goto(resolvePath(`/dashboard/pages/${params.id}`))}>Cancel</Button
+		>
 	{/snippet}
 </Topbar>
 
@@ -37,7 +46,9 @@
 			void goto(resolvePath(`/dashboard/pages/${next.id}`));
 		}}
 		onCancel={() => void goto(resolvePath(`/dashboard/pages/${params.id}`))}
-/>
+	/>
 {:else}
-	<div class="mx-auto max-w-[1280px] px-4 py-6 text-[13px] text-[#777]">Page not found.</div>
+	<div class="mx-auto max-w-[1280px] px-4 py-6 text-[13px] text-muted-foreground">
+		Page not found.
+	</div>
 {/if}

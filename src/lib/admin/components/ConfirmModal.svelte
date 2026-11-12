@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Modal from './Modal.svelte';
+	import { Button } from '#lib/components/ui/button/index.ts';
+	import { Checkbox } from '#lib/components/ui/checkbox/index.ts';
 
 	let {
 		title,
@@ -25,12 +27,6 @@
 	} = $props();
 
 	let armed = $state(false);
-
-	const confirmClass = $derived(
-		danger
-			? 'bg-[#D9534F] text-white'
-			: 'bg-[#242424] text-white'
-	);
 </script>
 
 <!--
@@ -38,45 +34,34 @@
 	Confirmation modal on the generic Modal (ref delete/confirm flows + arm checkbox).
 -->
 
-<Modal title={title}>
-	<p class="text-[12px] text-[#777] mt-1">{body}</p>
+<Modal {title}>
+	<p class="mt-1 text-[12px] text-muted-foreground">{body}</p>
 
 	{#if note}
-		<div class="bg-[#FFF0F0] border rounded-[8px] p-2 mt-3" style="border-color: #F2C2C0;">
-			<p class="text-[11px] text-[#A33A37]">{note}</p>
+		<div class="mt-3 rounded-[8px] border border-destructive/30 bg-destructive/10 p-2">
+			<p class="text-[11px] text-destructive">{note}</p>
 		</div>
 	{/if}
 
 	{#if requireArm}
-		<label class="flex items-center gap-2 mt-3 text-[12px]">
-			<input
-				type="checkbox"
-				bind:checked={armed}
-				class="rounded"
-			/>
+		<label class="mt-3 flex items-center gap-2 text-[12px]">
+			<Checkbox bind:checked={armed} />
 			{armLabel}
 		</label>
 	{/if}
 
-	<div class="flex gap-2 mt-4">
-		<button
-			type="button"
+	<div class="mt-4 flex gap-2">
+		<Button
+			variant={danger ? 'destructive' : 'default'}
+			class="flex-1"
 			disabled={requireArm && !armed}
-			class="flex-1 h-10 rounded-full text-[12px] font-medium transition disabled:opacity-50 {confirmClass}"
 			onclick={() => {
 				armed = false;
 				onconfirm();
 			}}
 		>
 			{confirmLabel}
-		</button>
-		<button
-			type="button"
-			class="flex-1 h-10 rounded-full border bg-white text-[12px] font-medium transition hover:border-[#242424]"
-			style="border-color: var(--border);"
-			onclick={oncancel}
-		>
-			Cancel
-		</button>
+		</Button>
+		<Button variant="outline" class="flex-1" onclick={oncancel}>Cancel</Button>
 	</div>
 </Modal>

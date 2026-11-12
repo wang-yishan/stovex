@@ -130,7 +130,7 @@
 			<h1 class="font-display text-4xl">
 				Produk tidak ditemukan<span class="text-[#D9534F]">.</span>
 			</h1>
-			<p class="mt-4 text-sm text-[#77736E]">
+			<p class="mt-4 text-sm text-[#6B6762]">
 				Tautan ini mungkin sudah berubah atau produknya sudah tidak dipublikasikan.
 			</p>
 			<a
@@ -145,7 +145,7 @@
 		<main class="mx-auto max-w-[1400px] px-5 pt-6 pb-28 sm:px-8 sm:pt-8 lg:px-12 lg:pb-24">
 			<!-- Breadcrumb -->
 			<nav
-				class="flex items-center gap-2 text-[10px] tracking-[0.12em] text-[#77736E] uppercase"
+				class="flex items-center gap-2 text-[10px] tracking-[0.12em] text-[#6B6762] uppercase"
 				aria-label="Breadcrumb"
 			>
 				<a href="/" class="hover:text-[#242424]">Beranda</a>
@@ -174,12 +174,12 @@
 				<aside>
 					<div class="lg:sticky lg:top-[100px]">
 						<div class="flex items-start justify-between gap-4">
-							<p class="text-[10px] tracking-[0.18em] text-[#77736E] uppercase">
+							<p class="text-[10px] tracking-[0.18em] text-[#6B6762] uppercase">
 								{admin.settings.logo}{collections.length ? ` / ${collections[0]}` : ''}
 							</p>
 							<button
 								type="button"
-								class="-mt-1 p-1 text-[#77736E] transition hover:text-[#D9534F]"
+								class="-mt-1 p-1 text-[#6B6762] transition hover:text-[#D9534F]"
 								aria-label={wished ? 'Hapus dari wishlist' : 'Tambah ke wishlist'}
 								aria-pressed={wished}
 								onclick={() => (wished = !wished)}
@@ -192,12 +192,12 @@
 							{product.name}
 						</h1>
 
-						<p class="mt-4 max-w-md text-sm leading-7 text-[#77736E]">{product.shortDescription}</p>
+						<p class="mt-4 max-w-md text-sm leading-7 text-[#6B6762]">{product.shortDescription}</p>
 
 						<div class="mt-6 flex items-baseline gap-3">
 							<span class="text-[15px] tracking-wide">{formatIDR(price)}</span>
 							{#if product.compareAtPrice}
-								<span class="text-[12px] text-[#999] line-through"
+								<span class="text-[12px] text-[#636363] line-through"
 									>{formatIDR(product.compareAtPrice)}</span
 								>
 							{/if}
@@ -210,7 +210,7 @@
 							<div class="mb-6">
 								<div class="mb-3 flex items-center justify-between">
 									<span class="text-[10px] tracking-[0.16em] uppercase">Warna</span>
-									<span class="text-[11px] text-[#77736E]">{activeColor}</span>
+									<span class="text-[11px] text-[#6B6762]">{activeColor}</span>
 								</div>
 								<div class="flex items-center gap-3">
 									{#each colors as color (color.value)}
@@ -236,7 +236,7 @@
 								<div class="mb-3 flex items-center justify-between">
 									<span class="text-[10px] tracking-[0.16em] uppercase">Ukuran</span>
 									{#if sizes.length === 1}
-										<span class="text-[10px] text-[#77736E] underline underline-offset-4">
+										<span class="text-[10px] text-[#6B6762] underline underline-offset-4">
 											{sizes[0].value}
 										</span>
 									{/if}
@@ -333,7 +333,7 @@
 							</button>
 						</div>
 
-						<p class="mt-4 text-[10px] leading-5 text-[#77736E]">
+						<p class="mt-4 text-[10px] leading-5 text-[#6B6762]">
 							Pesanan dibuka di WhatsApp. Ketersediaan dan pengiriman dikonfirmasi oleh tim kami.
 						</p>
 
@@ -373,7 +373,7 @@
 			<section class="mt-16 border-t border-[#EAE8E4] pt-10 sm:mt-24 sm:pt-14">
 				<div class="grid gap-8 md:grid-cols-[0.8fr_1.2fr] md:gap-20">
 					<div>
-						<p class="text-[10px] tracking-[0.18em] text-[#77736E] uppercase">The details</p>
+						<p class="text-[10px] tracking-[0.18em] text-[#6B6762] uppercase">The details</p>
 						<h2 class="font-display mt-3 text-[30px] leading-tight sm:text-[36px]">
 							Dirancang untuk dipakai setiap hari.
 						</h2>
@@ -454,7 +454,7 @@
 				<section class="mt-16 sm:mt-24">
 					<div class="mb-7 flex items-end justify-between">
 						<div>
-							<p class="text-[10px] tracking-[0.18em] text-[#77736E] uppercase">Discover more</p>
+							<p class="text-[10px] tracking-[0.18em] text-[#6B6762] uppercase">Discover more</p>
 							<h2 class="font-display mt-2 text-[28px] sm:text-[34px]">Mungkin juga kamu suka</h2>
 						</div>
 						<a
@@ -466,8 +466,8 @@
 						</a>
 					</div>
 					<div class="grid grid-cols-2 gap-x-3 gap-y-9 sm:gap-x-5 sm:gap-y-12 lg:grid-cols-4">
-						{#each related as p, i (p.id)}
-							<ProductCard product={p} index={i} />
+						{#each related as p (p.id)}
+							<ProductCard product={p} />
 						{/each}
 					</div>
 				</section>
@@ -480,7 +480,7 @@
 		>
 			<div class="mx-auto flex max-w-xl items-center justify-between gap-4">
 				<div class="min-w-0">
-					<p class="truncate text-[9px] tracking-[0.12em] text-[#77736E] uppercase">
+					<p class="truncate text-[9px] tracking-[0.12em] text-[#6B6762] uppercase">
 						{product.name}
 					</p>
 					<p class="mt-1 text-[13px]">{formatIDR(price)}</p>
