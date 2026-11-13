@@ -10,6 +10,8 @@ import {
 	SEED_MOVEMENTS,
 	SEED_PRODUCTS,
 	SEED_SETTINGS,
+	SEED_SHIPMENTS,
+	SHIPMENT_STATUS_META,
 	emptyPage,
 	lowThreshold,
 	nowISO,
@@ -17,14 +19,18 @@ import {
 	seedVersions,
 	uid
 } from './data';
-import { categoryApi, collectionApi, productApi } from './api.ts';
+import { categoryApi, collectionApi, notificationApi, productApi, shipmentApi } from './api.ts';
 import type {
+	AppNotification,
 	Category,
 	Collection,
 	MediaItem,
 	PageStatus,
 	PageVersion,
 	Product,
+	Shipment,
+	ShipmentEventInput,
+	ShipmentStatus,
 	StockMovement,
 	StorePage,
 	StoreSettings,
@@ -53,6 +59,8 @@ class AdminStore {
 	categories = $state<Category[]>(SEED_CATEGORIES);
 	collections = $state<Collection[]>(SEED_COLLECTIONS);
 	movements = $state<StockMovement[]>(SEED_MOVEMENTS);
+	shipments = $state<Shipment[]>(SEED_SHIPMENTS);
+	notifications = $state<AppNotification[]>([]);
 	pages = $state<StorePage[]>(seedPages());
 	pageVersions = $state<PageVersion[]>(seedVersions(seedPages()));
 	media = $state<MediaItem[]>(SEED_MEDIA);
@@ -288,6 +296,101 @@ class AdminStore {
 			const [moved] = next.splice(i, 1);
 			next.splice(j, 0, moved!);
 			this.collections = next.map((c, k) => ({ ...c, order: k }));
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
+	}
+
+	/* --- notifications --- */
+
+	/** Replace cached notifications with what SQLite holds. */
+	hydrateNotifications(data: AppNotification[]): void {
+		this.notifications = data;
+	}
+
+	async markNotificationRead(id: string): Promise<void> {
+		try {
+			const { notification } = await notificationApi.markRead(id);
+			this.notifications = this.notifications.map((n) => (n.id === id ? notification : n));
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
+	}
+
+	async markAllNotificationsRead(): Promise<void> {
+		try {
+			await notificationApi.markAllRead();
+			this.notifications = this.notifications.map((n) => ({ ...n, read: true }));
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
+	}
+
+	async deleteNotification(id: string): Promise<void> {
+		try {
+			await notificationApi.remove(id);
+			this.notifications = this.notifications.filter((n) => n.id !== id);
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
+	}
+
+	/* --- shipping --- */
+
+	/** Replace the cached shipments with what SQLite holds. */
+	hydrateShipments(data: Shipment[]): void {
+		this.shipments = data;
+	}
+
+	/** Persist a shipment (create or update), then mirror it into the cache. */
+	async upsertShipment(shipment: Shipment): Promise<Shipment | null> {
+		try {
+			const isNew = !this.shipments.some((s) => s.id === shipment.id);
+			const { shipment: saved } = isNew
+				? await shipmentApi.save(shipment)
+				: await shipmentApi.update(shipment);
+			const i = this.shipments.findIndex((s) => s.id === saved.id);
+			if (i >= 0) this.shipments[i] = saved;
+			else this.shipments = [saved, ...this.shipments];
+			this.showToast(isNew ? 'Shipment created' : 'Shipment updated', 'success');
+			return saved;
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+			return null;
+		}
+	}
+
+	async deleteShipment(id: string): Promise<void> {
+		try {
+			await shipmentApi.remove(id);
+			this.shipments = this.shipments.filter((s) => s.id !== id);
+			this.showToast('Shipment deleted', 'success');
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
+	}
+
+	/** Move a shipment to a new status and record it on the timeline. */
+	async setShipmentStatus(
+		id: string,
+		status: ShipmentStatus,
+		detail?: { location?: string; label?: string; note?: string }
+	): Promise<void> {
+		try {
+			const { shipment } = await shipmentApi.setStatus(id, status, detail);
+			this.shipments = this.shipments.map((s) => (s.id === id ? shipment : s));
+			this.showToast(`Shipment ${SHIPMENT_STATUS_META[status].label}`, 'success');
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
+	}
+
+	/** Append a tracking event; the status follows when it changes. */
+	async addShipmentEvent(id: string, input: ShipmentEventInput): Promise<void> {
+		try {
+			const { shipment } = await shipmentApi.addEvent(id, input);
+			this.shipments = this.shipments.map((s) => (s.id === id ? shipment : s));
+			this.showToast('Tracking updated', 'success');
 		} catch (cause) {
 			this.showToast(errorMessage(cause), 'error');
 		}

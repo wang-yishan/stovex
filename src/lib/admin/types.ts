@@ -34,6 +34,8 @@ export interface Product {
 	slug: string;
 	shortDescription: string;
 	fullDescription: string;
+	/** Customer-facing fabric / material note, e.g. "Organic cotton canvas". */
+	material?: string;
 	categoryId: string;
 	collectionIds: string[];
 	images: ProductImage[];
@@ -89,6 +91,84 @@ export interface ToastMsg {
 	id: string;
 	msg: string;
 	type: ToastType;
+}
+
+/* --- Notifications --- */
+
+export type NotificationKind = 'order' | 'product' | 'shipping' | 'system';
+
+export interface AppNotification {
+	id: string;
+	kind: NotificationKind;
+	title: string;
+	message: string;
+	href?: string;
+	read: boolean;
+	createdAt: string;
+}
+
+/* --- Shipping module --- */
+
+export type ShipmentStatus =
+	| 'pending'
+	| 'packed'
+	| 'shipped'
+	| 'in_transit'
+	| 'out_for_delivery'
+	| 'delivered'
+	| 'exception'
+	| 'returned';
+
+export interface ShipmentItem {
+	id: string;
+	name: string;
+	qty: number;
+}
+
+/** One entry in a shipment's tracking timeline. */
+export interface ShipmentEvent {
+	id: string;
+	shipmentId: string;
+	status: ShipmentStatus;
+	label: string;
+	location: string;
+	note?: string;
+	createdAt: string;
+}
+
+export interface Shipment {
+	id: string;
+	orderId: string;
+	customerName: string;
+	customerPhone: string;
+	/** City + province, e.g. "Jakarta Selatan, DKI Jakarta". */
+	destination: string;
+	address: string;
+	courier: string;
+	service: string;
+	/** Resi / tracking number. */
+	trackingNumber: string;
+	status: ShipmentStatus;
+	items: ShipmentItem[];
+	weightKg: number;
+	shippingCost: number;
+	orderTotal: number;
+	createdAt: string;
+	updatedAt: string;
+	deliveredAt: string | null;
+	events: ShipmentEvent[];
+}
+
+export interface ShipmentStatusInput {
+	status: ShipmentStatus;
+	note?: string;
+}
+
+export interface ShipmentEventInput {
+	status: ShipmentStatus;
+	label: string;
+	location: string;
+	note?: string;
 }
 
 /** ProductForm local attribute-builder row. */

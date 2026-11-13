@@ -38,6 +38,7 @@ export const product = sqliteTable('product', {
 	slug: text('slug').notNull(),
 	shortDescription: text('short_description').notNull().default(''),
 	fullDescription: text('full_description').notNull().default(''),
+	material: text('material'),
 	categoryId: text('category_id').notNull().default(''),
 	/** JSON array of collection ids. */
 	collectionIds: text('collection_ids', { mode: 'json' }).$type<string[]>().notNull().default([]),
@@ -93,6 +94,62 @@ export const stockMovement = sqliteTable('stock_movement', {
 	previousStock: integer('previous_stock').notNull(),
 	newStock: integer('new_stock').notNull(),
 	reason: text('reason').notNull().default(''),
+	createdAt: text('created_at').notNull()
+});
+
+/* ------------------------------------------------------------------ *
+ * Shipping schema — shipment monitoring for the dashboard.
+ *
+ * A shipment is one delivery: recipient, courier, resi and status. Its
+ * tracking timeline lives in `shipment_event`, newest event appended as
+ * the courier reports progress.
+ * ------------------------------------------------------------------ */
+
+export const shipment = sqliteTable('shipment', {
+	id: text('id').primaryKey(),
+	orderId: text('order_id').notNull(),
+	customerName: text('customer_name').notNull(),
+	customerPhone: text('customer_phone').notNull().default(''),
+	destination: text('destination').notNull().default(''),
+	address: text('address').notNull().default(''),
+	courier: text('courier').notNull().default(''),
+	service: text('service').notNull().default(''),
+	trackingNumber: text('tracking_number').notNull().default(''),
+	status: text('status').notNull().default('pending'),
+	/** JSON array of `{ id, name, qty }` line items. */
+	items: text('items', { mode: 'json' })
+		.$type<{ id: string; name: string; qty: number }[]>()
+		.notNull()
+		.default([]),
+	weightKg: integer('weight_kg').notNull().default(0),
+	shippingCost: integer('shipping_cost').notNull().default(0),
+	orderTotal: integer('order_total').notNull().default(0),
+	createdAt: text('created_at').notNull(),
+	updatedAt: text('updated_at').notNull(),
+	deliveredAt: text('delivered_at')
+});
+
+export const shipmentEvent = sqliteTable('shipment_event', {
+	id: text('id').primaryKey(),
+	shipmentId: text('shipment_id').notNull(),
+	status: text('status').notNull(),
+	label: text('label').notNull(),
+	location: text('location').notNull().default(''),
+	note: text('note'),
+	createdAt: text('created_at').notNull()
+});
+
+/* ------------------------------------------------------------------ *
+ * Notifications — in-app alerts for orders, stock, shipping and system.
+ * ------------------------------------------------------------------ */
+
+export const notification = sqliteTable('notification', {
+	id: text('id').primaryKey(),
+	kind: text('kind').notNull().default('system'),
+	title: text('title').notNull(),
+	message: text('message').notNull(),
+	href: text('href'),
+	read: integer('read', { mode: 'boolean' }).notNull().default(false),
 	createdAt: text('created_at').notNull()
 });
 

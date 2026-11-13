@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ThemeToggle from '#lib/admin/components/ThemeToggle.svelte';
+	import NotificationBell from '#lib/admin/components/NotificationBell.svelte';
 	import type { Snippet } from 'svelte';
 	import { resolvePath } from '#lib/admin/paths.ts';
 
@@ -67,6 +68,7 @@
 				{#if actions}
 					{@render actions()}
 				{/if}
+				<NotificationBell />
 				<ThemeToggle />
 				<div class="hidden md:flex items-center gap-2 pl-2 border-l ml-1" style="border-color: var(--border);">
 					<div

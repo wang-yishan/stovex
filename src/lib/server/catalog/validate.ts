@@ -68,6 +68,7 @@ export function parseProductPayload(body: unknown): Product {
 		slug: str(raw.slug),
 		shortDescription: str(raw.shortDescription),
 		fullDescription: str(raw.fullDescription),
+		material: raw.material ? str(raw.material) : undefined,
 		categoryId: str(raw.categoryId),
 		collectionIds: Array.isArray(raw.collectionIds)
 			? (raw.collectionIds as unknown[]).map((id) => str(id)).filter(Boolean)

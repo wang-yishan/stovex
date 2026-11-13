@@ -16,7 +16,9 @@ import type {
 	StorePage,
 	StoreSettings,
 	PageVersion,
-	VariantAttribute
+	VariantAttribute,
+	Shipment,
+	ShipmentStatus
 } from './types';
 
 export const SEED_CATEGORIES: Category[] = [
@@ -61,6 +63,7 @@ export const SEED_PRODUCTS: Product[] = [
 		shortDescription: 'Lightweight canvas tote for daily essentials.',
 		fullDescription:
 			'Made from organic canvas with reinforced handles. Interior pocket and magnetic closure. Fits laptop up to 14". Designed for minimal daily carry.',
+		material: 'Organic cotton canvas',
 		categoryId: 'cat-tote',
 		collectionIds: ['col-best', 'col-new'],
 		images: [
@@ -144,6 +147,7 @@ export const SEED_PRODUCTS: Product[] = [
 		slug: 'mini-shoulder-bag-cream',
 		shortDescription: 'Compact shoulder bag with chain strap.',
 		fullDescription: 'Cream textured leather mini shoulder, chain strap, interior card slots.',
+		material: 'Cream textured leather',
 		categoryId: 'cat-shoulder',
 		collectionIds: ['col-new'],
 		images: [
@@ -200,6 +204,7 @@ export const SEED_PRODUCTS: Product[] = [
 		slug: 'crossbody-classic-black',
 		shortDescription: 'Classic black crossbody, everyday use.',
 		fullDescription: 'Black pebbled leather, adjustable strap, zip closure.',
+		material: 'Black pebbled leather',
 		categoryId: 'cat-crossbody',
 		collectionIds: ['col-best'],
 		images: [
@@ -270,6 +275,7 @@ export const SEED_PRODUCTS: Product[] = [
 		slug: 'canvas-shopper-beige',
 		shortDescription: 'Oversized shopper in natural beige.',
 		fullDescription: 'Oversized canvas shopper, natural beige, open top.',
+		material: 'Natural beige canvas',
 		categoryId: 'cat-tote',
 		collectionIds: [],
 		images: [
@@ -326,6 +332,7 @@ export const SEED_PRODUCTS: Product[] = [
 		slug: 'leather-clutch-noir',
 		shortDescription: 'Slim leather clutch for evenings.',
 		fullDescription: 'Noir lambskin clutch, slim profile, magnetic closure.',
+		material: 'Noir lambskin',
 		categoryId: 'cat-clutch',
 		collectionIds: ['col-best'],
 		images: [
@@ -383,6 +390,7 @@ export const SEED_PRODUCTS: Product[] = [
 		slug: 'woven-bucket-bag-tan',
 		shortDescription: 'Handwoven bucket with drawstring.',
 		fullDescription: 'Tan rattan woven bucket, cotton lining, drawstring closure.',
+		material: 'Tan rattan with cotton lining',
 		categoryId: 'cat-bucket',
 		collectionIds: ['col-new'],
 		images: [
@@ -439,6 +447,7 @@ export const SEED_PRODUCTS: Product[] = [
 		slug: 'sling-bag-minimal-gray',
 		shortDescription: 'Minimal sling, gray nylon.',
 		fullDescription: 'Gray nylon sling, water resistant, minimal branding.',
+		material: 'Gray nylon',
 		categoryId: 'cat-crossbody',
 		collectionIds: [],
 		images: [
@@ -481,6 +490,7 @@ export const SEED_PRODUCTS: Product[] = [
 		slug: 'structured-satchel-cream',
 		shortDescription: 'Structured satchel with top handles.',
 		fullDescription: 'Cream structured satchel, top handles and detachable strap.',
+		material: 'Cream leather',
 		categoryId: 'cat-shoulder',
 		collectionIds: ['col-best'],
 		images: [
@@ -558,6 +568,664 @@ export const SEED_MOVEMENTS: StockMovement[] = [
 		newStock: 0,
 		reason: 'Damaged',
 		createdAt: '2024-11-17T15:00:00Z'
+	}
+];
+
+/* --------------------------- notifications --------------------------- */
+
+export const SEED_NOTIFICATIONS: import('./types.ts').AppNotification[] = [
+	{
+		id: 'notif-1',
+		kind: 'order',
+		title: 'New checkout inquiry',
+		message: 'Order #1023 from Sarah W. is awaiting confirmation.',
+		href: '/dashboard/shipping',
+		read: false,
+		createdAt: '2024-11-18T10:19:00Z'
+	},
+	{
+		id: 'notif-2',
+		kind: 'shipping',
+		title: 'Shipment out for delivery',
+		message: 'Order #1022 (James L.) is with the courier in Bandung.',
+		href: '/dashboard/shipping/ship-2',
+		read: false,
+		createdAt: '2024-11-18T07:15:00Z'
+	},
+	{
+		id: 'notif-3',
+		kind: 'product',
+		title: 'Low stock alert',
+		message: 'Mini Shoulder Bag Cream has only 3 units left.',
+		href: '/dashboard/products',
+		read: false,
+		createdAt: '2024-11-18T09:00:00Z'
+	},
+	{
+		id: 'notif-4',
+		kind: 'shipping',
+		title: 'Delivery exception',
+		message: 'Order #1020 (Alex P.) could not be delivered — address not found.',
+		href: '/dashboard/shipping/ship-4',
+		read: false,
+		createdAt: '2024-11-18T06:50:00Z'
+	},
+	{
+		id: 'notif-5',
+		kind: 'order',
+		title: 'Order confirmed',
+		message: 'Order #1019 has been confirmed and is ready to pack.',
+		href: '/dashboard/shipping',
+		read: true,
+		createdAt: '2024-11-18T08:00:00Z'
+	},
+	{
+		id: 'notif-6',
+		kind: 'system',
+		title: 'Product published',
+		message: 'Mini Shoulder is now live in the storefront.',
+		href: '/dashboard/products',
+		read: true,
+		createdAt: '2024-11-18T05:00:00Z'
+	},
+	{
+		id: 'notif-7',
+		kind: 'shipping',
+		title: 'Shipment delivered',
+		message: 'Order #1017 (Clara D.) was delivered in Semarang.',
+		href: '/dashboard/shipping/ship-7',
+		read: true,
+		createdAt: '2024-11-17T13:45:00Z'
+	},
+	{
+		id: 'notif-8',
+		kind: 'order',
+		title: 'New checkout inquiry',
+		message: 'Order #1016 from Dimas A. is pending packing.',
+		href: '/dashboard/shipping',
+		read: false,
+		createdAt: '2024-11-18T09:55:00Z'
+	},
+	{
+		id: 'notif-9',
+		kind: 'product',
+		title: 'Stock adjusted',
+		message: 'Everyday Canvas Tote (Beige / M) restocked by 10 units.',
+		href: '/dashboard/products',
+		read: true,
+		createdAt: '2024-11-18T10:35:00Z'
+	},
+	{
+		id: 'notif-10',
+		kind: 'system',
+		title: 'Weekly summary ready',
+		message: 'Store activity summary for this week is available to review.',
+		href: '/dashboard',
+		read: false,
+		createdAt: '2024-11-18T06:00:00Z'
+	},
+	{
+		id: 'notif-11',
+		kind: 'shipping',
+		title: 'Shipment in transit',
+		message: 'Order #1023 (Sarah W.) has departed the sorting facility.',
+		href: '/dashboard/shipping/ship-1',
+		read: false,
+		createdAt: '2024-11-18T11:10:00Z'
+	},
+	{
+		id: 'notif-12',
+		kind: 'product',
+		title: 'Product archived',
+		message: 'Structured Satchel Cream was moved to archived.',
+		href: '/dashboard/products',
+		read: true,
+		createdAt: '2024-11-17T09:20:00Z'
+	},
+	{
+		id: 'notif-13',
+		kind: 'order',
+		title: 'Payment reminder',
+		message: 'Order #1020 is awaiting updated delivery details from the customer.',
+		href: '/dashboard/shipping',
+		read: false,
+		createdAt: '2024-11-18T04:30:00Z'
+	},
+	{
+		id: 'notif-14',
+		kind: 'shipping',
+		title: 'Return received',
+		message: 'Order #1018 (Budi S.) was returned to the warehouse.',
+		href: '/dashboard/shipping/ship-6',
+		read: true,
+		createdAt: '2024-11-17T17:00:00Z'
+	},
+	{
+		id: 'notif-15',
+		kind: 'system',
+		title: 'Settings updated',
+		message: 'Store contact and WhatsApp template changes were saved.',
+		href: '/dashboard/settings',
+		read: true,
+		createdAt: '2024-11-17T08:10:00Z'
+	},
+	{
+		id: 'notif-16',
+		kind: 'product',
+		title: 'Low stock alert',
+		message: 'Crossbody Classic Black (Black / M) is running low with 2 units left.',
+		href: '/dashboard/products',
+		read: false,
+		createdAt: '2024-11-17T15:10:00Z'
+	},
+	{
+		id: 'notif-17',
+		kind: 'order',
+		title: 'Order packed',
+		message: 'Order #1021 (Mina K.) has been packed and is ready for handoff.',
+		href: '/dashboard/shipping',
+		read: true,
+		createdAt: '2024-11-16T11:00:00Z'
+	},
+	{
+		id: 'notif-18',
+		kind: 'shipping',
+		title: 'Shipment created',
+		message: 'A new shipment was created for Order #1016 (Dimas A.).',
+		href: '/dashboard/shipping/ship-8',
+		read: false,
+		createdAt: '2024-11-18T09:52:00Z'
+	},
+	{
+		id: 'notif-19',
+		kind: 'product',
+		title: 'New product draft',
+		message: 'Sling Bag Minimal Gray is saved as a draft and not yet published.',
+		href: '/dashboard/products',
+		read: true,
+		createdAt: '2024-11-16T14:40:00Z'
+	},
+	{
+		id: 'notif-20',
+		kind: 'system',
+		title: 'Maintenance window',
+		message: 'Scheduled maintenance is planned tonight at 11:00 PM.',
+		href: '/dashboard',
+		read: false,
+		createdAt: '2024-11-18T03:00:00Z'
+	}
+];
+
+/* ------------------------------ shipping ------------------------------ */
+
+export const SHIPMENT_STATUSES: ShipmentStatus[] = [
+	'pending',
+	'packed',
+	'shipped',
+	'in_transit',
+	'out_for_delivery',
+	'delivered',
+	'exception',
+	'returned'
+];
+
+export type ShipmentTone = 'neutral' | 'accent' | 'warning' | 'success' | 'danger';
+
+export const SHIPMENT_STATUS_META: Record<
+	ShipmentStatus,
+	{ label: string; eventLabel: string; tone: ShipmentTone }
+> = {
+	pending: { label: 'Pending', eventLabel: 'Order received', tone: 'neutral' },
+	packed: { label: 'Packed', eventLabel: 'Package packed', tone: 'neutral' },
+	shipped: { label: 'Shipped', eventLabel: 'Handed to courier', tone: 'accent' },
+	in_transit: { label: 'In Transit', eventLabel: 'In transit', tone: 'accent' },
+	out_for_delivery: {
+		label: 'Out for Delivery',
+		eventLabel: 'Out for delivery',
+		tone: 'warning'
+	},
+	delivered: { label: 'Delivered', eventLabel: 'Delivered to recipient', tone: 'success' },
+	exception: { label: 'Exception', eventLabel: 'Delivery exception', tone: 'danger' },
+	returned: { label: 'Returned', eventLabel: 'Returned to sender', tone: 'danger' }
+};
+
+/** Happy-path order used to suggest the next status. */
+export const SHIPMENT_FLOW: ShipmentStatus[] = [
+	'pending',
+	'packed',
+	'shipped',
+	'in_transit',
+	'out_for_delivery',
+	'delivered'
+];
+
+export function nextShipmentStatus(status: ShipmentStatus): ShipmentStatus | null {
+	const i = SHIPMENT_FLOW.indexOf(status);
+	return i < 0 || i === SHIPMENT_FLOW.length - 1 ? null : SHIPMENT_FLOW[i + 1]!;
+}
+
+export const COURIERS = [
+	'JNE',
+	'J&T Express',
+	'SiCepat',
+	'AnterAja',
+	'POS Indonesia',
+	'GoSend',
+	'GrabExpress'
+];
+
+export const COURIER_SERVICES: Record<string, string[]> = {
+	JNE: ['REG', 'YES', 'OKE', 'JTR'],
+	'J&T Express': ['REG', 'Express', 'Same Day'],
+	SiCepat: ['BEST', 'REG', 'Cargo'],
+	AnterAja: ['REG', 'Same Day', 'Next Day'],
+	'POS Indonesia': ['Paket Kilat', 'Express', 'Biasa'],
+	GoSend: ['Same Day', 'Instant', 'Cargo'],
+	GrabExpress: ['Same Day', 'Instant', 'Cargo']
+};
+
+export const SEED_SHIPMENTS: Shipment[] = [
+	{
+		id: 'ship-1',
+		orderId: '#1023',
+		customerName: 'Sarah Wulandari',
+		customerPhone: '0812-3456-7890',
+		destination: 'Jakarta Selatan, DKI Jakarta',
+		address: 'Jl. Bango III No. 4, Pondok Indah',
+		courier: 'JNE',
+		service: 'REG',
+		trackingNumber: 'JNE-88412301',
+		status: 'in_transit',
+		items: [
+			{ id: 'itm-1a', name: 'Everyday Canvas Tote — Beige / M', qty: 1 },
+			{ id: 'itm-1b', name: 'Mini Shoulder Bag Cream', qty: 1 }
+		],
+		weightKg: 1.2,
+		shippingCost: 28000,
+		orderTotal: 3720000,
+		createdAt: '2024-11-16T09:12:00Z',
+		updatedAt: '2024-11-18T08:40:00Z',
+		deliveredAt: null,
+		events: [
+			{
+				id: 'evt-1a',
+				shipmentId: 'ship-1',
+				status: 'pending',
+				label: 'Order received',
+				location: 'BAG STORE Warehouse',
+				createdAt: '2024-11-16T09:12:00Z'
+			},
+			{
+				id: 'evt-1b',
+				shipmentId: 'ship-1',
+				status: 'packed',
+				label: 'Package packed',
+				location: 'BAG STORE Warehouse',
+				createdAt: '2024-11-17T10:05:00Z'
+			},
+			{
+				id: 'evt-1c',
+				shipmentId: 'ship-1',
+				status: 'shipped',
+				label: 'Handed to JNE',
+				location: 'Jakarta Pusat',
+				createdAt: '2024-11-17T16:20:00Z'
+			},
+			{
+				id: 'evt-1d',
+				shipmentId: 'ship-1',
+				status: 'in_transit',
+				label: 'Arrived at sorting center',
+				location: 'Jakarta Selatan',
+				createdAt: '2024-11-18T08:40:00Z'
+			}
+		]
+	},
+	{
+		id: 'ship-2',
+		orderId: '#1022',
+		customerName: 'James Limanto',
+		customerPhone: '0813-9988-1122',
+		destination: 'Bandung, Jawa Barat',
+		address: 'Jl. Setiabudi No. 88, Cihampelas',
+		courier: 'J&T Express',
+		service: 'Express',
+		trackingNumber: 'JT-99283741',
+		status: 'out_for_delivery',
+		items: [{ id: 'itm-2a', name: 'Woven Bucket Bag Tan', qty: 1 }],
+		weightKg: 0.8,
+		shippingCost: 22000,
+		orderTotal: 1680000,
+		createdAt: '2024-11-17T09:14:00Z',
+		updatedAt: '2024-11-18T07:15:00Z',
+		deliveredAt: null,
+		events: [
+			{
+				id: 'evt-2a',
+				shipmentId: 'ship-2',
+				status: 'pending',
+				label: 'Order received',
+				location: 'BAG STORE Warehouse',
+				createdAt: '2024-11-17T09:14:00Z'
+			},
+			{
+				id: 'evt-2b',
+				shipmentId: 'ship-2',
+				status: 'packed',
+				label: 'Package packed',
+				location: 'BAG STORE Warehouse',
+				createdAt: '2024-11-17T13:40:00Z'
+			},
+			{
+				id: 'evt-2c',
+				shipmentId: 'ship-2',
+				status: 'shipped',
+				label: 'Handed to J&T Express',
+				location: 'Bandung',
+				createdAt: '2024-11-17T18:05:00Z'
+			},
+			{
+				id: 'evt-2d',
+				shipmentId: 'ship-2',
+				status: 'out_for_delivery',
+				label: 'With courier — arrive today',
+				location: 'Bandung',
+				createdAt: '2024-11-18T07:15:00Z'
+			}
+		]
+	},
+	{
+		id: 'ship-3',
+		orderId: '#1021',
+		customerName: 'Mina Kusuma',
+		customerPhone: '0857-1122-3344',
+		destination: 'Surabaya, Jawa Timur',
+		address: 'Jl. Raya Darmo No. 12',
+		courier: 'SiCepat',
+		service: 'BEST',
+		trackingNumber: 'SCP-55667788',
+		status: 'delivered',
+		items: [
+			{ id: 'itm-3a', name: 'Leather Clutch Noir', qty: 1 },
+			{ id: 'itm-3b', name: 'Structured Satchel Cream', qty: 1 }
+		],
+		weightKg: 1.5,
+		shippingCost: 30000,
+		orderTotal: 1335000,
+		createdAt: '2024-11-15T14:42:00Z',
+		updatedAt: '2024-11-17T11:30:00Z',
+		deliveredAt: '2024-11-17T11:30:00Z',
+		events: [
+			{
+				id: 'evt-3a',
+				shipmentId: 'ship-3',
+				status: 'pending',
+				label: 'Order received',
+				location: 'BAG STORE Warehouse',
+				createdAt: '2024-11-15T14:42:00Z'
+			},
+			{
+				id: 'evt-3b',
+				shipmentId: 'ship-3',
+				status: 'shipped',
+				label: 'Handed to SiCepat',
+				location: 'Surabaya',
+				createdAt: '2024-11-16T09:00:00Z'
+			},
+			{
+				id: 'evt-3c',
+				shipmentId: 'ship-3',
+				status: 'in_transit',
+				label: 'In transit',
+				location: 'Surabaya',
+				createdAt: '2024-11-16T20:10:00Z'
+			},
+			{
+				id: 'evt-3d',
+				shipmentId: 'ship-3',
+				status: 'delivered',
+				label: 'Delivered to recipient',
+				location: 'Surabaya',
+				createdAt: '2024-11-17T11:30:00Z'
+			}
+		]
+	},
+	{
+		id: 'ship-4',
+		orderId: '#1020',
+		customerName: 'Alex Pratama',
+		customerPhone: '0811-5566-7788',
+		destination: 'Yogyakarta',
+		address: 'Jl. Magelang KM 5, Sleman',
+		courier: 'AnterAja',
+		service: 'REG',
+		trackingNumber: 'ANT-33445566',
+		status: 'exception',
+		items: [{ id: 'itm-4a', name: 'Canvas Shopper Beige', qty: 2 }],
+		weightKg: 1.8,
+		shippingCost: 25000,
+		orderTotal: 4800000,
+		createdAt: '2024-11-16T13:05:00Z',
+		updatedAt: '2024-11-18T06:50:00Z',
+		deliveredAt: null,
+		events: [
+			{
+				id: 'evt-4a',
+				shipmentId: 'ship-4',
+				status: 'pending',
+				label: 'Order received',
+				location: 'BAG STORE Warehouse',
+				createdAt: '2024-11-16T13:05:00Z'
+			},
+			{
+				id: 'evt-4b',
+				shipmentId: 'ship-4',
+				status: 'shipped',
+				label: 'Handed to AnterAja',
+				location: 'Yogyakarta',
+				createdAt: '2024-11-17T08:30:00Z'
+			},
+			{
+				id: 'evt-4c',
+				shipmentId: 'ship-4',
+				status: 'exception',
+				label: 'Recipient address not found',
+				location: 'Sleman',
+				note: 'Courier will retry once more tomorrow',
+				createdAt: '2024-11-18T06:50:00Z'
+			}
+		]
+	},
+	{
+		id: 'ship-5',
+		orderId: '#1019',
+		customerName: 'Rani Puspita',
+		customerPhone: '0878-2233-4455',
+		destination: 'Denpasar, Bali',
+		address: 'Jl. Sunset Road No. 99, Kuta',
+		courier: 'JNE',
+		service: 'OKE',
+		trackingNumber: 'JNE-77120945',
+		status: 'in_transit',
+		items: [{ id: 'itm-5a', name: 'Crossbody Classic Black — Black / S', qty: 1 }],
+		weightKg: 1.0,
+		shippingCost: 35000,
+		orderTotal: 2450000,
+		createdAt: '2024-11-17T10:20:00Z',
+		updatedAt: '2024-11-18T05:30:00Z',
+		deliveredAt: null,
+		events: [
+			{
+				id: 'evt-5a',
+				shipmentId: 'ship-5',
+				status: 'pending',
+				label: 'Order received',
+				location: 'BAG STORE Warehouse',
+				createdAt: '2024-11-17T10:20:00Z'
+			},
+			{
+				id: 'evt-5b',
+				shipmentId: 'ship-5',
+				status: 'packed',
+				label: 'Package packed',
+				location: 'BAG STORE Warehouse',
+				createdAt: '2024-11-17T15:00:00Z'
+			},
+			{
+				id: 'evt-5c',
+				shipmentId: 'ship-5',
+				status: 'shipped',
+				label: 'Handed to JNE',
+				location: 'Denpasar',
+				createdAt: '2024-11-18T01:10:00Z'
+			},
+			{
+				id: 'evt-5d',
+				shipmentId: 'ship-5',
+				status: 'in_transit',
+				label: 'Departed transit hub',
+				location: 'Denpasar',
+				createdAt: '2024-11-18T05:30:00Z'
+			}
+		]
+	},
+	{
+		id: 'ship-6',
+		orderId: '#1018',
+		customerName: 'Budi Santoso',
+		customerPhone: '0812-7788-9900',
+		destination: 'Medan, Sumatera Utara',
+		address: 'Jl. Gatot Subroto No. 21',
+		courier: 'POS Indonesia',
+		service: 'Paket Kilat',
+		trackingNumber: 'POS-20918374',
+		status: 'returned',
+		items: [{ id: 'itm-6a', name: 'Sling Bag Minimal Gray', qty: 1 }],
+		weightKg: 0.7,
+		shippingCost: 40000,
+		orderTotal: 1890000,
+		createdAt: '2024-11-14T11:00:00Z',
+		updatedAt: '2024-11-17T16:45:00Z',
+		deliveredAt: null,
+		events: [
+			{
+				id: 'evt-6a',
+				shipmentId: 'ship-6',
+				status: 'pending',
+				label: 'Order received',
+				location: 'BAG STORE Warehouse',
+				createdAt: '2024-11-14T11:00:00Z'
+			},
+			{
+				id: 'evt-6b',
+				shipmentId: 'ship-6',
+				status: 'shipped',
+				label: 'Handed to POS Indonesia',
+				location: 'Medan',
+				createdAt: '2024-11-15T09:20:00Z'
+			},
+			{
+				id: 'evt-6c',
+				shipmentId: 'ship-6',
+				status: 'exception',
+				label: 'Recipient refused the package',
+				location: 'Medan',
+				createdAt: '2024-11-16T14:00:00Z'
+			},
+			{
+				id: 'evt-6d',
+				shipmentId: 'ship-6',
+				status: 'returned',
+				label: 'Returned to sender',
+				location: 'BAG STORE Warehouse',
+				createdAt: '2024-11-17T16:45:00Z'
+			}
+		]
+	},
+	{
+		id: 'ship-7',
+		orderId: '#1017',
+		customerName: 'Clara Dewi',
+		customerPhone: '0856-3344-5566',
+		destination: 'Semarang, Jawa Tengah',
+		address: 'Jl. Pandanaran No. 5, Candi',
+		courier: 'GoSend',
+		service: 'Same Day',
+		trackingNumber: 'GS-66778899',
+		status: 'delivered',
+		items: [{ id: 'itm-7a', name: 'Mini Shoulder Bag Cream', qty: 1 }],
+		weightKg: 0.9,
+		shippingCost: 20000,
+		orderTotal: 1240000,
+		createdAt: '2024-11-17T08:05:00Z',
+		updatedAt: '2024-11-17T13:40:00Z',
+		deliveredAt: '2024-11-17T13:40:00Z',
+		events: [
+			{
+				id: 'evt-7a',
+				shipmentId: 'ship-7',
+				status: 'pending',
+				label: 'Order received',
+				location: 'BAG STORE Warehouse',
+				createdAt: '2024-11-17T08:05:00Z'
+			},
+			{
+				id: 'evt-7b',
+				shipmentId: 'ship-7',
+				status: 'packed',
+				label: 'Package packed',
+				location: 'BAG STORE Warehouse',
+				createdAt: '2024-11-17T09:30:00Z'
+			},
+			{
+				id: 'evt-7c',
+				shipmentId: 'ship-7',
+				status: 'shipped',
+				label: 'Handed to GoSend',
+				location: 'Semarang',
+				createdAt: '2024-11-17T10:15:00Z'
+			},
+			{
+				id: 'evt-7d',
+				shipmentId: 'ship-7',
+				status: 'delivered',
+				label: 'Delivered to recipient',
+				location: 'Semarang',
+				createdAt: '2024-11-17T13:40:00Z'
+			}
+		]
+	},
+	{
+		id: 'ship-8',
+		orderId: '#1016',
+		customerName: 'Dimas Anggara',
+		customerPhone: '0813-4455-6677',
+		destination: 'Makassar, Sulawesi Selatan',
+		address: 'Jl. A.P. Pettarani No. 18, Panakkukang',
+		courier: 'GrabExpress',
+		service: 'Same Day',
+		trackingNumber: 'GX-11223344',
+		status: 'pending',
+		items: [
+			{ id: 'itm-8a', name: 'Everyday Canvas Tote — Black / M', qty: 1 },
+			{ id: 'itm-8b', name: 'Leather Clutch Noir', qty: 1 }
+		],
+		weightKg: 1.4,
+		shippingCost: 45000,
+		orderTotal: 2150000,
+		createdAt: '2024-11-18T09:50:00Z',
+		updatedAt: '2024-11-18T09:50:00Z',
+		deliveredAt: null,
+		events: [
+			{
+				id: 'evt-8a',
+				shipmentId: 'ship-8',
+				status: 'pending',
+				label: 'Order received',
+				location: 'BAG STORE Warehouse',
+				createdAt: '2024-11-18T09:50:00Z'
+			}
+		]
 	}
 ];
 

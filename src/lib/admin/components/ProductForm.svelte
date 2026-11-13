@@ -531,6 +531,16 @@
 							placeholder="Made from organic canvas with reinforced handles..."
 						></Textarea>
 					</div>
+					<div>
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+							>Material / Bahan</span
+						>
+						<Input
+							class="mt-1"
+							bind:value={draft.material}
+							placeholder="Organic cotton canvas"
+						/>
+					</div>
 				</div>
 			</div>
 

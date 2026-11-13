@@ -9,7 +9,6 @@
 		isAvailable,
 		priceFor,
 		sizeOptionsFor,
-		skuFor,
 		stockFor,
 		variantLabel
 	} from '#lib/catalog/product.ts';
@@ -340,10 +339,6 @@
 						<div class="my-7 h-px bg-[#EAE8E4]"></div>
 
 						<dl class="flex flex-col gap-3 text-[11px] text-[#5F5E57]">
-							<div class="flex justify-between gap-4">
-								<dt>Kode produk</dt>
-								<dd class="tracking-wide">{skuFor(product, variant)}</dd>
-							</div>
 							{#if category}
 								<div class="flex justify-between gap-4">
 									<dt>Kategori</dt>
@@ -404,7 +399,7 @@
 							id: 'spec',
 							title: 'Spesifikasi produk',
 							facts: [
-								{ label: 'Kode produk', value: skuFor(product, variant) },
+								{ label: 'Bahan', value: product.material?.trim() || '—' },
 								{ label: 'Kategori', value: category?.name ?? '—' },
 								{
 									label: 'Warna',
@@ -426,9 +421,10 @@
 						},
 						{
 							id: 'shipping',
-							title: 'Pengiriman & pengiriman',
+							title: 'Pengiriman',
 							paragraphs: [
-								'Detail pengiriman dan estimasi tiba dikonfirmasikan oleh tim kami melalui WhatsApp setelah pesanan masuk.'
+								'Detail pengiriman dan estimasi tiba dikonfirmasikan oleh tim kami melalui WhatsApp setelah pesanan masuk.',
+								'Gratis ongkir untuk pembelian di atas Rp750.000. Pengiriman ke seluruh Indonesia.'
 							]
 						},
 						{

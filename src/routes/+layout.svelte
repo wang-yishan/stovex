@@ -12,14 +12,18 @@
 
 	let { data, children }: LayoutProps = $props();
 
-	// The admin store mirrors SQLite: fill it with the loaded catalog before
+	// The admin store mirrors SQLite: fill it with the loaded data before
 	// any page renders, on the server as well as in the browser.
 	// `untrack` keeps this a one-off read of the initial payload.
 	admin.hydrateCatalog(untrack(() => data.catalog));
+	admin.hydrateShipments(untrack(() => data.shipments));
+	admin.hydrateNotifications(untrack(() => data.notifications));
 
-	// Navigations refresh the catalog; keep the mirror in sync.
+	// Navigations refresh the data; keep the mirror in sync.
 	$effect(() => {
 		admin.hydrateCatalog(data.catalog);
+		admin.hydrateShipments(data.shipments);
+		admin.hydrateNotifications(data.notifications);
 	});
 </script>
 

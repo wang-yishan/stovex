@@ -14,6 +14,7 @@ import {
 	Shapes,
 	ShieldCheck,
 	ShoppingCart,
+	Truck,
 	Users,
 	Warehouse
 } from '@lucide/svelte';
@@ -25,6 +26,7 @@ export type NavId =
 	| 'collections'
 	| 'inventory'
 	| 'orders'
+	| 'shipping'
 	| 'customers'
 	| 'pages'
 	| 'media'
@@ -60,6 +62,7 @@ export const NAV_SECTIONS: NavSection[] = [
 		label: 'SALES',
 		items: [
 			{ id: 'orders', label: 'Orders', icon: ShoppingCart },
+			{ id: 'shipping', label: 'Shipping', icon: Truck },
 			{ id: 'customers', label: 'Customers', icon: Users }
 		]
 	},
@@ -89,6 +92,7 @@ export const ROUTE_BY_NAV_ID: Record<NavId, string> = {
 	collections: '/dashboard/collections',
 	inventory: '/dashboard/inventory',
 	orders: '/dashboard/orders',
+	shipping: '/dashboard/shipping',
 	customers: '/dashboard/customers',
 	pages: '/dashboard/pages',
 	media: '/dashboard/media',
@@ -105,6 +109,7 @@ const KNOWN_SLUGS: Record<string, NavId> = {
 	collections: 'collections',
 	inventory: 'inventory',
 	orders: 'orders',
+	shipping: 'shipping',
 	customers: 'customers',
 	pages: 'pages',
 	media: 'media',

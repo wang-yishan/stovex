@@ -4,10 +4,15 @@
 
 import type {
 	AdjustStockInput,
+	AppNotification,
 	Category,
 	Collection,
 	Product,
 	ProductStatus,
+	Shipment,
+	ShipmentEvent,
+	ShipmentEventInput,
+	ShipmentStatus,
 	StockMovement
 } from './types.ts';
 
@@ -91,6 +96,42 @@ export const collectionApi = {
 			method: 'POST',
 			body: JSON.stringify({ dir })
 		})
+};
+
+export const shipmentApi = {
+	list: () => request<{ shipments: Shipment[] }>('/api/shipments'),
+	save: (shipment: Shipment) =>
+		request<{ shipment: Shipment }>('/api/shipments', {
+			method: 'POST',
+			body: JSON.stringify(shipment)
+		}),
+	update: (shipment: Shipment) =>
+		request<{ shipment: Shipment }>(`/api/shipments/${shipment.id}`, {
+			method: 'PUT',
+			body: JSON.stringify(shipment)
+		}),
+	remove: (id: string) => request<{ ok: true }>(`/api/shipments/${id}`, { method: 'DELETE' }),
+	setStatus: (id: string, status: ShipmentStatus, detail?: { location?: string; label?: string; note?: string }) =>
+		request<{ shipment: Shipment; event: ShipmentEvent }>(`/api/shipments/${id}/status`, {
+			method: 'POST',
+			body: JSON.stringify({ status, ...detail })
+		}),
+	addEvent: (id: string, input: ShipmentEventInput) =>
+		request<{ shipment: Shipment; event: ShipmentEvent }>(`/api/shipments/${id}/events`, {
+			method: 'POST',
+			body: JSON.stringify(input)
+		})
+};
+
+export const notificationApi = {
+	list: () => request<{ notifications: AppNotification[] }>('/api/notifications'),
+	markRead: (id: string) =>
+		request<{ notification: AppNotification }>(`/api/notifications/${id}`, {
+			method: 'PATCH',
+			body: JSON.stringify({ read: true })
+		}),
+	markAllRead: () => request<{ ok: true }>('/api/notifications/read-all', { method: 'POST' }),
+	remove: (id: string) => request<{ ok: true }>(`/api/notifications/${id}`, { method: 'DELETE' })
 };
 
 /** Upload image files to disk; returns the stored URLs. */

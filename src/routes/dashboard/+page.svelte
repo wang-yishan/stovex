@@ -14,7 +14,6 @@
 	import {
 		ShoppingCart,
 		LayoutDashboard,
-		Bell,
 		ChevronDown,
 		CircleCheck,
 		Package,
@@ -46,12 +45,6 @@
 		<Button variant="outline">
 			Today
 			<ChevronDown class="h-4 w-4 text-muted-foreground" />
-		</Button>
-		<Button variant="outline" size="icon" aria-label="Notifications" class="relative">
-			<Bell class="h-5 w-5 text-foreground" strokeWidth={1.6} />
-			<span
-				class="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-card bg-[#D9534F]"
-			></span>
 		</Button>
 	{/snippet}
 </Topbar>
@@ -261,8 +254,7 @@
 										<span class="text-[11px] text-muted-foreground">{item.time}</span>
 									</div>
 									<div class="mt-1 text-[12px] leading-snug">
-										<span class="text-muted-foreground">{item.title}</span>{' '}
-										<span class="font-medium text-foreground">{item.entity}</span>
+										<span class="text-muted-foreground">{item.title}</span> <span class="font-medium text-foreground">{item.entity}</span>
 									</div>
 								</div>
 							</div>
