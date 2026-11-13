@@ -52,8 +52,9 @@
 	--text-secondary: #5a5a5a; /* 6.5:1 on --bg */
 	--text-muted: #636363; /* 5.7:1 on --bg */
 	--border: #eaeaea;
-	/* control border: interactive-control boundaries need 3:1 against the
-	   surface they sit on (WCAG 1.4.11), which --border does not reach */
+	/* emphasis border: optional stronger outline (3.45:1 on white) for
+	   hover/active states — controls rest on the card border (--border) so
+	   inputs, selects and checkboxes match the dashboard cards */
 	--border-control: #8a8a8a; /* 3.45:1 on white, 4.94:1 on --surface dark */
 	--ink: #242424; /* primary button fill */
 	--ink-hover: #1a1a1a; /* primary button hover (darker in light mode) */
@@ -88,7 +89,7 @@
 	--accent-foreground: var(--text-primary);
 	--destructive: var(--danger-text);
 	--destructive-foreground: #ffffff;
-	--input: var(--border-control);
+	--input: var(--border);
 	--ring: var(--text-primary);
 	--primary-hover: var(--ink-hover);
 	--field: var(--field-bg);
@@ -151,7 +152,7 @@
 	--accent-foreground: var(--text-primary);
 	--destructive: var(--danger-text);
 	--destructive-foreground: #1c1c1c;
-	--input: var(--border-control);
+	--input: var(--border);
 	--ring: var(--text-primary);
 	--primary-hover: var(--ink-hover);
 	--field: var(--field-bg);
@@ -349,22 +350,24 @@ html {
 	text-wrap: balance;
 }
 
-@media (max-width: 767px) {
-	/* iOS zooms on focus when input text < 16px; keep tap targets ≥40px */
-	.admin-root input,
-	.admin-root select,
-	.admin-root textarea {
-		font-size: 16px;
-	}
-	.admin-root button,
-	.admin-root a {
-		-webkit-tap-highlight-color: transparent;
-	}
-	/* Lift the smallest action icons (12–14px) to a legible 16px on mobile */
-	.admin-root svg[class*='h-3 '],
-	.admin-root svg[class*='w-3 '] {
-		width: 16px;
-		height: 16px;
+@layer base {
+	@media (max-width: 767px) {
+		/* iOS zooms on focus when input text < 16px; keep tap targets ≥40px */
+		.admin-root input,
+		.admin-root select,
+		.admin-root textarea {
+			font-size: 16px;
+		}
+		.admin-root button,
+		.admin-root a {
+			-webkit-tap-highlight-color: transparent;
+		}
+		/* Lift the smallest action icons (12–14px) to a legible 16px on mobile */
+		.admin-root svg[class*='h-3 '],
+		.admin-root svg[class*='w-3 '] {
+			width: 16px;
+			height: 16px;
+		}
 	}
 }
 
@@ -503,7 +506,7 @@ html {
 	--accent-foreground: var(--text-primary);
 	--destructive: #a33a37;
 	--destructive-foreground: #ffffff;
-	--input: var(--border-control);
+	--input: var(--border);
 	--ring: var(--text-primary);
 	--field: var(--field-bg);
 	--field-focus: var(--field-bg-focus);

@@ -41,7 +41,7 @@
 		draft = { name: c.name, slug: c.slug, description: c.description ?? '' };
 		editing = { mode: 'edit', cat: c };
 	}
-	function save() {
+	async function save() {
 		if (!draft.name.trim()) {
 			admin.showToast('Name required', 'error');
 			return;
@@ -51,14 +51,15 @@
 			return;
 		}
 		if (editing?.mode === 'create') {
-			admin.createCategory({
+			const created = await admin.createCategory({
 				name: draft.name,
 				slug: draft.slug || slugify(draft.name),
 				description: draft.description
 			});
+			if (!created) return;
 			admin.showToast('Category created', 'success');
 		} else if (editing?.cat) {
-			admin.updateCategory({
+			await admin.updateCategory({
 				id: editing.cat.id,
 				name: draft.name,
 				slug: draft.slug,
@@ -68,14 +69,14 @@
 		}
 		editing = null;
 	}
-	function doDelete() {
+	async function doDelete() {
 		if (!deleteId) return;
 		const n = counts[deleteId] ?? 0;
 		if (n > 0 && !reassignTo) {
 			admin.showToast('Reassign products before delete', 'error');
 			return;
 		}
-		admin.deleteCategory(deleteId, reassignTo || undefined);
+		await admin.deleteCategory(deleteId, reassignTo || undefined);
 		admin.showToast('Category deleted', 'success');
 		deleteId = null;
 		reassignTo = '';

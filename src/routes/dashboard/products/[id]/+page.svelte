@@ -85,14 +85,14 @@
 					<Button
 						variant="ghost"
 						class="h-auto w-full justify-start rounded-[6px] px-3 py-2.5 text-[13px]"
-						onclick={() => admin.duplicateProduct(product.id)}
+						onclick={() => void admin.duplicateProduct(product.id)}
 					>
 						<Copy class="h-4 w-4 shrink-0" /> Duplicate
 					</Button>
 					<Button
 						variant="ghost"
 						class="h-auto w-full justify-start rounded-[6px] px-3 py-2.5 text-[13px]"
-						onclick={() => admin.archiveProduct(product.id)}
+						onclick={() => void admin.archiveProduct(product.id)}
 					>
 						<Archive class="h-4 w-4 shrink-0" /> Archive
 					</Button>
@@ -366,8 +366,8 @@
 			confirmLabel="Delete"
 			danger
 			requireArm
-			onconfirm={() => {
-				admin.deleteProducts([product.id]);
+			onconfirm={async () => {
+				await admin.deleteProducts([product.id]);
 				admin.showToast('Product deleted', 'success');
 				void goto(resolve('/dashboard/products'));
 			}}

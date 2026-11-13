@@ -15,9 +15,9 @@ import {
 	nowISO,
 	seedPages,
 	seedVersions,
-	slugify,
 	uid
 } from './data';
+import { categoryApi, collectionApi, productApi } from './api.ts';
 import type {
 	Category,
 	Collection,
@@ -25,7 +25,6 @@ import type {
 	PageStatus,
 	PageVersion,
 	Product,
-	ProductStatus,
 	StockMovement,
 	StorePage,
 	StoreSettings,
@@ -35,6 +34,19 @@ import type {
 } from './types';
 
 export type SlugKind = 'product' | 'category' | 'collection' | 'page';
+
+/** The catalog as loaded from SQLite and mirrored into this store. */
+export interface CatalogSnapshot {
+	products: Product[];
+	categories: Category[];
+	collections: Collection[];
+	movements: StockMovement[];
+}
+
+/** Human readable message for a failed API call. */
+function errorMessage(cause: unknown): string {
+	return cause instanceof Error ? cause.message : 'Something went wrong';
+}
 
 class AdminStore {
 	products = $state<Product[]>(SEED_PRODUCTS);
@@ -98,167 +110,187 @@ class AdminStore {
 
 	/* --- products --- */
 
-	upsertProduct(product: Product): void {
-		const i = this.products.findIndex((p) => p.id === product.id);
-		if (i >= 0) {
-			this.products[i] = product;
-		} else {
-			this.products.unshift(product);
+	/**
+	 * Replace the cached catalog with what SQLite holds. Called by the root
+	 * layout on every load so the dashboard and the storefront always read
+	 * the same rows.
+	 */
+	hydrateCatalog(data: CatalogSnapshot): void {
+		this.products = data.products;
+		this.categories = data.categories;
+		this.collections = data.collections;
+		this.movements = data.movements;
+	}
+
+	/** Persist a product, then mirror the saved row into the local cache. */
+	async upsertProduct(product: Product): Promise<Product | null> {
+		try {
+			const { product: saved } = await productApi.save(product);
+			const i = this.products.findIndex((p) => p.id === saved.id);
+			if (i >= 0) this.products[i] = saved;
+			else this.products = [saved, ...this.products];
+			this.showToast(saved.status === 'active' ? 'Product published' : 'Product saved', 'success');
+			return saved;
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+			return null;
 		}
-		this.showToast(product.status === 'active' ? 'Product published' : 'Product saved', 'success');
 	}
 
-	deleteProducts(ids: string[]): void {
-		this.products = this.products.filter((p) => !ids.includes(p.id));
+	async deleteProducts(ids: string[]): Promise<void> {
+		try {
+			for (const id of ids) await productApi.remove(id);
+			this.products = this.products.filter((p) => !ids.includes(p.id));
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
 	}
 
-	duplicateProduct(id: string): string | undefined {
-		const src = this.products.find((p) => p.id === id);
-		if (!src) return undefined;
-		let slug = `${src.slug}-copy`;
-		let n = 1;
-		while (!this.slugUnique(slug)) slug = `${src.slug}-copy-${n++}`;
-		const copy: Product = {
-			...structuredClone($state.snapshot(src)),
-			id: uid('prod-'),
-			name: `${src.name} Copy`,
-			slug: slug,
-			status: 'draft',
-			createdAt: nowISO(),
-			updatedAt: nowISO(),
-			sku: src.sku ? `${src.sku}-COPY` : '',
-			variants: src.variants.map((v) => ({
-				...structuredClone($state.snapshot(v)),
-				id: uid('var-'),
-				productId: '',
-				sku: v.sku ? `${v.sku}-COPY` : ''
-			}))
-		};
-		for (const v of copy.variants) v.productId = copy.id;
-		this.products = [copy, ...this.products];
-		this.showToast('Duplicated as draft', 'success');
-		return copy.id;
+	async duplicateProduct(id: string): Promise<string | undefined> {
+		try {
+			const { product } = await productApi.duplicate(id);
+			this.products = [product, ...this.products];
+			this.showToast('Duplicated as draft', 'success');
+			return product.id;
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+			return undefined;
+		}
 	}
 
-	setProductsStatus(ids: string[], status: 'active' | 'archived'): void {
-		this.products = this.products.map((p) =>
-			ids.includes(p.id) ? { ...p, status: status, updatedAt: nowISO() } : p
-		);
+	async setProductsStatus(ids: string[], status: 'active' | 'archived'): Promise<void> {
+		try {
+			await productApi.setStatus(ids, status);
+			this.products = this.products.map((p) =>
+				ids.includes(p.id) ? { ...p, status: status, updatedAt: nowISO() } : p
+			);
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
 	}
 
-	archiveProduct(id: string): void {
-		this.products = this.products.map((p) =>
-			p.id === id ? { ...p, status: 'archived' as ProductStatus, updatedAt: nowISO() } : p
-		);
+	async archiveProduct(id: string): Promise<void> {
+		await this.setProductsStatus([id], 'archived');
 	}
 
 	/* --- inventory --- */
 
-	/** Clamps target stock at 0; appends a traceable movement record (newest first). */
-	adjustStock(input: AdjustStockInput): void {
-		const { productId, variantId, delta, reason, note } = input;
-		const product = this.products.find((p) => p.id === productId);
-		if (!product) return;
-		let previousStock: number;
-		let newStock: number;
-		let variantName: string | undefined;
-		let sku: string;
-		if (variantId) {
-			const variant = product.variants.find((v) => v.id === variantId);
-			if (!variant) return;
-			previousStock = variant.stock;
-			newStock = Math.max(0, previousStock + delta);
-			variant.stock = newStock;
-			variantName = variant.name;
-			sku = variant.sku || product.sku || '';
-		} else {
-			previousStock = product.stock;
-			newStock = Math.max(0, previousStock + delta);
-			product.stock = newStock;
-			sku = product.sku || '';
+	/**
+	 * Clamps target stock at 0 and appends a traceable movement record
+	 * (newest first). The change is written to SQLite first.
+	 */
+	async adjustStock(input: AdjustStockInput): Promise<void> {
+		try {
+			const { movement } = await productApi.adjustStock(input.productId, input);
+			this.products = this.products.map((p) => {
+				if (p.id !== input.productId) return p;
+				if (input.variantId) {
+					return {
+						...p,
+						updatedAt: movement.createdAt,
+						variants: p.variants.map((v) =>
+							v.id === input.variantId ? { ...v, stock: movement.newStock } : v
+						)
+					};
+				}
+				return { ...p, updatedAt: movement.createdAt, stock: movement.newStock };
+			});
+			this.movements = [movement, ...this.movements];
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
 		}
-		product.updatedAt = nowISO();
-		const movement: StockMovement = {
-			id: uid('mov-'),
-			productId: productId,
-			variantId: variantId,
-			productName: product.name,
-			variantName: variantName,
-			sku: sku,
-			type: reason.toLowerCase(),
-			quantityChange: delta,
-			previousStock: previousStock,
-			newStock: newStock,
-			reason: note ? `${reason} - ${note}` : reason,
-			createdAt: nowISO()
-		};
-		this.movements = [movement, ...this.movements];
 	}
 
 	/* --- categories --- */
 
-	createCategory(draft: Omit<Category, 'id'>): Category {
-		const category: Category = {
-			id: uid('cat-'),
-			name: draft.name,
-			slug: draft.slug || slugify(draft.name),
-			description: draft.description
-		};
-		this.categories = [...this.categories, category];
-		return category;
-	}
-
-	updateCategory(draft: Category): void {
-		this.categories = this.categories.map((c) => (c.id === draft.id ? draft : c));
-	}
-
-	deleteCategory(id: string, reassignTo?: string): void {
-		if (reassignTo) {
-			this.products = this.products.map((p) =>
-				p.categoryId === id ? { ...p, categoryId: reassignTo } : p
-			);
+	async createCategory(draft: Omit<Category, 'id'>): Promise<Category | null> {
+		try {
+			const { category } = await categoryApi.create(draft);
+			this.categories = [...this.categories, category];
+			return category;
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+			return null;
 		}
-		this.categories = this.categories.filter((c) => c.id !== id);
+	}
+
+	async updateCategory(draft: Category): Promise<void> {
+		try {
+			const { category } = await categoryApi.update(draft);
+			this.categories = this.categories.map((c) => (c.id === category.id ? category : c));
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
+	}
+
+	async deleteCategory(id: string, reassignTo?: string): Promise<void> {
+		try {
+			await categoryApi.remove(id, reassignTo);
+			this.categories = this.categories.filter((c) => c.id !== id);
+			if (reassignTo) {
+				this.products = this.products.map((p) =>
+					p.categoryId === id ? { ...p, categoryId: reassignTo } : p
+				);
+			}
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
 	}
 
 	/* --- collections --- */
 
-	createCollection(draft: Omit<Collection, 'id' | 'order'>): Collection {
-		const collection: Collection = {
-			id: uid('col-'),
-			name: draft.name,
-			slug: draft.slug || slugify(draft.name),
-			description: draft.description,
-			coverImage: draft.coverImage,
-			productIds: draft.productIds ?? [],
-			order: this.collections.length
-		};
-		this.collections = [...this.collections, collection];
-		return collection;
+	async createCollection(draft: Omit<Collection, 'id' | 'order'>): Promise<Collection | null> {
+		try {
+			const { collection } = await collectionApi.create(draft);
+			this.collections = [...this.collections, collection];
+			return collection;
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+			return null;
+		}
 	}
 
-	updateCollection(draft: Collection): void {
-		this.collections = this.collections.map((c) => (c.id === draft.id ? draft : c));
+	async updateCollection(draft: Collection): Promise<void> {
+		try {
+			const { collection } = await collectionApi.update(draft);
+			this.collections = this.collections.map((c) => (c.id === collection.id ? collection : c));
+			this.products = this.products.map((p) => ({
+				...p,
+				collectionIds: p.collectionIds.filter((cid) => cid !== collection.id)
+			}));
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
 	}
 
-	deleteCollection(id: string): void {
-		this.collections = this.collections.filter((c) => c.id !== id);
-		// ref leaves dangling product.collectionIds; we strip them to keep invariants honest.
-		this.products = this.products.map((p) => ({
-			...p,
-			collectionIds: p.collectionIds.filter((cid) => cid !== id)
-		}));
+	async deleteCollection(id: string): Promise<void> {
+		try {
+			await collectionApi.remove(id);
+			this.collections = this.collections.filter((c) => c.id !== id);
+			// ref leaves dangling product.collectionIds; we strip them to keep invariants honest.
+			this.products = this.products.map((p) => ({
+				...p,
+				collectionIds: p.collectionIds.filter((cid) => cid !== id)
+			}));
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
 	}
 
 	/** Swap a collection by ±1 position (clamped) then re-index `order` fields. */
-	moveCollection(id: string, dir: 1 | -1): void {
-		const i = this.collections.findIndex((c) => c.id === id);
-		const j = i + dir;
-		if (i < 0 || j < 0 || j >= this.collections.length) return;
-		const next = [...this.collections];
-		const [moved] = next.splice(i, 1);
-		next.splice(j, 0, moved!);
-		this.collections = next.map((c, k) => ({ ...c, order: k }));
+	async moveCollection(id: string, dir: 1 | -1): Promise<void> {
+		try {
+			await collectionApi.move(id, dir);
+			const next = [...this.collections];
+			const i = next.findIndex((c) => c.id === id);
+			const j = i + dir;
+			if (i < 0 || j < 0 || j >= next.length) return;
+			const [moved] = next.splice(i, 1);
+			next.splice(j, 0, moved!);
+			this.collections = next.map((c, k) => ({ ...c, order: k }));
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
 	}
 
 	/* --- misc helpers used by pages --- */

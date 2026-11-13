@@ -50,7 +50,7 @@
 		productSearch = '';
 		editing = { mode: 'edit', col: c };
 	}
-	function save() {
+	async function save() {
 		if (!draft.name.trim()) {
 			admin.showToast('Name required', 'error');
 			return;
@@ -60,16 +60,17 @@
 			return;
 		}
 		if (editing?.mode === 'create') {
-			admin.createCollection({
+			const created = await admin.createCollection({
 				name: draft.name,
 				slug: draft.slug || slugify(draft.name),
 				description: draft.description,
 				coverImage: draft.coverImage,
 				productIds: draft.productIds
 			});
+			if (!created) return;
 			admin.showToast('Collection created', 'success');
 		} else if (editing?.col) {
-			admin.updateCollection({
+			await admin.updateCollection({
 				...editing.col,
 				name: draft.name,
 				slug: draft.slug,
@@ -133,13 +134,13 @@
 										<Button
 											variant="outline"
 											size="icon-sm"
-											onclick={() => admin.moveCollection(c.id, -1)}
+											onclick={() => void admin.moveCollection(c.id, -1)}
 											aria-label="Move up"><ChevronUp class="h-3.5 w-3.5 text-[#5A5A5A]" /></Button
 										>
 										<Button
 											variant="outline"
 											size="icon-sm"
-											onclick={() => admin.moveCollection(c.id, 1)}
+											onclick={() => void admin.moveCollection(c.id, 1)}
 											aria-label="Move down"
 											><ChevronDown class="h-3.5 w-3.5 text-[#5A5A5A]" /></Button
 										>

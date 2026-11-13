@@ -9,6 +9,7 @@ import {
 	Menu,
 	Package,
 	PanelsTopLeft,
+	PlugZap,
 	Settings,
 	Shapes,
 	ShieldCheck,
@@ -30,6 +31,7 @@ export type NavId =
 	| 'promotions'
 	| 'navigation'
 	| 'store-settings'
+	| 'integrations'
 	| 'users-perms';
 
 export interface NavItem {
@@ -74,6 +76,7 @@ export const NAV_SECTIONS: NavSection[] = [
 		label: 'SYSTEM',
 		items: [
 			{ id: 'store-settings', label: 'Store Settings', icon: Settings },
+			{ id: 'integrations', label: 'Integrations', icon: PlugZap },
 			{ id: 'users-perms', label: 'Users & Permissions', icon: ShieldCheck }
 		]
 	}
@@ -92,6 +95,7 @@ export const ROUTE_BY_NAV_ID: Record<NavId, string> = {
 	promotions: '/dashboard/promotions',
 	navigation: '/dashboard/navigation',
 	'store-settings': '/dashboard/store-settings',
+	integrations: '/dashboard/integrations',
 	'users-perms': '/dashboard/users-perms'
 };
 
@@ -107,6 +111,7 @@ const KNOWN_SLUGS: Record<string, NavId> = {
 	promotions: 'promotions',
 	navigation: 'navigation',
 	'store-settings': 'store-settings',
+	integrations: 'integrations',
 	'users-perms': 'users-perms'
 };
 

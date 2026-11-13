@@ -62,10 +62,12 @@
 		: 'px-4 py-6 md:px-6 lg:px-8'}"
 >
 	<!-- KPI cards -->
-	<div class="mb-4 grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 md:gap-4 lg:grid-cols-4">
+	<div class="mb-4 flex flex-wrap gap-3 md:gap-4">
 		<!-- Orders KPI -->
-		<div class="min-w-0 rounded-[12px] border border-border bg-card p-4">
-			<div class="mb-3 flex items-start justify-between gap-2">
+		<div
+			class="min-w-0 grow basis-[calc(50%-0.375rem)] rounded-[12px] border border-border bg-card p-4 md:basis-[calc(50%-0.5rem)] lg:basis-[calc(25%-0.75rem)]"
+		>
+			<div class="mb-3 flex flex-wrap items-start justify-between gap-2">
 				<div
 					class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border bg-[#FFF8E6]"
 					style="border-color: #F3D9A0;"
@@ -73,7 +75,7 @@
 					<ShoppingCart class="h-5 w-5 text-[#8A6A24]" strokeWidth={1.6} />
 				</div>
 				<span
-					class="inline-flex max-w-[92px] shrink-0 items-center gap-1 truncate rounded-full border bg-[#FFF8E6] px-2 py-0.5 text-[10px] font-medium text-[#8A6A24]"
+					class="ml-auto inline-flex max-w-[92px] shrink-0 items-center gap-1 truncate rounded-full border bg-[#FFF8E6] px-2 py-0.5 text-[10px] font-medium text-[#8A6A24]"
 					style="border-color: #F3D9A0;"
 				>
 					<span class="h-1 w-1 shrink-0 rounded-full bg-[#D69A35]"></span>
@@ -89,8 +91,10 @@
 		</div>
 
 		<!-- Active products KPI -->
-		<div class="min-w-0 rounded-[12px] border border-border bg-card p-4">
-			<div class="mb-3 flex items-start justify-between gap-2">
+		<div
+			class="min-w-0 grow basis-[calc(50%-0.375rem)] rounded-[12px] border border-border bg-card p-4 md:basis-[calc(50%-0.5rem)] lg:basis-[calc(25%-0.75rem)]"
+		>
+			<div class="mb-3 flex flex-wrap items-start justify-between gap-2">
 				<div
 					class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border bg-[#F0FAF6]"
 					style="border-color: #C7EBDB;"
@@ -98,7 +102,7 @@
 					<Package class="h-5 w-5 text-[#1A7A52]" strokeWidth={1.6} />
 				</div>
 				<span
-					class="inline-flex max-w-[92px] shrink-0 items-center gap-1 truncate rounded-full border bg-[#F0FAF6] px-2 py-0.5 text-[10px] font-medium text-[#1A7A52]"
+					class="ml-auto inline-flex max-w-[92px] shrink-0 items-center gap-1 truncate rounded-full border bg-[#F0FAF6] px-2 py-0.5 text-[10px] font-medium text-[#1A7A52]"
 					style="border-color: #C7EBDB;"
 				>
 					<span class="h-1 w-1 shrink-0 rounded-full bg-[#269B65]"></span>
@@ -114,8 +118,10 @@
 		</div>
 
 		<!-- Low stock KPI -->
-		<div class="min-w-0 rounded-[12px] border border-border bg-card p-4">
-			<div class="mb-3 flex items-start justify-between gap-2">
+		<div
+			class="min-w-0 grow basis-[calc(50%-0.375rem)] rounded-[12px] border border-border bg-card p-4 md:basis-[calc(50%-0.5rem)] lg:basis-[calc(25%-0.75rem)]"
+		>
+			<div class="mb-3 flex flex-wrap items-start justify-between gap-2">
 				<div
 					class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border bg-[#FFF0F0]"
 					style="border-color: #F2C2C0;"
@@ -123,7 +129,7 @@
 					<TriangleAlert class="h-5 w-5 text-[#A33A37]" strokeWidth={1.6} />
 				</div>
 				<span
-					class="inline-flex max-w-[92px] shrink-0 items-center gap-1 truncate rounded-full border bg-[#FFF0F0] px-2 py-0.5 text-[10px] font-medium text-[#A33A37]"
+					class="ml-auto inline-flex max-w-[92px] shrink-0 items-center gap-1 truncate rounded-full border bg-[#FFF0F0] px-2 py-0.5 text-[10px] font-medium text-[#A33A37]"
 					style="border-color: #F2C2C0;"
 				>
 					<span class="h-1 w-1 shrink-0 rounded-full bg-[#D9534F]"></span>
@@ -139,15 +145,17 @@
 		</div>
 
 		<!-- Store health KPI -->
-		<div class="min-w-0 rounded-[12px] border border-border bg-card p-4">
-			<div class="mb-3 flex items-start justify-between gap-2">
+		<div
+			class="min-w-0 grow basis-[calc(50%-0.375rem)] rounded-[12px] border border-border bg-card p-4 md:basis-[calc(50%-0.5rem)] lg:basis-[calc(25%-0.75rem)]"
+		>
+			<div class="mb-3 flex flex-wrap items-start justify-between gap-2">
 				<div
 					class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border border-border bg-muted"
 				>
 					<LayoutDashboard class="h-5 w-5 text-muted-foreground" strokeWidth={1.6} />
 				</div>
 				<span
-					class="inline-flex max-w-[92px] shrink-0 items-center gap-1 truncate rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
+					class="ml-auto inline-flex max-w-[92px] shrink-0 items-center gap-1 truncate rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
 				>
 					<span class="h-1 w-1 shrink-0 rounded-full bg-[#269B65]"></span>
 					Healthy

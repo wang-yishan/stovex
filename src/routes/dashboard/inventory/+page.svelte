@@ -102,7 +102,7 @@
 		note = '';
 	}
 
-	function confirmAdjust() {
+	async function confirmAdjust() {
 		if (!target || !reason) {
 			admin.showToast('Reason required', 'error');
 			return;
@@ -111,7 +111,7 @@
 			admin.showToast('Quantity change cannot be 0', 'error');
 			return;
 		}
-		admin.adjustStock({
+		await admin.adjustStock({
 			productId: target.productId,
 			variantId: target.variantId,
 			delta,

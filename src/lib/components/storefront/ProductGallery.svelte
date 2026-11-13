@@ -17,6 +17,11 @@
 
 	const current = $derived(images[active] ?? images[0]);
 
+	// Keep the selection valid when the gallery shrinks (e.g. after an edit).
+	$effect(() => {
+		if (active > images.length - 1) active = Math.max(0, images.length - 1);
+	});
+
 	function go(delta: number) {
 		if (images.length === 0) return;
 		active = (active + delta + images.length) % images.length;
@@ -48,26 +53,9 @@
 
 <svelte:window onkeydown={onKeydown} />
 
-<div class="grid grid-cols-[60px_minmax(0,1fr)] gap-3 sm:grid-cols-[76px_minmax(0,1fr)] sm:gap-4">
-	<!-- Thumbnail rail -->
-	<div class="order-1 flex flex-col gap-2 sm:gap-3">
-		{#each images as image, i (image.src + i)}
-			<button
-				type="button"
-				class="aspect-[3/4] overflow-hidden border transition duration-200 {i === active
-					? 'border-[#242424] opacity-100'
-					: 'border-transparent opacity-70 hover:opacity-100'}"
-				aria-label={`Lihat gambar ${i + 1}`}
-				aria-current={i === active}
-				onclick={() => select(i)}
-			>
-				<img class="h-full w-full object-cover" src={image.src} alt={image.alt} loading="lazy" />
-			</button>
-		{/each}
-	</div>
-
-	<!-- Main frame -->
-	<div class="relative order-2 min-w-0 bg-[#F5F3EF]">
+<div class="flex flex-col gap-3">
+	<!-- Primary frame -->
+	<div class="relative min-w-0 bg-[#F5F3EF]">
 		<button
 			type="button"
 			class="block w-full cursor-zoom-in"
@@ -113,6 +101,26 @@
 			</button>
 		</div>
 	</div>
+
+	<!-- Thumbnails under the primary image -->
+	{#if images.length > 1}
+		<div class="flex flex-wrap gap-2 sm:gap-3">
+			{#each images as image, i (image.src + i)}
+				<button
+					type="button"
+					class="aspect-[3/4] w-[64px] shrink-0 overflow-hidden border transition duration-200 sm:w-[78px] {i ===
+					active
+						? 'border-[#242424] opacity-100'
+						: 'border-transparent opacity-70 hover:opacity-100'}"
+					aria-label={`Lihat gambar ${i + 1}`}
+					aria-current={i === active}
+					onclick={() => select(i)}
+				>
+					<img class="h-full w-full object-cover" src={image.src} alt={image.alt} loading="lazy" />
+				</button>
+			{/each}
+		</div>
+	{/if}
 </div>
 
 <!-- Lightbox -->

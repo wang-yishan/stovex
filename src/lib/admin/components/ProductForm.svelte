@@ -25,6 +25,7 @@
 	import Modal from '#lib/admin/components/Modal.svelte';
 	import StatusBadge from '#lib/admin/components/StatusBadge.svelte';
 	import { admin } from '#lib/admin/state.svelte.ts';
+	import { uploadImages } from '#lib/admin/api.ts';
 	import {
 		effectiveStock,
 		generateCombinations,
@@ -75,12 +76,12 @@
 		slugManual = !slugManual;
 	}
 
-	/* --- Media: multi-file upload (reference-only), primary flag, reorder --- */
+	/* --- Media: multi-file upload (saved to disk), primary flag, reorder --- */
 	let uploadError = $state('');
-	let uploadProgress = $state<number | null>(null);
+	let uploading = $state(false);
 	let fileInput = $state<HTMLInputElement | null>(null);
 
-	function onFiles(e: Event) {
+	async function onFiles(e: Event) {
 		const input = e.currentTarget as HTMLInputElement;
 		const files = input.files ? Array.from(input.files) : [];
 		let hadError = false;
@@ -97,27 +98,19 @@
 			}
 			return true;
 		});
-		if (hadError && ok.length === 0) return;
-		uploadProgress = 0;
-		const urls = ok.map((f) => URL.createObjectURL(f));
-		const tick = setInterval(() => {
-			if (uploadProgress === null) {
-				clearInterval(tick);
-				return;
-			}
-			if (uploadProgress >= 100) {
-				clearInterval(tick);
-				uploadProgress = 100;
-			} else {
-				uploadProgress = uploadProgress + 20;
-			}
-		}, 120);
-		setTimeout(() => {
-			clearInterval(tick);
-			uploadProgress = null;
-			const added = urls.map((url, i) => ({
+		if (ok.length === 0) {
+			input.value = '';
+			return;
+		}
+
+		uploading = true;
+		uploadError = '';
+		try {
+			// The bytes are written to disk by /api/uploads and served from /uploads.
+			const saved = await uploadImages(ok);
+			const added = saved.map((file, i) => ({
 				id: uid('img'),
-				url,
+				url: file.url,
 				isPrimary: false,
 				alt: ok[i]?.name
 			}));
@@ -125,9 +118,16 @@
 			if (images.length > 0 && !images.some((i) => i.isPrimary))
 				images[0] = { ...images[0]!, isPrimary: true };
 			draft.images = images;
-			admin.showToast('Images added (reference only, not binary stored)', 'success');
+			admin.showToast(
+				`${saved.length} image${saved.length > 1 ? 's' : ''} saved to disk`,
+				'success'
+			);
+		} catch (cause) {
+			uploadError = cause instanceof Error ? cause.message : 'Upload failed';
+		} finally {
+			uploading = false;
 			input.value = '';
-		}, 700);
+		}
 	}
 
 	function setPrimary(id: string) {
@@ -285,7 +285,7 @@
 	let colModal = $state(false);
 	let colDraft = $state({ name: '', slug: '', description: '' });
 
-	function createCategoryInline() {
+	async function createCategoryInline() {
 		if (!catDraft.name.trim()) {
 			admin.showToast('Name required', 'error');
 			return;
@@ -295,17 +295,18 @@
 			admin.showToast('Invalid or duplicate slug', 'error');
 			return;
 		}
-		const c = admin.createCategory({
+		const c = await admin.createCategory({
 			name: catDraft.name.trim(),
 			slug,
 			description: catDraft.description
 		});
+		if (!c) return;
 		draft.categoryId = c.id;
 		catModal = false;
 		catDraft = { name: '', slug: '', description: '' };
 		admin.showToast('Category created', 'success');
 	}
-	function createCollectionInline() {
+	async function createCollectionInline() {
 		if (!colDraft.name.trim()) {
 			admin.showToast('Name required', 'error');
 			return;
@@ -315,12 +316,13 @@
 			admin.showToast('Invalid or duplicate slug', 'error');
 			return;
 		}
-		const c = admin.createCollection({
+		const c = await admin.createCollection({
 			name: colDraft.name.trim(),
 			slug,
 			description: colDraft.description,
 			productIds: []
 		});
+		if (!c) return;
 		draft.collectionIds = [...draft.collectionIds, c.id];
 		colModal = false;
 		colDraft = { name: '', slug: '', description: '' };
@@ -367,6 +369,8 @@
 			draft.seoDescription = draft.shortDescription.slice(0, 160);
 	}
 
+	let saving = $state(false);
+
 	async function saveAs(status: 'active' | 'draft' | 'archived') {
 		const strict = status === 'active';
 		const gate = strict ? publishErrors : errors;
@@ -383,7 +387,11 @@
 			createdAt: draft.createdAt || nowISO(),
 			variants: draft.variants.map((v) => ({ ...v, productId: draft.id }))
 		};
-		admin.upsertProduct(toSave);
+		saving = true;
+		// Writes to SQLite; the store mirrors the saved row.
+		const saved = await admin.upsertProduct(toSave);
+		saving = false;
+		if (!saved) return;
 		const target = mode === 'create' ? '/dashboard/products' : `/dashboard/products/${draft.id}`;
 		await goto(resolvePath(target));
 	}
@@ -547,14 +555,14 @@
 						<Upload class="h-4 w-4 shrink-0" />Upload images
 					</Button>
 					<p class="mt-2 text-[11px] text-[#636363]">
-						jpg/png/webp max 5MB • Store references not binary • Primary required for publish
+						jpg/png/webp max 5MB • Files are saved to disk • Primary required for publish
 					</p>
-					{#if uploadProgress !== null}
-						<div class="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#EAEAEA]">
-							<div
-								class="h-full bg-[#242424] transition-all"
-								style="width: {uploadProgress}%"
-							></div>
+					{#if uploading}
+						<div class="mt-3 flex items-center gap-2 text-[11px] text-[#5A5A5A]">
+							<span
+								class="h-3 w-3 animate-spin rounded-full border-2 border-[#EAEAEA] border-t-[#242424]"
+							></span>
+							Saving files…
 						</div>
 					{/if}
 					{#if uploadError}<p class="mt-2 text-[11px] text-[#D9534F]">{uploadError}</p>{/if}
@@ -1216,6 +1224,7 @@
 						size="default"
 						class="w-full"
 						type="button"
+						disabled={saving}
 						onclick={() => saveAs('active')}
 					>
 						Publish Product
@@ -1242,7 +1251,8 @@
 			</div>
 			<div class="rounded-[12px] border bg-[#FBFBFA] p-3" style="border-color: var(--border);">
 				<p class="text-[11px] text-[#5A5A5A]">
-					In-memory draft mode — changes not persisted to server. Server-side validation simulated.
+					Saved to SQLite — the storefront catalog shows this product as soon as it is published.
+					Uploaded images are written to disk.
 				</p>
 			</div>
 		</div>

@@ -64,8 +64,24 @@ export const SEED_PRODUCTS: Product[] = [
 		categoryId: 'cat-tote',
 		collectionIds: ['col-best', 'col-new'],
 		images: [
-			{ id: 'img1', url: '', isPrimary: true, alt: 'Tote beige' },
-			{ id: 'img1b', url: '', isPrimary: false }
+			{
+				id: 'img1a',
+				url: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: true,
+				alt: 'Tote beige depan'
+			},
+			{
+				id: 'img1b',
+				url: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Tote beige samping'
+			},
+			{
+				id: 'img1c',
+				url: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Detail strap tas'
+			}
 		],
 		basePrice: 890000,
 		compareAtPrice: 1150000,
@@ -130,7 +146,26 @@ export const SEED_PRODUCTS: Product[] = [
 		fullDescription: 'Cream textured leather mini shoulder, chain strap, interior card slots.',
 		categoryId: 'cat-shoulder',
 		collectionIds: ['col-new'],
-		images: [{ id: 'img2', url: '', isPrimary: true }],
+		images: [
+			{
+				id: 'img2a',
+				url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: true,
+				alt: 'Shoulder bag cream'
+			},
+			{
+				id: 'img2b',
+				url: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Tali rantai detail'
+			},
+			{
+				id: 'img2c',
+				url: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Warna cream'
+			}
+		],
 		basePrice: 1240000,
 		sku: 'MSB-CRM-OS',
 		status: 'active',
@@ -167,7 +202,26 @@ export const SEED_PRODUCTS: Product[] = [
 		fullDescription: 'Black pebbled leather, adjustable strap, zip closure.',
 		categoryId: 'cat-crossbody',
 		collectionIds: ['col-best'],
-		images: [{ id: 'img3', url: '', isPrimary: true }],
+		images: [
+			{
+				id: 'img3a',
+				url: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: true,
+				alt: 'Crossbody black depan'
+			},
+			{
+				id: 'img3b',
+				url: 'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Crossbody black detail'
+			},
+			{
+				id: 'img3c',
+				url: 'https://images.unsplash.com/photo-1600857062241-98e5dba7f214?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Tas hitam'
+			}
+		],
 		basePrice: 950000,
 		compareAtPrice: 1100000,
 		sku: 'CCB-BLK-S',
@@ -218,7 +272,26 @@ export const SEED_PRODUCTS: Product[] = [
 		fullDescription: 'Oversized canvas shopper, natural beige, open top.',
 		categoryId: 'cat-tote',
 		collectionIds: [],
-		images: [{ id: 'img4', url: '', isPrimary: true }],
+		images: [
+			{
+				id: 'img4a',
+				url: 'https://images.unsplash.com/photo-1605733513597-a8f8341084e6?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: true,
+				alt: 'Shopper kanvas beige'
+			},
+			{
+				id: 'img4b',
+				url: 'https://images.unsplash.com/photo-1622560480654-d96214fdc887?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Shopper sisi'
+			},
+			{
+				id: 'img4c',
+				url: 'https://images.unsplash.com/photo-1575032617751-6ddec2089882?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Detail kanvas'
+			}
+		],
 		basePrice: 650000,
 		sku: 'CSB-BGE-L',
 		status: 'active',
@@ -255,7 +328,26 @@ export const SEED_PRODUCTS: Product[] = [
 		fullDescription: 'Noir lambskin clutch, slim profile, magnetic closure.',
 		categoryId: 'cat-clutch',
 		collectionIds: ['col-best'],
-		images: [{ id: 'img5', url: '', isPrimary: true }],
+		images: [
+			{
+				id: 'img5a',
+				url: 'https://images.unsplash.com/photo-1624687943971-e86af76d57de?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: true,
+				alt: 'Clutch noir depan'
+			},
+			{
+				id: 'img5b',
+				url: 'https://images.unsplash.com/photo-1637759292654-a12cb2be085e?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Clutch noir detail'
+			},
+			{
+				id: 'img5c',
+				url: 'https://images.unsplash.com/photo-1603219527847-24c87f552a77?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Kulit clutch'
+			}
+		],
 		basePrice: 1500000,
 		compareAtPrice: 1800000,
 		sku: 'LCN-BLK-OS',
@@ -293,7 +385,26 @@ export const SEED_PRODUCTS: Product[] = [
 		fullDescription: 'Tan rattan woven bucket, cotton lining, drawstring closure.',
 		categoryId: 'cat-bucket',
 		collectionIds: ['col-new'],
-		images: [{ id: 'img6', url: '', isPrimary: true }],
+		images: [
+			{
+				id: 'img6a',
+				url: 'https://images.unsplash.com/photo-1681747685985-a401c271156c?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: true,
+				alt: 'Bucket bag tan anyaman'
+			},
+			{
+				id: 'img6b',
+				url: 'https://images.unsplash.com/photo-1523779105320-d1cd346ff52b?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Bucket bag detail'
+			},
+			{
+				id: 'img6c',
+				url: 'https://images.unsplash.com/photo-1560891958-68bb1fe7fb78?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Anyaman rotan'
+			}
+		],
 		basePrice: 1100000,
 		sku: 'WBB-TAN-L',
 		status: 'active',
@@ -330,7 +441,26 @@ export const SEED_PRODUCTS: Product[] = [
 		fullDescription: 'Gray nylon sling, water resistant, minimal branding.',
 		categoryId: 'cat-crossbody',
 		collectionIds: [],
-		images: [{ id: 'img7', url: '', isPrimary: true }],
+		images: [
+			{
+				id: 'img7a',
+				url: 'https://images.unsplash.com/photo-1711548244653-72219aa9ac27?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: true,
+				alt: 'Sling abu-abu'
+			},
+			{
+				id: 'img7b',
+				url: 'https://images.unsplash.com/photo-1705909237050-7a7625b47fac?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Sling detail'
+			},
+			{
+				id: 'img7c',
+				url: 'https://images.unsplash.com/photo-1657603738389-951c374b740c?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Nylon sling'
+			}
+		],
 		basePrice: 780000,
 		sku: 'SBM-GRY-S',
 		status: 'draft',
@@ -353,7 +483,26 @@ export const SEED_PRODUCTS: Product[] = [
 		fullDescription: 'Cream structured satchel, top handles and detachable strap.',
 		categoryId: 'cat-shoulder',
 		collectionIds: ['col-best'],
-		images: [{ id: 'img8', url: '', isPrimary: true }],
+		images: [
+			{
+				id: 'img8a',
+				url: 'https://images.unsplash.com/photo-1746880223690-359948154c53?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: true,
+				alt: 'Satchel cream depan'
+			},
+			{
+				id: 'img8b',
+				url: 'https://images.unsplash.com/photo-1473188588951-666fce8e7c68?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Satchel cream samping'
+			},
+			{
+				id: 'img8c',
+				url: 'https://images.unsplash.com/photo-1613482184972-f9c1022d0928?auto=format&fit=crop&w=1200&q=85',
+				isPrimary: false,
+				alt: 'Handles satchel'
+			}
+		],
 		basePrice: 1350000,
 		sku: 'SSC-CRM-M',
 		status: 'archived',

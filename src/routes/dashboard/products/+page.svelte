@@ -128,23 +128,23 @@
 		storefrontPreview = !storefrontPreview;
 		selected.clear();
 	}
-	function bulkSet(status: 'active' | 'archived') {
-		admin.setProductsStatus([...selected], status);
+	async function bulkSet(status: 'active' | 'archived') {
+		await admin.setProductsStatus([...selected], status);
 		admin.showToast(status === 'active' ? 'Activated selected' : 'Archived selected', 'success');
 		selected.clear();
 	}
-	function doDeleteMany() {
-		admin.deleteProducts([...selected]);
+	async function doDeleteMany() {
+		await admin.deleteProducts([...selected]);
 		admin.showToast('Deleted selected', 'success');
 		selected.clear();
 		deleteMany = false;
 	}
-	function toggleStatus(p: Product) {
+	async function toggleStatus(p: Product) {
 		if (p.status === 'archived') {
-			admin.setProductsStatus([p.id], 'active');
+			await admin.setProductsStatus([p.id], 'active');
 			admin.showToast('Activated', 'success');
 		} else {
-			admin.archiveProduct(p.id);
+			await admin.archiveProduct(p.id);
 			admin.showToast('Archived', 'success');
 		}
 	}
@@ -232,25 +232,25 @@
 		<div class="flex flex-col gap-2 lg:flex-row">
 			<SearchInput bind:value={search} placeholder="Search by name, SKU..." />
 			<div class="flex flex-wrap items-center gap-2">
-				<NativeSelect shape="pill" class="font-medium" bind:value={statusFilter}>
+				<NativeSelect shape="pill" class="text-[12px] font-medium" bind:value={statusFilter}>
 					<option value="all">All Status</option>
 					<option value="active">Active</option>
 					<option value="draft">Draft</option>
 					<option value="archived">Archived</option>
 				</NativeSelect>
-				<NativeSelect shape="pill" class="font-medium" bind:value={categoryFilter}>
+				<NativeSelect shape="pill" class="text-[12px] font-medium" bind:value={categoryFilter}>
 					<option value="all">All Categories</option>
 					{#each admin.categories as c (c.id)}
 						<option value={c.id}>{c.name}</option>
 					{/each}
 				</NativeSelect>
-				<NativeSelect shape="pill" class="font-medium" bind:value={stockFilter}>
+				<NativeSelect shape="pill" class="text-[12px] font-medium" bind:value={stockFilter}>
 					<option value="all">All Stock</option>
 					<option value="in-stock">In Stock</option>
 					<option value="low">Low</option>
 					<option value="out">Out</option>
 				</NativeSelect>
-				<NativeSelect shape="pill" class="font-medium" bind:value={sortKey}>
+				<NativeSelect shape="pill" class="text-[12px] font-medium" bind:value={sortKey}>
 					<option value="updated">Sort: Updated</option>
 					<option value="name">Sort: Name</option>
 					<option value="price">Sort: Price</option>
@@ -491,7 +491,7 @@
 													size="sm"
 													class="h-auto w-full justify-start gap-2 rounded-[6px] px-3 py-2 text-[12px]"
 													onclick={() => {
-														admin.duplicateProduct(p.id);
+														void admin.duplicateProduct(p.id);
 														selected.clear();
 													}}
 												>
@@ -618,9 +618,9 @@
 		danger
 		requireArm
 		armLabel="I understand this will permanently delete"
-		onconfirm={() => {
+		onconfirm={async () => {
 			const id = deleteId!;
-			admin.deleteProducts([id]);
+			await admin.deleteProducts([id]);
 			admin.showToast('Product deleted', 'success');
 			selected.delete(id);
 			deleteId = null;
