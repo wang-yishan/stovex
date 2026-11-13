@@ -7,5 +7,9 @@ export const variables = defineEnvVars({
 	},
 	BETTER_AUTH_SECRET: {
 		description: 'Secret used to sign tokens. For production use 32 characters generated with high entropy. See [Better Auth installation](https://www.better-auth.com/docs/installation).'
+	},
+	TURSO_AUTH_TOKEN: {
+		description: 'Auth token for a remote libSQL/Turso database (optional for local file DBs).',
+		required: false
 	}
 });
