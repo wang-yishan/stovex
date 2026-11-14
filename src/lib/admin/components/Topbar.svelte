@@ -42,7 +42,7 @@
 							<span class="opacity-60 shrink-0">/</span>
 						{/if}
 						{#if crumb.href}
-							<a href={resolvePath(crumb.href)} class="hover:text-[#242424] hover:underline shrink-0">
+							<a href={resolvePath(crumb.href)} class="shrink-0 transition-colors hover:text-foreground hover:underline">
 								{crumb.label}
 							</a>
 						{:else}

@@ -44,7 +44,7 @@
 					size="icon-sm"
 					onclick={() => admin.toggleSidebar()}
 					aria-label="Collapse sidebar"
-					class="shrink-0 text-muted-foreground hover:text-foreground"
+					class="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
 				>
 					<PanelLeftClose class="h-4 w-4" />
 				</Button>
@@ -54,7 +54,7 @@
 					size="icon-sm"
 					onclick={() => admin.toggleSidebar()}
 					aria-label="Expand sidebar"
-					class="mx-auto shrink-0 text-muted-foreground hover:text-foreground"
+					class="mx-auto shrink-0 text-muted-foreground transition-colors hover:text-foreground"
 				>
 					<PanelLeftOpen class="h-4 w-4" />
 				</Button>
@@ -84,8 +84,8 @@
 							<a
 								{href}
 								class="relative flex h-10 w-full items-center gap-2.5 rounded-md px-2.5 text-[13px] font-medium transition-colors {isActive
-									? 'bg-[#F0F0EF] text-[#242424]'
-									: 'text-[#5A5A5A] hover:bg-[#F8F8F7] hover:text-[#242424]'} {collapsed
+									? 'bg-[#F0F0EF] text-foreground'
+									: 'text-muted-foreground hover:bg-muted hover:text-foreground'} {collapsed
 									? 'justify-center'
 									: ''}"
 							>
@@ -95,7 +95,7 @@
 									></span>
 								{/if}
 								<item.icon
-									class="h-5 w-5 shrink-0 {isActive ? 'text-[#242424]' : 'text-[#5A5A5A]'}"
+									class="h-5 w-5 shrink-0 {isActive ? 'text-foreground' : 'text-muted-foreground'}"
 									strokeWidth={1.6}
 								/>
 								{#if !collapsed}
