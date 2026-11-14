@@ -323,7 +323,7 @@
 					</thead>
 					<tbody class="divide-y divide-border">
 						{#each filtered as s (s.id)}
-							<tr class="hover:bg-muted">
+							<tr class="transition-colors hover:bg-muted">
 								<td class="px-5 py-3">
 									<div class="text-[13px] font-medium">{s.orderId}</div>
 									<div class="mono text-[11px] text-muted-foreground">{s.trackingNumber || '—'}</div>

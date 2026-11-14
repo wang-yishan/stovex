@@ -120,7 +120,7 @@
 					</thead>
 					<tbody class="divide-y divide-border">
 						{#each filtered as c (c.id)}
-							<tr class="hover:bg-muted">
+							<tr class="transition-colors hover:bg-muted">
 								<td class="px-5 py-3 text-[13px] font-medium">{c.name}</td>
 								<td class="mono px-5 py-3 text-[11px] text-muted-foreground">{c.slug}</td>
 								<td class="max-w-[260px] truncate px-5 py-3 text-[12px] text-muted-foreground"

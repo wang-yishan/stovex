@@ -187,7 +187,7 @@
 						</thead>
 						<tbody class="divide-y divide-border">
 							{#each SEED_ORDERS as order (order.id)}
-								<tr class="hover:bg-muted">
+								<tr class="transition-colors hover:bg-muted">
 									<td class="mono px-4 py-2.5 text-[11px] text-muted-foreground">{order.id}</td>
 									<td class="px-4 py-2.5 text-[12px]">{order.customer}</td>
 									<td class="px-4 py-2.5 text-[11px] text-muted-foreground">{order.date}</td>

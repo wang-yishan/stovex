@@ -396,7 +396,7 @@
 							{@const stock = effectiveStock(p)}
 							{@const st = stockStatus(stock, lowThreshold(p), p.trackInventory)}
 							{@const primary = p.images.find((i) => i.isPrimary) ?? p.images[0]}
-							<tr class="transition hover:bg-[#F8F8F7]">
+							<tr class="transition-colors hover:bg-muted">
 								<td class="px-3 py-3">
 									<Checkbox
 										checked={selected.has(p.id)}

@@ -197,7 +197,7 @@
 					</thead>
 					<tbody class="divide-y divide-border">
 						{#each rows as r, i (`${r.productId}-${r.variantId || 'prod'}-${i}`)}
-							<tr class="hover:bg-muted">
+							<tr class="transition-colors hover:bg-muted">
 								<td class="px-5 py-3">
 									<div class="text-[13px] font-medium">{r.productName}</div>
 									{#if r.variantName}<div class="text-[11px] text-muted-foreground">

@@ -128,7 +128,7 @@
 					</thead>
 					<tbody class="divide-y" style="border-color: var(--border);">
 						{#each sorted as c (c.id)}
-							<tr class="hover:bg-[#F8F8F7]">
+							<tr class="transition-colors hover:bg-muted">
 								<td class="px-5 py-3">
 									<div class="flex gap-1">
 										<Button
