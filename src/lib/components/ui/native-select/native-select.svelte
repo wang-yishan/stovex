@@ -12,7 +12,7 @@
 	 * `bind:value` filters keep working without a rewrite.
 	 */
 	export const nativeSelectVariants = tv({
-		base: 'w-full min-w-0 appearance-none bg-none rounded-[8px] border border-input bg-field px-3 pr-8 text-[13px] text-foreground transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:bg-field-focus focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/25 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20',
+		base: 'w-full min-w-0 appearance-none whitespace-nowrap bg-none rounded-[8px] border border-input bg-field px-3 pr-8 text-[13px] text-foreground transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:bg-field-focus focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/25 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20',
 		variants: {
 			shape: {
 				field: 'rounded-[8px]',
@@ -48,7 +48,7 @@
 	} = $props();
 </script>
 
-<div class="group/native-select relative w-fit" data-slot="native-select-wrapper">
+<div class="group/native-select relative w-fit shrink-0 max-w-full" data-slot="native-select-wrapper">
 	<select
 		bind:this={ref}
 		data-slot="native-select"
