@@ -5,14 +5,13 @@ import { DATABASE_URL, TURSO_AUTH_TOKEN, TURSO_DATABASE_URL, PROJECT_STATUS } fr
 
 const projectStatus = (PROJECT_STATUS ?? 'DEV').toUpperCase();
 
-const url =
-	projectStatus === 'PROD'
-		? (TURSO_DATABASE_URL ?? DATABASE_URL)
-		: 'file:local.db';
+const url = projectStatus === 'PROD' ? TURSO_DATABASE_URL : (DATABASE_URL ?? 'file:local.db');
 
 if (!url) {
 	throw new Error(
-		'DATABASE_URL or TURSO_DATABASE_URL must be set when PROJECT_STATUS=PROD'
+		projectStatus === 'PROD'
+			? 'TURSO_DATABASE_URL must be set when PROJECT_STATUS=PROD'
+			: 'DATABASE_URL must be set when PROJECT_STATUS=DEV'
 	);
 }
 
