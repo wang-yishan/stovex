@@ -186,7 +186,7 @@
 					shipmentId: id,
 					status: 'pending',
 					label: SHIPMENT_STATUS_META.pending.eventLabel,
-					location: 'BAG STORE Warehouse',
+					location: `${admin.settings.brand.wordmark} Warehouse`,
 					createdAt: now
 				}
 			]

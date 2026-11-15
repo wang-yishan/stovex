@@ -13,7 +13,8 @@ import type {
 	ShipmentEvent,
 	ShipmentEventInput,
 	ShipmentStatus,
-	StockMovement
+	StockMovement,
+	StoreSettings
 } from './types.ts';
 
 interface ErrorPayload {
@@ -111,7 +112,11 @@ export const shipmentApi = {
 			body: JSON.stringify(shipment)
 		}),
 	remove: (id: string) => request<{ ok: true }>(`/api/shipments/${id}`, { method: 'DELETE' }),
-	setStatus: (id: string, status: ShipmentStatus, detail?: { location?: string; label?: string; note?: string }) =>
+	setStatus: (
+		id: string,
+		status: ShipmentStatus,
+		detail?: { location?: string; label?: string; note?: string }
+	) =>
 		request<{ shipment: Shipment; event: ShipmentEvent }>(`/api/shipments/${id}/status`, {
 			method: 'POST',
 			body: JSON.stringify({ status, ...detail })
@@ -132,6 +137,20 @@ export const notificationApi = {
 		}),
 	markAllRead: () => request<{ ok: true }>('/api/notifications/read-all', { method: 'POST' }),
 	remove: (id: string) => request<{ ok: true }>(`/api/notifications/${id}`, { method: 'DELETE' })
+};
+
+/**
+ * Store settings (brand identity + contact/social/SEO).
+ * `save` sends a partial patch — the server merges it into the stored row,
+ * so the Brand page and the Store Settings page never clobber each other.
+ */
+export const settingsApi = {
+	load: () => request<{ settings: StoreSettings }>('/api/settings'),
+	save: (patch: Partial<StoreSettings>) =>
+		request<{ settings: StoreSettings }>('/api/settings', {
+			method: 'PUT',
+			body: JSON.stringify(patch)
+		})
 };
 
 /** Upload image files to disk; returns the stored URLs. */

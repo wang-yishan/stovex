@@ -52,6 +52,19 @@
 	--text-secondary: #5a5a5a; /* 6.5:1 on --bg */
 	--text-muted: #636363; /* 5.7:1 on --bg */
 	--border: #eaeaea;
+
+	/* --- brand identity (merchant-editable) ---
+	   These are the defaults the dashboard's Brand page overrides at runtime
+	   through the inline style on the storefront root. The storefront renders
+	   with `brand-*` utilities so a saved palette applies everywhere. */
+	--brand-accent: #d9534f; /* links, hovers, highlights — UI-only on light */
+	--brand-ink: #242424; /* headings and body copy */
+	--brand-muted: #6b6762; /* secondary copy and captions */
+	--brand-surface: #fbfbfa; /* storefront page background */
+	--brand-border: #eae8e4; /* hairlines, dividers, card edges */
+	--brand-font-display: 'Playfair Display Variable', 'Playfair Display', Georgia, serif;
+	--brand-font-body:
+		'DM Sans Variable', 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
 	/* emphasis border: optional stronger outline (3.45:1 on white) for
 	   hover/active states — controls rest on the card border (--border) so
 	   inputs, selects and checkboxes match the dashboard cards */
@@ -178,7 +191,15 @@
 		'Inter Variable', 'Inter', 'Geist Variable', 'Geist', system-ui, -apple-system,
 		BlinkMacSystemFont, sans-serif;
 	--font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
-	--font-display: 'Playfair Display Variable', 'Playfair Display', Georgia, serif;
+	--font-display: var(--brand-font-display);
+
+	/* brand identity — the merchant-editable storefront palette */
+	--color-brand-accent: var(--brand-accent);
+	--color-brand-ink: var(--brand-ink);
+	--color-brand-muted: var(--brand-muted);
+	--color-brand-surface: var(--brand-surface);
+	--color-brand-border: var(--brand-border);
+	--font-brand-body: var(--brand-font-body);
 
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
@@ -469,23 +490,19 @@ html {
 	instead of inheriting the dashboard's flipped dark palette.
 */
 .forma-root {
-	--font-display: 'Playfair Display Variable', 'Playfair Display', Georgia, serif;
-	font-family:
-		'DM Sans Variable',
-		'DM Sans',
-		system-ui,
-		-apple-system,
-		'Segoe UI',
-		sans-serif;
+	--font-display: var(--brand-font-display);
+	font-family: var(--brand-font-body);
 	-webkit-font-smoothing: antialiased;
 
-	/* pinned light tokens (see :root for the dark-mode counterparts) */
-	--bg: #fbfbfa;
+	/* pinned light tokens (see :root for the dark-mode counterparts) —
+	   the brand roles are merchant-editable, so they resolve from the
+	   `--brand-*` custom properties the root layout injects */
+	--bg: var(--brand-surface);
 	--surface: #ffffff;
-	--text-primary: #242424;
-	--text-secondary: #5a5a5a;
-	--text-muted: #636363;
-	--border: #eae8e4;
+	--text-primary: var(--brand-ink);
+	--text-secondary: var(--brand-muted);
+	--text-muted: var(--brand-muted);
+	--border: var(--brand-border);
 	--border-control: #8a8a8a;
 	--field-bg: #ffffff;
 	--field-bg-focus: #ffffff;
@@ -495,9 +512,9 @@ html {
 	--card-foreground: var(--text-primary);
 	--popover: var(--surface);
 	--popover-foreground: var(--text-primary);
-	--primary: #242424;
+	--primary: var(--brand-ink);
 	--primary-foreground: #ffffff;
-	--primary-hover: #1a1a1a;
+	--primary-hover: color-mix(in srgb, var(--brand-ink) 88%, black);
 	--secondary: #f5f3ef;
 	--secondary-foreground: var(--text-primary);
 	--muted: #f5f3ef;

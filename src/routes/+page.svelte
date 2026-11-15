@@ -4,7 +4,7 @@
 	import type { Product } from '#lib/admin/types.ts';
 	import { cart } from '#lib/catalog/cart.svelte.ts';
 	import { FALLBACK_PHOTOS } from '#lib/catalog/photos.ts';
-	import { generalWaLink } from '#lib/catalog/wa.ts';
+	import { generalWaLinkWithGreeting } from '#lib/catalog/wa.ts';
 	import { catalogHref } from '#lib/catalog/links.ts';
 	import StoreHeader from '#lib/components/storefront/StoreHeader.svelte';
 	import StoreFooter from '#lib/components/storefront/StoreFooter.svelte';
@@ -57,7 +57,7 @@
 	<meta name="theme-color" content="#fbfbfa" />
 </svelte:head>
 
-<div class="forma-root min-h-screen w-full bg-[#FBFBFA] text-[#242424]">
+<div class="forma-root min-h-screen w-full bg-brand-surface text-brand-ink">
 	<StoreHeader />
 
 	<main id="top">
@@ -70,50 +70,52 @@
 					class="relative z-10 flex flex-col justify-center px-7 py-12 sm:px-12 lg:px-16 xl:px-20"
 				>
 					<p
-						class="mb-6 text-[10px] font-semibold tracking-[0.24em] text-[#D9534F] uppercase sm:text-xs"
+						class="mb-6 text-[10px] font-semibold tracking-[0.24em] text-brand-accent uppercase sm:text-xs"
 					>
 						The art of carrying well
 					</p>
 					<h1
-						class="font-display max-w-xl text-[44px] leading-[1.08] tracking-[-0.035em] sm:text-6xl xl:text-[72px]"
+						class="max-w-xl font-display text-[44px] leading-[1.08] tracking-[-0.035em] sm:text-6xl xl:text-[72px]"
 					>
-						Membawa gaya,<br /><em class="font-medium text-[#D9534F]">menjalani hari.</em>
+						Membawa gaya,<br /><em class="font-medium text-brand-accent">menjalani hari.</em>
 					</h1>
-					<p class="mt-7 max-w-md text-sm leading-7 text-[#6B6762] sm:text-base">
+					<p class="mt-7 max-w-md text-sm leading-7 text-brand-muted sm:text-base">
 						Tas pilihan dengan desain yang tenang, detail yang dipikirkan, dan karakter yang
 						bertahan melampaui tren.
 					</p>
 					<div class="mt-9 flex flex-wrap items-center gap-5">
 						<a
 							href="#koleksi"
-							class="inline-flex items-center gap-4 bg-[#242424] px-6 py-4 text-xs tracking-[0.12em] text-white uppercase transition hover:bg-[#D9534F]"
+							class="inline-flex items-center gap-4 bg-brand-ink px-6 py-4 text-xs tracking-[0.12em] text-white uppercase transition hover:bg-brand-accent"
 						>
 							Jelajahi koleksi
 							<ArrowUpRight class="h-4 w-4" strokeWidth={1.6} />
 						</a>
 						<a
 							href="#cerita"
-							class="border-b border-[#242424]/40 pb-1 text-xs tracking-wide transition hover:border-[#D9534F] hover:text-[#D9534F]"
+							class="border-b border-brand-ink/40 pb-1 text-xs tracking-wide transition hover:border-brand-accent hover:text-brand-accent"
 						>
-							Kenali Forma
+							Kenali {admin.settings.brand.name}
 						</a>
 					</div>
 					<div class="mt-14 flex max-w-md items-center gap-8 border-t border-black/10 pt-6">
 						<div>
 							<p class="font-display text-2xl">01</p>
-							<p class="mt-1 text-[10px] tracking-wider text-[#6B6762] uppercase">
+							<p class="mt-1 text-[10px] tracking-wider text-brand-muted uppercase">
 								Thoughtful design
 							</p>
 						</div>
 						<div>
 							<p class="font-display text-2xl">02</p>
-							<p class="mt-1 text-[10px] tracking-wider text-[#6B6762] uppercase">
+							<p class="mt-1 text-[10px] tracking-wider text-brand-muted uppercase">
 								Everyday function
 							</p>
 						</div>
 						<div>
 							<p class="font-display text-2xl">03</p>
-							<p class="mt-1 text-[10px] tracking-wider text-[#6B6762] uppercase">Timeless style</p>
+							<p class="mt-1 text-[10px] tracking-wider text-brand-muted uppercase">
+								Timeless style
+							</p>
 						</div>
 					</div>
 				</div>
@@ -124,10 +126,10 @@
 						alt="Tas kulit berwarna netral dengan desain elegan"
 					/>
 					<div
-						class="absolute right-6 bottom-6 max-w-[210px] bg-[#FBFBFA]/95 px-5 py-4 sm:right-9 sm:bottom-9"
+						class="absolute right-6 bottom-6 max-w-[210px] bg-brand-surface/95 px-5 py-4 sm:right-9 sm:bottom-9"
 					>
-						<p class="text-[9px] tracking-[0.2em] text-[#6B6762] uppercase">Curated essentials</p>
-						<p class="font-display mt-1 text-xl">Less, but better.</p>
+						<p class="text-[9px] tracking-[0.2em] text-brand-muted uppercase">Curated essentials</p>
+						<p class="mt-1 font-display text-xl">Less, but better.</p>
 					</div>
 				</div>
 			</div>
@@ -135,33 +137,35 @@
 
 		<!-- Trust strip -->
 		<section class="mx-auto max-w-[1400px] px-5 py-9 sm:px-8 sm:py-12 lg:px-12">
-			<div class="grid grid-cols-2 gap-x-4 gap-y-6 border-b border-[#EAE8E4] pb-9 md:grid-cols-4">
+			<div
+				class="grid grid-cols-2 gap-x-4 gap-y-6 border-b border-brand-border pb-9 md:grid-cols-4"
+			>
 				<div class="flex items-center gap-3">
 					<span class="text-xl text-[#D69A35]">✳</span>
 					<div>
 						<p class="text-xs font-semibold">Pilihan terkurasi</p>
-						<p class="mt-1 text-[11px] text-[#6B6762]">Gaya yang relevan setiap hari</p>
+						<p class="mt-1 text-[11px] text-brand-muted">Gaya yang relevan setiap hari</p>
 					</div>
 				</div>
 				<div class="flex items-center gap-3">
 					<span class="text-xl text-[#D69A35]">◇</span>
 					<div>
 						<p class="text-xs font-semibold">Detail fungsional</p>
-						<p class="mt-1 text-[11px] text-[#6B6762]">Dirancang untuk digunakan</p>
+						<p class="mt-1 text-[11px] text-brand-muted">Dirancang untuk digunakan</p>
 					</div>
 				</div>
 				<div class="flex items-center gap-3">
 					<span class="text-xl text-[#D69A35]">↗</span>
 					<div>
 						<p class="text-xs font-semibold">Belanja mudah</p>
-						<p class="mt-1 text-[11px] text-[#6B6762]">Pesan langsung via WhatsApp</p>
+						<p class="mt-1 text-[11px] text-brand-muted">Pesan langsung via WhatsApp</p>
 					</div>
 				</div>
 				<div class="flex items-center gap-3">
 					<span class="text-xl text-[#D69A35]">♡</span>
 					<div>
 						<p class="text-xs font-semibold">Layanan personal</p>
-						<p class="mt-1 text-[11px] text-[#6B6762]">Kami siap membantu pilihanmu</p>
+						<p class="mt-1 text-[11px] text-brand-muted">Kami siap membantu pilihanmu</p>
 					</div>
 				</div>
 			</div>
@@ -171,27 +175,27 @@
 		<section id="koleksi" class="mx-auto max-w-[1400px] px-5 py-10 sm:px-8 sm:py-14 lg:px-12">
 			<div class="mb-8 flex flex-col gap-5 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
 				<div>
-					<p class="mb-3 text-[10px] font-semibold tracking-[0.22em] text-[#D9534F] uppercase">
+					<p class="mb-3 text-[10px] font-semibold tracking-[0.22em] text-brand-accent uppercase">
 						Find your everyday piece
 					</p>
 					<h2 class="font-display text-4xl tracking-tight sm:text-5xl">
-						Koleksi pilihan<span class="text-[#D9534F]">.</span>
+						Koleksi pilihan<span class="text-brand-accent">.</span>
 					</h2>
-					<p class="mt-3 text-sm text-[#6B6762]">
+					<p class="mt-3 text-sm text-brand-muted">
 						Temukan bentuk yang paling sesuai dengan ritme harimu.
 					</p>
 				</div>
 				<div class="flex flex-col items-start gap-3 sm:items-end">
 					<a
 						href="#pilihan"
-						class="self-start border-b border-[#242424]/40 pb-1 text-xs hover:border-[#D9534F] hover:text-[#D9534F] sm:self-auto"
+						class="self-start border-b border-brand-ink/40 pb-1 text-xs hover:border-brand-accent hover:text-brand-accent sm:self-auto"
 					>
 						Lihat panduan memilih
 						<ArrowUpRight class="inline h-3.5 w-3.5 align-[-2px]" strokeWidth={1.6} />
 					</a>
 					<a
 						href={catalogHref()}
-						class="self-start border-b border-[#242424]/40 pb-1 text-xs hover:border-[#D9534F] hover:text-[#D9534F] sm:self-auto"
+						class="self-start border-b border-brand-ink/40 pb-1 text-xs hover:border-brand-accent hover:text-brand-accent sm:self-auto"
 					>
 						Lihat katalog lengkap
 						<ArrowUpRight class="inline h-3.5 w-3.5 align-[-2px]" strokeWidth={1.6} />
@@ -203,10 +207,10 @@
 				{#each filterPills as pill (pill.id)}
 					<button
 						type="button"
-						class="shrink-0 rounded-full border border-[#EAE8E4] px-5 py-2.5 text-xs transition hover:border-[#242424] {activeFilter ===
+						class="shrink-0 rounded-full border border-brand-border px-5 py-2.5 text-xs transition hover:border-brand-ink {activeFilter ===
 						pill.id
-							? 'border-[#242424] bg-[#242424] text-white'
-							: 'bg-transparent text-[#242424]'}"
+							? 'border-brand-ink bg-brand-ink text-white'
+							: 'bg-transparent text-brand-ink'}"
 						onclick={() => (activeFilter = pill.id)}
 					>
 						{pill.name}
@@ -215,7 +219,7 @@
 			</div>
 
 			{#if filtered.length === 0}
-				<p class="py-10 text-center text-sm text-[#6B6762]">
+				<p class="py-10 text-center text-sm text-brand-muted">
 					Belum ada produk pada kategori ini. Silakan cek kembali nanti.
 				</p>
 			{:else}
@@ -225,7 +229,7 @@
 					{/each}
 				</div>
 			{/if}
-			<p class="mt-8 text-center text-[10px] text-[#6B6762]">
+			<p class="mt-8 text-center text-[10px] text-brand-muted">
 				*Katalog, harga, dan foto mengikuti data yang aktif di dashboard.
 			</p>
 		</section>
@@ -242,20 +246,21 @@
 					/>
 				</div>
 				<div class="flex flex-col justify-center px-8 py-12 sm:px-14 lg:px-16 xl:px-20">
-					<p class="mb-5 text-[10px] font-semibold tracking-[0.22em] text-[#D9534F] uppercase">
+					<p class="mb-5 text-[10px] font-semibold tracking-[0.22em] text-brand-accent uppercase">
 						Our point of view
 					</p>
 					<h2 class="font-display text-4xl leading-[1.12] sm:text-5xl">
 						Bukan sekadar<br />pelengkap penampilan.
 					</h2>
-					<p class="mt-6 max-w-lg text-sm leading-7 text-[#6B6762]">
+					<p class="mt-6 max-w-lg text-sm leading-7 text-brand-muted">
 						Kami percaya tas yang baik seharusnya terasa tepat—mudah dipadukan, nyaman digunakan,
-						dan cukup istimewa untuk menemani banyak cerita. Karena itu, setiap pilihan di Forma
+						dan cukup istimewa untuk menemani banyak cerita. Karena itu, setiap pilihan di {admin
+							.settings.brand.name}
 						mengutamakan siluet yang bersih dan fungsi sehari-hari.
 					</p>
 					<a
 						href="#koleksi"
-						class="mt-8 inline-flex items-center gap-4 self-start border-b border-[#242424]/40 pb-3 text-xs tracking-[0.12em] uppercase transition hover:border-[#D9534F] hover:text-[#D9534F]"
+						class="mt-8 inline-flex items-center gap-4 self-start border-b border-brand-ink/40 pb-3 text-xs tracking-[0.12em] uppercase transition hover:border-brand-accent hover:text-brand-accent"
 					>
 						Temukan koleksimu
 						<ArrowUpRight class="h-4 w-4" strokeWidth={1.6} />
@@ -267,11 +272,11 @@
 		<!-- Collection editorial cards -->
 		<section id="pilihan" class="mx-auto max-w-[1400px] px-5 py-10 sm:px-8 sm:py-14 lg:px-12">
 			<div class="mx-auto mb-10 max-w-xl text-center">
-				<p class="mb-3 text-[10px] font-semibold tracking-[0.22em] text-[#D9534F] uppercase">
+				<p class="mb-3 text-[10px] font-semibold tracking-[0.22em] text-brand-accent uppercase">
 					Made for your rhythm
 				</p>
 				<h2 class="font-display text-4xl sm:text-5xl">Satu tas, banyak cerita.</h2>
-				<p class="mt-4 text-sm leading-6 text-[#6B6762]">
+				<p class="mt-4 text-sm leading-6 text-brand-muted">
 					Mulai dari hari kerja yang padat hingga akhir pekan yang santai.
 				</p>
 			</div>
@@ -297,7 +302,7 @@
 									0{i + 1} / {c.count}
 									{c.count === 1 ? 'item' : 'items'}
 								</p>
-								<h3 class="font-display mt-1 text-2xl">{c.name}</h3>
+								<h3 class="mt-1 font-display text-2xl">{c.name}</h3>
 							</div>
 						</a>
 					{/each}
@@ -320,7 +325,7 @@
 							></div>
 							<div class="absolute bottom-6 left-6 text-white">
 								<p class="text-[9px] tracking-[0.2em] uppercase">{card.k}</p>
-								<h3 class="font-display mt-1 text-2xl">{card.t}</h3>
+								<h3 class="mt-1 font-display text-2xl">{card.t}</h3>
 							</div>
 						</a>
 					{/each}
@@ -331,7 +336,7 @@
 		<!-- CTA -->
 		<section class="mx-auto max-w-[1400px] px-5 py-16 sm:px-8 sm:py-24 lg:px-12">
 			<div
-				class="relative overflow-hidden bg-[#242424] px-7 py-14 text-center text-white sm:px-14 sm:py-16"
+				class="relative overflow-hidden bg-brand-ink px-7 py-14 text-center text-white sm:px-14 sm:py-16"
 			>
 				<div class="absolute -top-20 -right-10 h-64 w-64 rounded-full border border-white/10"></div>
 				<div
@@ -340,17 +345,17 @@
 				<p class="relative text-[10px] font-semibold tracking-[0.24em] text-[#D69A35] uppercase">
 					A better everyday starts here
 				</p>
-				<h2 class="font-display relative mt-4 text-4xl sm:text-5xl">
+				<h2 class="relative mt-4 font-display text-4xl sm:text-5xl">
 					Temukan tas yang terasa seperti kamu.
 				</h2>
 				<p class="relative mt-4 text-sm text-white/60">
 					Butuh bantuan memilih? Ceritakan kebutuhanmu kepada tim kami.
 				</p>
 				<a
-					href={generalWaLink('Halo Forma, saya ingin bertanya tentang koleksi tas.')}
+					href={generalWaLinkWithGreeting('saya ingin bertanya tentang koleksi tas.')}
 					target="_blank"
 					rel="noopener"
-					class="relative mt-8 inline-flex items-center gap-2 bg-[#FBFBFA] px-7 py-4 text-xs tracking-[0.12em] text-[#242424] uppercase transition hover:bg-[#D9534F] hover:text-white"
+					class="relative mt-8 inline-flex items-center gap-2 bg-brand-surface px-7 py-4 text-xs tracking-[0.12em] text-brand-ink uppercase transition hover:bg-brand-accent hover:text-white"
 				>
 					<MessageCircle class="h-4 w-4" strokeWidth={1.6} />
 					Hubungi via WhatsApp

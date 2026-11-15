@@ -364,7 +364,9 @@
 
 	function backfillSeo() {
 		if (!draft.seoTitle?.trim())
-			draft.seoTitle = draft.name.trim() ? `${draft.name} - Bag Store` : draft.seoTitle;
+			draft.seoTitle = draft.name.trim()
+				? `${draft.name} - ${admin.settings.brand.name}`
+				: draft.seoTitle;
 		if (!draft.seoDescription?.trim() && draft.shortDescription)
 			draft.seoDescription = draft.shortDescription.slice(0, 160);
 	}
@@ -535,11 +537,7 @@
 						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
 							>Material / Bahan</span
 						>
-						<Input
-							class="mt-1"
-							bind:value={draft.material}
-							placeholder="Organic cotton canvas"
-						/>
+						<Input class="mt-1" bind:value={draft.material} placeholder="Organic cotton canvas" />
 					</div>
 				</div>
 			</div>
@@ -721,21 +719,22 @@
 				</h3>
 				<div class="mb-3 flex items-center gap-2">
 					<span class="text-[12px] font-medium">Track inventory</span>
-					<Button
-						variant="ghost"
-						size="default"
-						class="h-6 w-11 shrink-0 rounded-full p-0.5 transition {draft.trackInventory
+					<button
+						type="button"
+						role="switch"
+						aria-checked={draft.trackInventory}
+						aria-label="Track inventory"
+						class="inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border border-transparent p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 {draft.trackInventory
 							? 'bg-primary'
 							: 'bg-muted'}"
 						onclick={() => (draft.trackInventory = !draft.trackInventory)}
-						aria-label="Toggle inventory tracking"
 					>
 						<span
-							class="block h-5 w-5 rounded-full bg-card transition-transform {draft.trackInventory
+							class="pointer-events-none block h-5 w-5 rounded-full bg-card shadow-sm ring-0 transition-transform {draft.trackInventory
 								? 'translate-x-5'
-								: ''}"
+								: 'translate-x-0'}"
 						></span>
-					</Button>
+					</button>
 					{#if !draft.trackInventory}
 						<span class="text-[11px] text-[#5A5A5A]"
 							>Stock not tracked — hide misleading quantities</span
@@ -796,21 +795,22 @@
 					</h3>
 					<div class="flex items-center gap-2">
 						<span class="text-[12px]">Enable variants</span>
-						<Button
-							variant="ghost"
-							size="default"
-							class="h-6 w-11 shrink-0 rounded-full p-0.5 transition {draft.hasVariants
+						<button
+							type="button"
+							role="switch"
+							aria-checked={draft.hasVariants}
+							aria-label="Enable variants"
+							class="inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border border-transparent p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 {draft.hasVariants
 								? 'bg-primary'
 								: 'bg-muted'}"
 							onclick={toggleVariants}
-							aria-label="Toggle variants"
 						>
 							<span
-								class="block h-5 w-5 rounded-full bg-card transition-transform {draft.hasVariants
+								class="pointer-events-none block h-5 w-5 rounded-full bg-card shadow-sm ring-0 transition-transform {draft.hasVariants
 									? 'translate-x-5'
-									: ''}"
+									: 'translate-x-0'}"
 							></span>
-						</Button>
+						</button>
 					</div>
 				</div>
 
@@ -823,80 +823,132 @@
 							<p class="mb-2 text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase">
 								Attribute builder (Color/Size)
 							</p>
-							{#each attrs as a (a.id)}
-								<div class="mb-2 flex items-center gap-2">
-									<div class="grid flex-1 grid-cols-2 gap-2">
-										<Input
-											size="sm"
-											placeholder="Attribute name"
-											value={a.name}
-											oninput={(e) => {
-												const name = (e.currentTarget as HTMLInputElement).value;
-												attrs = attrs.map((x) => (x.id === a.id ? { ...x, name } : x));
-											}}
-										/>
-										<div
-											class="flex min-h-[32px] flex-wrap items-center gap-1 rounded-[6px] border bg-white px-2 py-1"
-											style="border-color: var(--border);"
-										>
-											{#each a.values as v, i (i)}
-												<span
-													class="flex items-center gap-1 rounded-full border bg-[#F0F0EF] px-1.5 py-0.5 text-[10px]"
-													style="border-color: var(--border);"
-												>
-													{v}
-													<Button
-														variant="ghost"
-														size="xs"
-														class="ml-1 size-4 rounded-full p-0"
-														onclick={() => removeValue(a.id, i)}
-														aria-label="Remove value {v}"
+							<div class="space-y-3">
+								{#each attrs as a (a.id)}
+									<div
+										class="rounded-[8px] border bg-white p-3"
+										style="border-color: var(--border);"
+									>
+										<div class="flex items-start gap-2">
+											<div class="min-w-0 flex-1 space-y-3">
+												<div>
+													<label
+														for="attr-name-{a.id}"
+														class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+														>Attribute label</label
 													>
-														<X class="h-2.5 w-2.5" />
-													</Button>
-												</span>
-											{/each}
-											<input
-												class="min-w-[80px] flex-1 bg-transparent text-[11px] outline-none"
-												placeholder="comma separated"
-												value={chipInputs[a.id] ?? ''}
-												oninput={(e) =>
-													(chipInputs = {
-														...chipInputs,
-														[a.id]: (e.currentTarget as HTMLInputElement).value
-													})}
-												onkeydown={(e) => chipKeyDown(e, a.id)}
-											/>
+													<Input
+														id="attr-name-{a.id}"
+														size="sm"
+														class="mt-1"
+														placeholder="e.g. Color"
+														value={a.name}
+														oninput={(e) => {
+															const name = (e.currentTarget as HTMLInputElement).value;
+															attrs = attrs.map((x) => (x.id === a.id ? { ...x, name } : x));
+														}}
+													/>
+												</div>
+												<div>
+													<label
+														for="attr-values-{a.id}"
+														class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+														>Values</label
+													>
+													<div
+														class="mt-1 flex min-h-[36px] flex-wrap items-center gap-1.5 rounded-[6px] border bg-white px-2 py-1.5"
+														style="border-color: var(--border);"
+													>
+														{#each a.values as v, i (i)}
+															<span
+																class="flex items-center gap-1 rounded-full border bg-[#F0F0EF] px-2 py-0.5 text-[11px]"
+																style="border-color: var(--border);"
+															>
+																{v}
+																<Button
+																	variant="ghost"
+																	size="xs"
+																	class="size-4 rounded-full p-0"
+																	onclick={() => removeValue(a.id, i)}
+																	aria-label="Remove value {v} from {a.name || 'attribute'}"
+																>
+																	<X class="h-3 w-3" />
+																</Button>
+															</span>
+														{/each}
+														<input
+															id="attr-values-{a.id}"
+															class="min-w-[120px] flex-1 bg-transparent text-[12px] outline-none"
+															placeholder="Type a value and press Enter or comma"
+															value={chipInputs[a.id] ?? ''}
+															oninput={(e) =>
+																(chipInputs = {
+																	...chipInputs,
+																	[a.id]: (e.currentTarget as HTMLInputElement).value
+																})}
+															onkeydown={(e) => chipKeyDown(e, a.id)}
+														/>
+													</div>
+													<p class="mt-1 text-[10px] text-[#636363]">Press Enter or comma to add a value.</p>
+												</div>
+											</div>
+											<Button
+												variant="outline"
+												size="icon-sm"
+												class="mt-5 shrink-0"
+												type="button"
+												onclick={() => removeAttr(a.id)}
+												aria-label="Remove attribute {a.name || 'attribute'}"
+											>
+												<Trash2 class="h-3.5 w-3.5 text-[#5A5A5A]" />
+											</Button>
 										</div>
 									</div>
-									<Button
-										variant="outline"
-										size="icon-sm"
-										class="shrink-0"
-										type="button"
-										onclick={() => removeAttr(a.id)}
-										aria-label="Remove attribute {a.name}"
-									>
-										<Trash2 class="h-3.5 w-3.5 text-[#5A5A5A]" />
-									</Button>
+								{/each}
+							</div>
+
+							<div
+								class="mt-3 rounded-[8px] border border-dashed bg-white p-3"
+								style="border-color: var(--border);"
+							>
+								<p class="mb-2 text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase">
+									Add attribute
+								</p>
+								<div class="space-y-2">
+									<div>
+										<label
+											for="new-attr-name"
+											class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+											>Attribute label</label
+										>
+										<Input
+											id="new-attr-name"
+											size="sm"
+											class="mt-1"
+											placeholder="e.g. Material"
+											bind:value={newAttrName}
+										/>
+									</div>
+									<div>
+										<label
+											for="new-attr-values"
+											class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+											>Values</label
+										>
+										<Input
+											id="new-attr-values"
+											size="sm"
+											class="mt-1"
+											placeholder="Comma-separated, e.g. Cotton, Leather"
+											bind:value={newAttrValues}
+										/>
+									</div>
+									<div class="pt-1">
+										<Button variant="default" size="sm" type="button" onclick={addAttr}>
+											<Plus class="h-3.5 w-3.5 shrink-0" />Add attribute
+										</Button>
+									</div>
 								</div>
-							{/each}
-							<div class="mt-3 flex gap-2">
-								<Input
-									size="sm"
-									class="flex-1"
-									placeholder="New attribute e.g. Material"
-									bind:value={newAttrName}
-								/>
-								<Input
-									size="sm"
-									class="flex-1"
-									placeholder="Values comma e.g. Cotton, Leather"
-									bind:value={newAttrValues}
-								/>
-								<Button variant="default" size="default" type="button" onclick={addAttr}>
-									Add
-								</Button>
 							</div>
 							<div class="mt-3 flex flex-wrap items-center justify-between gap-2">
 								<span class="text-[11px] text-[#5A5A5A]">
@@ -995,21 +1047,22 @@
 														</p>{/if}
 												</td>
 												<td class="px-3 py-2">
-													<Button
-														variant="ghost"
-														size="default"
-														class="h-6 w-11 shrink-0 rounded-full p-0.5 transition {v.available
+													<button
+														type="button"
+														role="switch"
+														aria-checked={v.available}
+														aria-label="Toggle availability for {v.name}"
+														class="inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border border-transparent p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 {v.available
 															? 'bg-success'
 															: 'bg-muted'}"
 														onclick={() => updateVariant(v.id, { available: !v.available })}
-														aria-label="Toggle availability for {v.name}"
 													>
 														<span
-															class="block h-5 w-5 rounded-full bg-card transition-transform {v.available
+															class="pointer-events-none block h-5 w-5 rounded-full bg-card shadow-sm ring-0 transition-transform {v.available
 																? 'translate-x-5'
-																: ''}"
+																: 'translate-x-0'}"
 														></span>
-													</Button>
+													</button>
 												</td>
 												<td class="px-3 py-2">
 													<Button
@@ -1173,7 +1226,7 @@
 								{draft.seoTitle || draft.name || 'Your product title'}
 							</div>
 							<div class="truncate text-[10px] text-[#006621]">
-								https://bagstore.com/products/{slug || 'your-slug'}
+								{admin.settings.brand.domain}/products/{slug || 'your-slug'}
 							</div>
 							<div class="mt-1 line-clamp-2 text-[11px] text-[#545454]">
 								{draft.seoDescription || draft.shortDescription || 'Search preview Google-style'}

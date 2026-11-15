@@ -8,6 +8,13 @@
       "when": 1794606266755,
       "tag": "0000_salty_silver_samurai",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1794703817846,
+      "tag": "0001_regular_zzzax",
+      "breakpoints": true
     }
   ]
 }

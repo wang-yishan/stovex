@@ -1086,7 +1086,7 @@
 							{draft.seo.title || admin.settings.defaultSeo.title || draft.title || 'Title'}
 						</div>
 						<div class="truncate text-[10px] text-[#006621]">
-							bagstore.example{draft.seo.canonical || `/${draft.slug || 'slug'}`}
+							{admin.settings.brand.domain}{draft.seo.canonical || `/${draft.slug || 'slug'}`}
 						</div>
 						<p class="mt-1 line-clamp-2 text-[11px] text-[#545454]">
 							{draft.seo.description || admin.settings.defaultSeo.description || 'Description'}

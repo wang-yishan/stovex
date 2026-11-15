@@ -2,8 +2,9 @@
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { cart } from '#lib/catalog/cart.svelte.ts';
 	import { formatIDR } from '#lib/admin/data.ts';
-	import { generalWaLink } from '#lib/catalog/wa.ts';
+	import { generalWaLinkWithGreeting } from '#lib/catalog/wa.ts';
 	import { catalogHref } from '#lib/catalog/links.ts';
+	import BrandWordmark from '#lib/components/storefront/BrandWordmark.svelte';
 	import { Menu, MessageCircle, Search, ShoppingBag, Trash2, X } from '@lucide/svelte';
 
 	interface Props {
@@ -39,13 +40,13 @@
 	Announcement strip, wordmark, section nav, search, cart and WhatsApp.
 -->
 
-<div class="bg-[#242424] px-4 py-2 text-center text-[11px] tracking-[0.12em] text-white sm:text-xs">
+<div class="bg-brand-ink px-4 py-2 text-center text-[11px] tracking-[0.12em] text-white sm:text-xs">
 	FREE SHIPPING untuk pembelian di atas Rp750.000
 	<span class="mx-1 text-[#D69A35]">✦</span>
 	Pengiriman ke seluruh Indonesia
 </div>
 
-<header class="sticky top-0 z-40 border-b border-[#EAE8E4] bg-[#FBFBFA]/95 backdrop-blur">
+<header class="sticky top-0 z-40 border-b border-brand-border bg-brand-surface/95 backdrop-blur">
 	<div
 		class="mx-auto flex h-[76px] max-w-[1400px] items-center justify-between px-5 sm:px-8 lg:px-12"
 	>
@@ -59,12 +60,13 @@
 		</button>
 
 		<a href={base || '/'} class="flex items-center gap-2">
-			<span class="text-[25px] leading-none font-semibold tracking-[0.18em]">
-				{admin.settings.logo}<span class="text-[#D9534F]">.</span>
-			</span>
+			<BrandWordmark
+				image
+				class="max-h-8 w-auto object-contain text-[25px] leading-none font-semibold tracking-[0.18em]"
+			/>
 		</a>
 
-		<nav class="hidden items-center gap-9 text-[13px] tracking-wide text-[#242424]/80 lg:flex">
+		<nav class="hidden items-center gap-9 text-[13px] tracking-wide text-brand-ink/80 lg:flex">
 			{#each navLinks as link (link.id)}
 				<a class="nav-link" href={link.href}>{link.label}</a>
 			{/each}
@@ -74,17 +76,17 @@
 		<div class="flex items-center gap-4 sm:gap-5">
 			<a
 				href={catalogHref()}
-				class="hidden items-center gap-2 text-[13px] text-[#242424]/80 transition hover:text-[#D9534F] sm:flex"
+				class="hidden items-center gap-2 text-[13px] text-brand-ink/80 transition hover:text-brand-accent sm:flex"
 			>
 				<Search class="h-4 w-4" strokeWidth={1.6} />
 				Cari tas
 			</a>
 
 			<a
-				href={generalWaLink('Halo Forma, saya butuh bantuan.')}
+				href={generalWaLinkWithGreeting('saya butuh bantuan.')}
 				target="_blank"
 				rel="noopener"
-				class="inline-flex items-center gap-2 text-[13px] text-[#242424]/80 transition hover:text-[#D9534F]"
+				class="inline-flex items-center gap-2 text-[13px] text-brand-ink/80 transition hover:text-brand-accent"
 			>
 				<MessageCircle class="h-4 w-4" strokeWidth={1.6} />
 				<span class="hidden sm:inline">WhatsApp</span>
@@ -101,7 +103,7 @@
 					<ShoppingBag class="h-5 w-5" strokeWidth={1.6} />
 					{#if cart.count > 0}
 						<span
-							class="absolute -top-2 -right-2 flex h-[17px] w-[17px] items-center justify-center rounded-full bg-[#D9534F] text-[9px] text-white"
+							class="absolute -top-2 -right-2 flex h-[17px] w-[17px] items-center justify-center rounded-full bg-brand-accent text-[9px] text-white"
 						>
 							{cart.count}
 						</span>
@@ -110,13 +112,13 @@
 
 				{#if cart.open}
 					<div
-						class="absolute top-full right-0 z-50 mt-3 w-[300px] border border-[#EAE8E4] bg-white p-4 shadow-[0_14px_45px_rgba(36,36,36,0.12)]"
+						class="absolute top-full right-0 z-50 mt-3 w-[300px] border border-brand-border bg-white p-4 shadow-[0_14px_45px_rgba(36,36,36,0.12)]"
 					>
 						<div class="mb-3 flex items-center justify-between">
-							<p class="text-[11px] tracking-[0.18em] text-[#6B6762] uppercase">Keranjang</p>
+							<p class="text-[11px] tracking-[0.18em] text-brand-muted uppercase">Keranjang</p>
 							<button
 								type="button"
-								class="text-[#6B6762] hover:text-[#242424]"
+								class="text-brand-muted hover:text-brand-ink"
 								aria-label="Tutup keranjang"
 								onclick={() => (cart.open = false)}
 							>
@@ -125,20 +127,20 @@
 						</div>
 
 						{#if cart.lines.length === 0}
-							<p class="py-3 text-[12px] text-[#6B6762]">Keranjang masih kosong.</p>
+							<p class="py-3 text-[12px] text-brand-muted">Keranjang masih kosong.</p>
 						{:else}
 							<ul class="flex max-h-[220px] flex-col gap-2 overflow-y-auto">
 								{#each cart.lines as line (line.id)}
 									<li class="flex items-start justify-between gap-3 text-[12px]">
-										<span class="leading-snug text-[#242424]">
+										<span class="leading-snug text-brand-ink">
 											{line.name}
-											{#if line.variant}<span class="text-[#6B6762]">· {line.variant}</span>{/if}
+											{#if line.variant}<span class="text-brand-muted">· {line.variant}</span>{/if}
 										</span>
 										<span class="flex items-center gap-2 whitespace-nowrap">
 											<span>{formatIDR(line.price)}</span>
 											<button
 												type="button"
-												class="text-[#636363] hover:text-[#D9534F]"
+												class="text-[#636363] hover:text-brand-accent"
 												aria-label={`Hapus ${line.name}`}
 												onclick={() => cart.remove(line.id)}
 											>
@@ -148,13 +150,13 @@
 									</li>
 								{/each}
 							</ul>
-							<div class="mt-3 flex items-center justify-between border-t border-[#EAE8E4] pt-3">
-								<span class="text-[11px] tracking-[0.18em] text-[#6B6762] uppercase">Total</span>
+							<div class="mt-3 flex items-center justify-between border-t border-brand-border pt-3">
+								<span class="text-[11px] tracking-[0.18em] text-brand-muted uppercase">Total</span>
 								<span class="text-[13px] font-semibold">{formatIDR(cart.total)}</span>
 							</div>
 							<button
 								type="button"
-								class="mt-3 w-full bg-[#242424] px-5 py-3 text-[11px] tracking-[0.12em] text-white uppercase transition hover:bg-[#D9534F]"
+								class="mt-3 w-full bg-brand-ink px-5 py-3 text-[11px] tracking-[0.12em] text-white uppercase transition hover:bg-brand-accent"
 								onclick={() => cart.checkout()}
 							>
 								Pesan via WhatsApp
@@ -168,14 +170,14 @@
 
 	{#if mobileMenuOpen}
 		<nav
-			class="flex flex-col gap-4 border-t border-[#EAE8E4] bg-[#FBFBFA] px-6 py-5 text-sm lg:hidden"
+			class="flex flex-col gap-4 border-t border-brand-border bg-brand-surface px-6 py-5 text-sm lg:hidden"
 		>
 			{#each navLinks as link (link.id)}
-				<a href={link.href} class="text-[#242424]/80" onclick={() => (mobileMenuOpen = false)}>
+				<a href={link.href} class="text-brand-ink/80" onclick={() => (mobileMenuOpen = false)}>
 					{link.label}
 				</a>
 			{/each}
-			<a href={catalogHref()} class="text-[#242424]/80" onclick={() => (mobileMenuOpen = false)}>
+			<a href={catalogHref()} class="text-brand-ink/80" onclick={() => (mobileMenuOpen = false)}>
 				Katalog
 			</a>
 		</nav>

@@ -55,7 +55,7 @@
 		<!-- Backdrop -->
 		<button
 			type="button"
-			class="absolute inset-0 bg-[#242424]/40 backdrop-blur-[2px]"
+			class="absolute inset-0 bg-brand-ink/40 backdrop-blur-[2px]"
 			aria-label="Tutup filter"
 			onclick={onclose}
 		></button>
@@ -63,7 +63,7 @@
 		<!-- Sheet -->
 		<div
 			bind:this={panel}
-			class="relative flex max-h-[88vh] w-full max-w-lg flex-col bg-[#FBFBFA] shadow-[0_-18px_50px_rgba(36,36,36,0.18)]"
+			class="relative flex max-h-[88vh] w-full max-w-lg flex-col bg-brand-surface shadow-[0_-18px_50px_rgba(36,36,36,0.18)]"
 			role="dialog"
 			aria-modal="true"
 			aria-label="Filter produk"
@@ -74,11 +74,11 @@
 				<span class="h-1 w-10 rounded-full bg-[#D8D5CC]"></span>
 			</div>
 
-			<header class="flex items-center justify-between border-b border-[#EAE8E4] px-5 py-4">
+			<header class="flex items-center justify-between border-b border-brand-border px-5 py-4">
 				<h2 class="font-display text-xl">Filter</h2>
 				<button
 					type="button"
-					class="-mr-2 p-2 text-[#6B6762] transition hover:text-[#242424]"
+					class="-mr-2 p-2 text-brand-muted transition hover:text-brand-ink"
 					aria-label="Tutup filter"
 					onclick={onclose}
 				>
@@ -92,7 +92,7 @@
 
 			{#if footer}
 				<div
-					class="border-t border-[#EAE8E4] bg-[#FBFBFA] px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+					class="border-t border-brand-border bg-brand-surface px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
 				>
 					{@render footer()}
 				</div>

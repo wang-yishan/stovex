@@ -1,17 +1,19 @@
-/* The catalog, shipments and notifications live in SQLite. Every route
-   loads them here so the storefront and the dashboard render the same
+/* The catalog, shipments, notifications and settings live in SQLite. Every
+   route loads them here so the storefront and the dashboard render the same
    rows the merchant just saved. */
 
 import { getCatalog } from '#lib/server/catalog/repository.ts';
 import { getNotifications } from '#lib/server/catalog/notifications.ts';
+import { getSettings } from '#lib/server/catalog/settings.ts';
 import { getShipments } from '#lib/server/catalog/shipping.ts';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async () => {
-	const [catalog, shipments, notifications] = await Promise.all([
+	const [catalog, shipments, notifications, settings] = await Promise.all([
 		getCatalog(),
 		getShipments(),
-		getNotifications()
+		getNotifications(),
+		getSettings()
 	]);
-	return { catalog, shipments, notifications };
+	return { catalog, shipments, notifications, settings };
 };

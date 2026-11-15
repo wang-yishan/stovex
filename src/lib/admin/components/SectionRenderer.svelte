@@ -240,7 +240,9 @@
 		</section>
 	{:else if section.type === 'benefits'}
 		<section class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
-			<h3 class="text-[16px] font-semibold text-[#242424]">{c.heading ?? 'Why Bag Store'}</h3>
+			<h3 class="text-[16px] font-semibold text-[#242424]">
+				{c.heading ?? `Why ${admin.settings.brand.name}`}
+			</h3>
 			<div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
 				{#each benefits as b, i (i)}
 					<div class="rounded-[10px] border p-3" style="border-color: var(--border);">

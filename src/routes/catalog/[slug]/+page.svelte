@@ -109,8 +109,8 @@
 <svelte:head>
 	<title
 		>{product
-			? `${product.name} — ${admin.settings.logo}`
-			: `Produk tidak ditemukan — ${admin.settings.logo}`}</title
+			? `${product.name} — ${admin.settings.brand.name}`
+			: `Produk tidak ditemukan — ${admin.settings.brand.name}`}</title
 	>
 	<meta
 		name="description"
@@ -121,20 +121,20 @@
 	<meta name="theme-color" content="#FBFBFA" />
 </svelte:head>
 
-<div class="forma-root min-h-screen w-full bg-[#FBFBFA] text-[#242424]">
+<div class="forma-root min-h-screen w-full bg-brand-surface text-brand-ink">
 	<StoreHeader base="/" />
 
 	{#if !product}
 		<main class="mx-auto max-w-[1400px] px-5 py-24 text-center sm:px-8 lg:px-12">
 			<h1 class="font-display text-4xl">
-				Produk tidak ditemukan<span class="text-[#D9534F]">.</span>
+				Produk tidak ditemukan<span class="text-brand-accent">.</span>
 			</h1>
-			<p class="mt-4 text-sm text-[#6B6762]">
+			<p class="mt-4 text-sm text-brand-muted">
 				Tautan ini mungkin sudah berubah atau produknya sudah tidak dipublikasikan.
 			</p>
 			<a
 				href={catalogHref()}
-				class="mt-8 inline-flex items-center gap-2 bg-[#242424] px-6 py-4 text-xs tracking-[0.12em] text-white uppercase transition hover:bg-[#D9534F]"
+				class="mt-8 inline-flex items-center gap-2 bg-brand-ink px-6 py-4 text-xs tracking-[0.12em] text-white uppercase transition hover:bg-brand-accent"
 			>
 				Lihat katalog
 				<ArrowUpRight class="h-4 w-4" strokeWidth={1.6} />
@@ -144,18 +144,18 @@
 		<main class="mx-auto max-w-[1400px] px-5 pt-6 pb-28 sm:px-8 sm:pt-8 lg:px-12 lg:pb-24">
 			<!-- Breadcrumb -->
 			<nav
-				class="flex items-center gap-2 text-[10px] tracking-[0.12em] text-[#6B6762] uppercase"
+				class="flex items-center gap-2 text-[10px] tracking-[0.12em] text-brand-muted uppercase"
 				aria-label="Breadcrumb"
 			>
-				<a href="/" class="hover:text-[#242424]">Beranda</a>
+				<a href="/" class="hover:text-brand-ink">Beranda</a>
 				<span aria-hidden="true">/</span>
-				<a href={catalogHref()} class="hover:text-[#242424]">Katalog</a>
+				<a href={catalogHref()} class="hover:text-brand-ink">Katalog</a>
 				{#if category}
 					<span aria-hidden="true">/</span>
-					<a href={catalogHref()} class="hover:text-[#242424]">{category.name}</a>
+					<a href={catalogHref()} class="hover:text-brand-ink">{category.name}</a>
 				{/if}
 				<span aria-hidden="true">/</span>
-				<span class="text-[#242424]">{product.name}</span>
+				<span class="text-brand-ink">{product.name}</span>
 			</nav>
 
 			<!-- Gallery + buy column -->
@@ -173,12 +173,12 @@
 				<aside>
 					<div class="lg:sticky lg:top-[100px]">
 						<div class="flex items-start justify-between gap-4">
-							<p class="text-[10px] tracking-[0.18em] text-[#6B6762] uppercase">
-								{admin.settings.logo}{collections.length ? ` / ${collections[0]}` : ''}
+							<p class="text-[10px] tracking-[0.18em] text-brand-muted uppercase">
+								{admin.settings.brand.name}{collections.length ? ` / ${collections[0]}` : ''}
 							</p>
 							<button
 								type="button"
-								class="-mt-1 p-1 text-[#6B6762] transition hover:text-[#D9534F]"
+								class="-mt-1 p-1 text-brand-muted transition hover:text-brand-accent"
 								aria-label={wished ? 'Hapus dari wishlist' : 'Tambah ke wishlist'}
 								aria-pressed={wished}
 								onclick={() => (wished = !wished)}
@@ -187,11 +187,13 @@
 							</button>
 						</div>
 
-						<h1 class="font-display mt-3 text-[34px] leading-[1.12] sm:text-[42px]">
+						<h1 class="mt-3 font-display text-[34px] leading-[1.12] sm:text-[42px]">
 							{product.name}
 						</h1>
 
-						<p class="mt-4 max-w-md text-sm leading-7 text-[#6B6762]">{product.shortDescription}</p>
+						<p class="mt-4 max-w-md text-sm leading-7 text-brand-muted">
+							{product.shortDescription}
+						</p>
 
 						<div class="mt-6 flex items-baseline gap-3">
 							<span class="text-[15px] tracking-wide">{formatIDR(price)}</span>
@@ -202,22 +204,22 @@
 							{/if}
 						</div>
 
-						<div class="my-6 h-px bg-[#EAE8E4]"></div>
+						<div class="my-6 h-px bg-brand-border"></div>
 
 						<!-- Colour -->
 						{#if colors.length > 0}
 							<div class="mb-6">
 								<div class="mb-3 flex items-center justify-between">
 									<span class="text-[10px] tracking-[0.16em] uppercase">Warna</span>
-									<span class="text-[11px] text-[#6B6762]">{activeColor}</span>
+									<span class="text-[11px] text-brand-muted">{activeColor}</span>
 								</div>
 								<div class="flex items-center gap-3">
 									{#each colors as color (color.value)}
 										<button
 											type="button"
-											class="h-7 w-7 rounded-full border-2 border-[#FBFBFA] outline-1 outline-transparent transition duration-200 {activeColor ===
+											class="h-7 w-7 rounded-full border-2 border-brand-surface outline-1 outline-transparent transition duration-200 {activeColor ===
 											color.value
-												? 'outline-[#242424]'
+												? 'outline-brand-ink'
 												: 'outline-transparent hover:outline-[#999]'}"
 											style={`background:${color.swatch}`}
 											aria-label={`Warna ${color.value}`}
@@ -235,7 +237,7 @@
 								<div class="mb-3 flex items-center justify-between">
 									<span class="text-[10px] tracking-[0.16em] uppercase">Ukuran</span>
 									{#if sizes.length === 1}
-										<span class="text-[10px] text-[#6B6762] underline underline-offset-4">
+										<span class="text-[10px] text-brand-muted underline underline-offset-4">
 											{sizes[0].value}
 										</span>
 									{/if}
@@ -245,8 +247,8 @@
 										<button
 											type="button"
 											class="border px-5 py-3 text-[11px] transition {activeSize === size.value
-												? 'border-[#242424] bg-[#242424] text-white'
-												: 'border-[#D9D6CE] hover:border-[#242424]'}"
+												? 'border-brand-ink bg-brand-ink text-white'
+												: 'border-[#D9D6CE] hover:border-brand-ink'}"
 											aria-pressed={activeSize === size.value}
 											onclick={() => selectSize(size.value)}
 										>
@@ -264,7 +266,7 @@
 									? lowStock
 										? 'bg-[#D69A35]'
 										: 'bg-[#269B65]'
-									: 'bg-[#D9534F]'}"
+									: 'bg-brand-accent'}"
 							></span>
 							<span class="text-[#5F5E57]">
 								{#if !available}
@@ -282,7 +284,7 @@
 						<!-- Quantity -->
 						<div class="mb-5 flex items-center justify-between">
 							<span class="text-[10px] tracking-[0.16em] uppercase">Jumlah</span>
-							<div class="flex items-center border border-[#EAE8E4]">
+							<div class="flex items-center border border-brand-border">
 								<button
 									type="button"
 									class="flex h-10 w-10 items-center justify-center text-lg transition hover:bg-[#F5F3EF] disabled:opacity-40"
@@ -308,7 +310,7 @@
 						<div class="space-y-2">
 							<button
 								type="button"
-								class="w-full bg-[#242424] px-5 py-[17px] text-[10px] tracking-[0.18em] text-white uppercase transition hover:bg-[#D9534F] disabled:cursor-not-allowed disabled:opacity-40"
+								class="w-full bg-brand-ink px-5 py-[17px] text-[10px] tracking-[0.18em] text-white uppercase transition hover:bg-brand-accent disabled:cursor-not-allowed disabled:opacity-40"
 								disabled={!available}
 								onclick={() => openWhatsApp('buy')}
 							>
@@ -316,7 +318,7 @@
 							</button>
 							<button
 								type="button"
-								class="w-full border border-[#C9C6BD] px-5 py-4 text-[10px] tracking-[0.16em] uppercase transition hover:border-[#242424] disabled:cursor-not-allowed disabled:opacity-40"
+								class="w-full border border-[#C9C6BD] px-5 py-4 text-[10px] tracking-[0.16em] uppercase transition hover:border-brand-ink disabled:cursor-not-allowed disabled:opacity-40"
 								disabled={!available}
 								onclick={() => addToCart()}
 							>
@@ -324,7 +326,7 @@
 							</button>
 							<button
 								type="button"
-								class="flex w-full items-center justify-center gap-2 border border-[#C9C6BD] px-5 py-4 text-[10px] tracking-[0.16em] uppercase transition hover:border-[#242424]"
+								class="flex w-full items-center justify-center gap-2 border border-[#C9C6BD] px-5 py-4 text-[10px] tracking-[0.16em] uppercase transition hover:border-brand-ink"
 								onclick={() => openWhatsApp('ask')}
 							>
 								<MessageCircle class="h-3.5 w-3.5" strokeWidth={1.6} />
@@ -332,11 +334,11 @@
 							</button>
 						</div>
 
-						<p class="mt-4 text-[10px] leading-5 text-[#6B6762]">
+						<p class="mt-4 text-[10px] leading-5 text-brand-muted">
 							Pesanan dibuka di WhatsApp. Ketersediaan dan pengiriman dikonfirmasi oleh tim kami.
 						</p>
 
-						<div class="my-7 h-px bg-[#EAE8E4]"></div>
+						<div class="my-7 h-px bg-brand-border"></div>
 
 						<dl class="flex flex-col gap-3 text-[11px] text-[#5F5E57]">
 							{#if category}
@@ -365,11 +367,11 @@
 			</section>
 
 			<!-- Editorial -->
-			<section class="mt-16 border-t border-[#EAE8E4] pt-10 sm:mt-24 sm:pt-14">
+			<section class="mt-16 border-t border-brand-border pt-10 sm:mt-24 sm:pt-14">
 				<div class="grid gap-8 md:grid-cols-[0.8fr_1.2fr] md:gap-20">
 					<div>
-						<p class="text-[10px] tracking-[0.18em] text-[#6B6762] uppercase">The details</p>
-						<h2 class="font-display mt-3 text-[30px] leading-tight sm:text-[36px]">
+						<p class="text-[10px] tracking-[0.18em] text-brand-muted uppercase">The details</p>
+						<h2 class="mt-3 font-display text-[30px] leading-tight sm:text-[36px]">
 							Dirancang untuk dipakai setiap hari.
 						</h2>
 					</div>
@@ -450,12 +452,12 @@
 				<section class="mt-16 sm:mt-24">
 					<div class="mb-7 flex items-end justify-between">
 						<div>
-							<p class="text-[10px] tracking-[0.18em] text-[#6B6762] uppercase">Discover more</p>
-							<h2 class="font-display mt-2 text-[28px] sm:text-[34px]">Mungkin juga kamu suka</h2>
+							<p class="text-[10px] tracking-[0.18em] text-brand-muted uppercase">Discover more</p>
+							<h2 class="mt-2 font-display text-[28px] sm:text-[34px]">Mungkin juga kamu suka</h2>
 						</div>
 						<a
 							href={catalogHref()}
-							class="hidden border-b border-[#AAA69C] pb-1 text-[10px] tracking-[0.14em] uppercase hover:border-[#242424] sm:inline"
+							class="hidden border-b border-[#AAA69C] pb-1 text-[10px] tracking-[0.14em] uppercase hover:border-brand-ink sm:inline"
 						>
 							Lihat semua produk
 							<ArrowUpRight class="inline h-3 w-3 align-[-1px]" strokeWidth={1.6} />
@@ -472,18 +474,18 @@
 
 		<!-- Mobile sticky bar -->
 		<div
-			class="fixed inset-x-0 bottom-0 z-40 border-t border-[#EAE8E4] bg-[#FBFBFA]/95 px-4 py-3 backdrop-blur lg:hidden"
+			class="fixed inset-x-0 bottom-0 z-40 border-t border-brand-border bg-brand-surface/95 px-4 py-3 backdrop-blur lg:hidden"
 		>
 			<div class="mx-auto flex max-w-xl items-center justify-between gap-4">
 				<div class="min-w-0">
-					<p class="truncate text-[9px] tracking-[0.12em] text-[#6B6762] uppercase">
+					<p class="truncate text-[9px] tracking-[0.12em] text-brand-muted uppercase">
 						{product.name}
 					</p>
 					<p class="mt-1 text-[13px]">{formatIDR(price)}</p>
 				</div>
 				<button
 					type="button"
-					class="shrink-0 bg-[#242424] px-5 py-4 text-[9px] tracking-[0.15em] text-white uppercase transition hover:bg-[#D9534F] disabled:cursor-not-allowed disabled:opacity-40"
+					class="shrink-0 bg-brand-ink px-5 py-4 text-[9px] tracking-[0.15em] text-white uppercase transition hover:bg-brand-accent disabled:cursor-not-allowed disabled:opacity-40"
 					disabled={!available}
 					onclick={() => openWhatsApp('buy')}
 				>

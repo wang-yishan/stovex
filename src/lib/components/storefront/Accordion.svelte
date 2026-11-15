@@ -25,9 +25,9 @@
 	}
 </script>
 
-<div class="border-t border-[#EAE8E4]">
+<div class="border-t border-brand-border">
 	{#each items as item (item.id)}
-		<div class="border-b border-[#EAE8E4]">
+		<div class="border-b border-brand-border">
 			<button
 				type="button"
 				class="flex w-full items-center justify-between gap-4 py-5 text-left"
@@ -47,7 +47,7 @@
 				<div class="pb-6">
 					{#if item.paragraphs}
 						{#each item.paragraphs as paragraph, i (i)}
-							<p class="text-[12px] leading-6 text-[#6B6762] {i > 0 ? 'mt-3' : ''}">
+							<p class="text-[12px] leading-6 text-brand-muted {i > 0 ? 'mt-3' : ''}">
 								{paragraph}
 							</p>
 						{/each}
@@ -57,7 +57,7 @@
 						<dl class="grid grid-cols-2 gap-y-4 text-[11px]">
 							{#each item.facts as fact (fact.label)}
 								<div>
-									<dt class="mb-1 text-[#6B6762]">{fact.label}</dt>
+									<dt class="mb-1 text-brand-muted">{fact.label}</dt>
 									<dd>{fact.value}</dd>
 								</div>
 							{/each}

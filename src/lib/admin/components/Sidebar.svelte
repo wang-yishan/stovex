@@ -35,7 +35,7 @@
 			{#if !collapsed}
 				<div class="flex-1">
 					<div class="text-[13px] leading-none font-bold tracking-[0.08em] text-[#242424]">
-						BAG STORE
+						{admin.settings.brand.wordmark}
 					</div>
 					<div class="mt-0.5 text-[10px] tracking-wide text-[#5A5A5A]">ADMIN</div>
 				</div>

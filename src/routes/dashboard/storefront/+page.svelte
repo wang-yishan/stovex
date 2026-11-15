@@ -114,7 +114,7 @@
 			<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] bg-[#111]">
 				<ShoppingBag class="h-4 w-4 text-white" strokeWidth={1.5} />
 			</div>
-			<span class="text-[14px] font-bold tracking-[0.08em]">{admin.settings.logo}</span>
+			<span class="text-[14px] font-bold tracking-[0.08em]">{admin.settings.brand.name}</span>
 			<nav class="ml-4 hidden gap-4 md:flex">
 				{#each admin.settings.headerLinks as link (link.id)}
 					<a href={link.href} class="text-[12px] text-muted-foreground hover:text-foreground"
@@ -295,7 +295,7 @@
 			class="mt-10 flex flex-col justify-between gap-3 rounded-[12px] border border-border bg-card p-5 md:flex-row"
 		>
 			<div>
-				<div class="text-[13px] font-bold tracking-[0.08em]">{admin.settings.logo}</div>
+				<div class="text-[13px] font-bold tracking-[0.08em]">{admin.settings.brand.name}</div>
 				<p class="mt-1 max-w-[480px] text-[12px] text-muted-foreground">
 					{admin.settings.footerText}
 				</p>

@@ -11,9 +11,19 @@ function digits(): string {
 	return admin.settings.whatsappNumber.replace(/[^0-9]/g, '');
 }
 
+/** The greeting every WhatsApp message opens with — always the brand name. */
+export function waGreeting(): string {
+	return `Halo ${admin.settings.brand.name},`;
+}
+
 /** Generic store enquiry link. */
 export function generalWaLink(text: string): string {
 	return `https://wa.me/${digits()}?text=${encodeURIComponent(text)}`;
+}
+
+/** The generic "I need help" enquiry, addressed to the brand by name. */
+export function generalWaLinkWithGreeting(body: string): string {
+	return generalWaLink(`${waGreeting()} ${body}`);
 }
 
 export interface WaRequest {
@@ -31,7 +41,7 @@ export function waMessage(request: WaRequest, mode: 'buy' | 'ask'): string {
 	const size = variant?.attributes?.find((a) => a.name.toLowerCase() === 'size')?.value;
 
 	const lines = [
-		`Halo ${admin.settings.logo},`,
+		waGreeting(),
 		'',
 		mode === 'ask'
 			? 'saya ingin bertanya tentang produk ini.'

@@ -221,8 +221,7 @@ export type SectionType =
 	| 'gallery'
 	| 'testimonials';
 
-export type SectionContent =
-	| Record<string, unknown>;
+export type SectionContent = Record<string, unknown>;
 
 export interface PageSection {
 	id: string;
@@ -292,8 +291,54 @@ export interface MediaItem {
 	alt: string;
 }
 
+/**
+ * The storefront brand fonts. Every family listed here ships with the
+ * project (@fontsource-variable), so the merchant can pick a face without
+ * any font loading work at runtime.
+ */
+export type BrandFontKey = 'playfair' | 'dm-sans' | 'inter' | 'geist' | 'mono';
+
+/** The brand palette. Every value is a `#rrggbb` hex colour. */
+export interface BrandColors {
+	/** Accent — links, dots, highlights, CTA hovers. */
+	accent: string;
+	/** Primary ink — headings and body copy. */
+	ink: string;
+	/** Page surface — the storefront background. */
+	surface: string;
+	/** Hairlines — dividers, card and input borders. */
+	border: string;
+	/** Muted copy — secondary text and captions. */
+	muted: string;
+}
+
+export interface BrandFonts {
+	/** Face used for display headings (`font-display`). */
+	display: BrandFontKey;
+	/** Face used for body copy. */
+	body: BrandFontKey;
+}
+
+/** Everything that makes the storefront look and read like this brand. */
+export interface BrandIdentity {
+	/** Full store name — copy, SEO, WhatsApp greetings. */
+	name: string;
+	/** The wordmark shown in the header/footer, e.g. `BAG STORE`. */
+	wordmark: string;
+	/** One-line brand promise, e.g. "Minimal bags, made to last". */
+	tagline: string;
+	/** Uploaded logo image. Empty → the wordmark text is used. */
+	logoUrl: string;
+	/** Uploaded favicon. Empty → the bundled default is used. */
+	faviconUrl: string;
+	/** Public host of the store, used for share/product links. */
+	domain: string;
+	colors: BrandColors;
+	fonts: BrandFonts;
+}
+
 export interface StoreSettings {
-	logo: string;
+	brand: BrandIdentity;
 	whatsappNumber: string;
 	whatsappTemplate: string;
 	headerLinks: { id: string; label: string; href: string }[];

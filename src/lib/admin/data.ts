@@ -3,6 +3,7 @@
 import type {
 	ActivityRow,
 	AttributeDraft,
+	BrandIdentity,
 	Category,
 	Collection,
 	MediaItem,
@@ -852,7 +853,7 @@ export const SEED_SHIPMENTS: Shipment[] = [
 				shipmentId: 'ship-1',
 				status: 'pending',
 				label: 'Order received',
-				location: 'BAG STORE Warehouse',
+				location: 'Main Warehouse',
 				createdAt: '2024-11-16T09:12:00Z'
 			},
 			{
@@ -860,7 +861,7 @@ export const SEED_SHIPMENTS: Shipment[] = [
 				shipmentId: 'ship-1',
 				status: 'packed',
 				label: 'Package packed',
-				location: 'BAG STORE Warehouse',
+				location: 'Main Warehouse',
 				createdAt: '2024-11-17T10:05:00Z'
 			},
 			{
@@ -905,7 +906,7 @@ export const SEED_SHIPMENTS: Shipment[] = [
 				shipmentId: 'ship-2',
 				status: 'pending',
 				label: 'Order received',
-				location: 'BAG STORE Warehouse',
+				location: 'Main Warehouse',
 				createdAt: '2024-11-17T09:14:00Z'
 			},
 			{
@@ -913,7 +914,7 @@ export const SEED_SHIPMENTS: Shipment[] = [
 				shipmentId: 'ship-2',
 				status: 'packed',
 				label: 'Package packed',
-				location: 'BAG STORE Warehouse',
+				location: 'Main Warehouse',
 				createdAt: '2024-11-17T13:40:00Z'
 			},
 			{
@@ -961,7 +962,7 @@ export const SEED_SHIPMENTS: Shipment[] = [
 				shipmentId: 'ship-3',
 				status: 'pending',
 				label: 'Order received',
-				location: 'BAG STORE Warehouse',
+				location: 'Main Warehouse',
 				createdAt: '2024-11-15T14:42:00Z'
 			},
 			{
@@ -1014,7 +1015,7 @@ export const SEED_SHIPMENTS: Shipment[] = [
 				shipmentId: 'ship-4',
 				status: 'pending',
 				label: 'Order received',
-				location: 'BAG STORE Warehouse',
+				location: 'Main Warehouse',
 				createdAt: '2024-11-16T13:05:00Z'
 			},
 			{
@@ -1060,7 +1061,7 @@ export const SEED_SHIPMENTS: Shipment[] = [
 				shipmentId: 'ship-5',
 				status: 'pending',
 				label: 'Order received',
-				location: 'BAG STORE Warehouse',
+				location: 'Main Warehouse',
 				createdAt: '2024-11-17T10:20:00Z'
 			},
 			{
@@ -1068,7 +1069,7 @@ export const SEED_SHIPMENTS: Shipment[] = [
 				shipmentId: 'ship-5',
 				status: 'packed',
 				label: 'Package packed',
-				location: 'BAG STORE Warehouse',
+				location: 'Main Warehouse',
 				createdAt: '2024-11-17T15:00:00Z'
 			},
 			{
@@ -1113,7 +1114,7 @@ export const SEED_SHIPMENTS: Shipment[] = [
 				shipmentId: 'ship-6',
 				status: 'pending',
 				label: 'Order received',
-				location: 'BAG STORE Warehouse',
+				location: 'Main Warehouse',
 				createdAt: '2024-11-14T11:00:00Z'
 			},
 			{
@@ -1137,7 +1138,7 @@ export const SEED_SHIPMENTS: Shipment[] = [
 				shipmentId: 'ship-6',
 				status: 'returned',
 				label: 'Returned to sender',
-				location: 'BAG STORE Warehouse',
+				location: 'Main Warehouse',
 				createdAt: '2024-11-17T16:45:00Z'
 			}
 		]
@@ -1166,7 +1167,7 @@ export const SEED_SHIPMENTS: Shipment[] = [
 				shipmentId: 'ship-7',
 				status: 'pending',
 				label: 'Order received',
-				location: 'BAG STORE Warehouse',
+				location: 'Main Warehouse',
 				createdAt: '2024-11-17T08:05:00Z'
 			},
 			{
@@ -1174,7 +1175,7 @@ export const SEED_SHIPMENTS: Shipment[] = [
 				shipmentId: 'ship-7',
 				status: 'packed',
 				label: 'Package packed',
-				location: 'BAG STORE Warehouse',
+				location: 'Main Warehouse',
 				createdAt: '2024-11-17T09:30:00Z'
 			},
 			{
@@ -1222,7 +1223,7 @@ export const SEED_SHIPMENTS: Shipment[] = [
 				shipmentId: 'ship-8',
 				status: 'pending',
 				label: 'Order received',
-				location: 'BAG STORE Warehouse',
+				location: 'Main Warehouse',
 				createdAt: '2024-11-18T09:50:00Z'
 			}
 		]
@@ -1427,7 +1428,7 @@ const SECTION_DEFAULTS: Record<string, Record<string, unknown>> = {
 		useWhatsApp: true
 	},
 	benefits: {
-		heading: 'Why Bag Store',
+		heading: 'Why our bags',
 		items: [
 			{
 				icon: 'Shield',
@@ -1518,24 +1519,50 @@ export const SEED_MEDIA: MediaItem[] = [
 	}
 ];
 
-export const SEED_SETTINGS: StoreSettings = {
-	logo: 'BAG STORE',
-	whatsappNumber: '6281234567890',
-	whatsappTemplate:
-		'Halo, saya tertarik dengan {{productName}} {{variant}} (SKU: {{sku}}) — {{price}}. {{url}}',
-	headerLinks: [
-		{ id: 'hl-1', label: 'Shop', href: '#shop' },
-		{ id: 'hl-2', label: 'Categories', href: '#categories' },
-		{ id: 'hl-3', label: 'About', href: '#about' }
-	],
-	footerText: 'BAG STORE — Minimal bags, made to last. Enquiries via WhatsApp.',
-	social: { instagram: '@bagstore', facebook: 'bagstore', tiktok: '@bagstore' },
-	defaultSeo: {
-		title: 'Bag Store — Minimal bags, made to last',
-		description: 'Everyday totes, shoulder bags and crossbodies in honest materials.',
-		image: ''
-	}
+/**
+ * The default brand. Everything the storefront shows (wordmark, copy, SEO,
+ * WhatsApp greeting) is derived from these fields — nothing hardcodes a
+ * store name.
+ */
+export const SEED_BRAND: BrandIdentity = {
+	name: 'Bag Store',
+	wordmark: 'BAG STORE',
+	tagline: 'Minimal bags, made to last',
+	logoUrl: '',
+	faviconUrl: '',
+	domain: 'bagstore.example',
+	colors: {
+		accent: '#D9534F',
+		ink: '#242424',
+		surface: '#FBFBFA',
+		border: '#EAE8E4',
+		muted: '#6B6762'
+	},
+	fonts: { display: 'playfair', body: 'dm-sans' }
 };
+
+/** The stock settings, derived from the seed brand. */
+export function seedSettings(): StoreSettings {
+	const brand = structuredClone(SEED_BRAND);
+	return {
+		brand,
+		whatsappNumber: '6281234567890',
+		whatsappTemplate:
+			'Halo, saya tertarik dengan {{productName}} {{variant}} (SKU: {{sku}}) — {{price}}. {{url}}',
+		headerLinks: [
+			{ id: 'hl-1', label: 'Shop', href: '#shop' },
+			{ id: 'hl-2', label: 'Categories', href: '#categories' },
+			{ id: 'hl-3', label: 'About', href: '#about' }
+		],
+		footerText: `${brand.wordmark} — ${brand.tagline}. Enquiries via WhatsApp.`,
+		social: { instagram: '@bagstore', facebook: 'bagstore', tiktok: '@bagstore' },
+		defaultSeo: {
+			title: `${brand.name} — ${brand.tagline}`,
+			description: 'Everyday totes, shoulder bags and crossbodies in honest materials.',
+			image: ''
+		}
+	};
+}
 
 export function seedPages(): StorePage[] {
 	const homeSections = [
@@ -1544,7 +1571,7 @@ export function seedPages(): StorePage[] {
 		seedSection('categories', 2),
 		seedSection('rich-text', 3),
 		seedSection('cta', 4),
-		seedSection('benefits', 5)
+		seedSection('benefits', 5, { heading: `Why ${SEED_BRAND.name}` })
 	];
 	const summerSections = [
 		seedSection('promo-banner', 0, { heading: 'The Summer Edit is here' }),
@@ -1560,7 +1587,7 @@ export function seedPages(): StorePage[] {
 			status: 'published',
 			sections: homeSections,
 			seo: {
-				title: 'Bag Store — Minimal bags, made to last',
+				title: `${SEED_BRAND.name} — ${SEED_BRAND.tagline}`,
 				description: 'Everyday totes, shoulder bags and crossbodies in honest materials.',
 				image: '',
 				canonical: '/home'
@@ -1577,7 +1604,7 @@ export function seedPages(): StorePage[] {
 			status: 'draft',
 			sections: summerSections,
 			seo: {
-				title: 'Summer Edit — Bag Store',
+				title: `Summer Edit — ${SEED_BRAND.name}`,
 				description: 'Light, everyday bags for the season.',
 				image: '',
 				canonical: '/summer-edit'
@@ -1631,7 +1658,14 @@ export function waMessage(
 		.replaceAll('{{variant}}', variant ? variant.name : '')
 		.replaceAll('{{sku}}', variant?.sku || product.sku || '-')
 		.replaceAll('{{price}}', price)
-		.replaceAll('{{url}}', `https://bagstore.example/products/${product.slug}`);
+		.replaceAll('{{url}}', `${brandOrigin(settings.brand.domain)}/products/${product.slug}`);
+}
+
+/** Normalise the store domain into an absolute origin (no trailing slash). */
+export function brandOrigin(domain: string): string {
+	const trimmed = domain.trim().replace(/\/+$/, '');
+	if (!trimmed) return '';
+	return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
 }
 
 export function waLink(

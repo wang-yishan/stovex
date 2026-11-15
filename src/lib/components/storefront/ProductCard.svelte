@@ -47,13 +47,13 @@
 
 		{#if product.featured}
 			<span
-				class="absolute top-3 left-3 z-10 bg-[#FBFBFA] px-2.5 py-1 text-[9px] tracking-wider uppercase"
+				class="absolute top-3 left-3 z-10 bg-brand-surface px-2.5 py-1 text-[9px] tracking-wider uppercase"
 			>
 				Bestseller
 			</span>
 		{:else if out}
 			<span
-				class="absolute top-3 left-3 z-10 bg-[#242424] px-2.5 py-1 text-[9px] tracking-wider text-white uppercase"
+				class="absolute top-3 left-3 z-10 bg-brand-ink px-2.5 py-1 text-[9px] tracking-wider text-white uppercase"
 			>
 				Out of stock
 			</span>
@@ -61,7 +61,7 @@
 
 		<button
 			type="button"
-			class="add-cart absolute right-3 bottom-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-[#FBFBFA] text-[#242424] shadow-[0_14px_45px_rgba(36,36,36,0.07)] transition hover:bg-[#D9534F] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+			class="add-cart absolute right-3 bottom-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-brand-surface text-brand-ink shadow-[0_14px_45px_rgba(36,36,36,0.07)] transition hover:bg-brand-accent hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
 			aria-label={`Tambah ${product.name} ke keranjang`}
 			disabled={out}
 			onclick={() => cart.add(product)}
@@ -76,10 +76,10 @@
 
 	<div class="mt-4 flex justify-between gap-2">
 		<div>
-			<a href={productHref(product.slug)} class="hover:text-[#D9534F]">
+			<a href={productHref(product.slug)} class="hover:text-brand-accent">
 				<p class="text-xs font-semibold sm:text-sm">{product.name}</p>
 			</a>
-			<p class="mt-1 text-[10px] text-[#6B6762] sm:text-xs">
+			<p class="mt-1 text-[10px] text-brand-muted sm:text-xs">
 				{categoryName(product.categoryId)}{cardVariantLabel(product)
 					? ` · ${cardVariantLabel(product)}`
 					: ''}

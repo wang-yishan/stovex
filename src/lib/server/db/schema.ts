@@ -1,4 +1,5 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import type { BrandColors, BrandFonts, StoreSettings } from '#lib/admin/types.ts';
 
 export const task = sqliteTable('task', {
 	id: text('id')
@@ -151,6 +152,48 @@ export const notification = sqliteTable('notification', {
 	href: text('href'),
 	read: integer('read', { mode: 'boolean' }).notNull().default(false),
 	createdAt: text('created_at').notNull()
+});
+
+/* ------------------------------------------------------------------ *
+ * Store settings — the singleton row that carries the brand identity
+ * (name, wordmark, colours, fonts) plus the contact/social/SEO fields
+ * the storefront reads. One row, id = 'default'.
+ * ------------------------------------------------------------------ */
+
+export const storeSetting = sqliteTable('store_setting', {
+	id: text('id').primaryKey(),
+	/* brand identity */
+	brandName: text('brand_name').notNull().default(''),
+	brandWordmark: text('brand_wordmark').notNull().default(''),
+	brandTagline: text('brand_tagline').notNull().default(''),
+	brandLogoUrl: text('brand_logo_url').notNull().default(''),
+	brandFaviconUrl: text('brand_favicon_url').notNull().default(''),
+	brandDomain: text('brand_domain').notNull().default(''),
+	brandColors: text('brand_colors', { mode: 'json' })
+		.$type<BrandColors>()
+		.notNull()
+		.default({} as BrandColors),
+	brandFonts: text('brand_fonts', { mode: 'json' })
+		.$type<BrandFonts>()
+		.notNull()
+		.default({} as BrandFonts),
+	/* contact + channels */
+	whatsappNumber: text('whatsapp_number').notNull().default(''),
+	whatsappTemplate: text('whatsapp_template').notNull().default(''),
+	footerText: text('footer_text').notNull().default(''),
+	social: text('social', { mode: 'json' })
+		.$type<StoreSettings['social']>()
+		.notNull()
+		.default({} as StoreSettings['social']),
+	defaultSeo: text('default_seo', { mode: 'json' })
+		.$type<StoreSettings['defaultSeo']>()
+		.notNull()
+		.default({} as StoreSettings['defaultSeo']),
+	headerLinks: text('header_links', { mode: 'json' })
+		.$type<StoreSettings['headerLinks']>()
+		.notNull()
+		.default([] as StoreSettings['headerLinks']),
+	updatedAt: text('updated_at').notNull()
 });
 
 export * from './auth.schema';

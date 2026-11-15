@@ -9,6 +9,7 @@ import {
 	saveShipment,
 	validateShipment
 } from '#lib/server/catalog/shipping.ts';
+import { getSettings } from '#lib/server/catalog/settings.ts';
 import { SHIPMENT_STATUS_META, uid } from '#lib/admin/data.ts';
 import type { RequestHandler } from './$types';
 
@@ -25,13 +26,14 @@ export const POST: RequestHandler = async ({ request }) => {
 	// A shipment without a timeline still starts with one entry, so the
 	// detail view always has something to show.
 	if (shipment.events.length === 0) {
+		const { brand } = await getSettings();
 		shipment.events = [
 			{
 				id: uid('evt-'),
 				shipmentId: shipment.id,
 				status: shipment.status,
 				label: SHIPMENT_STATUS_META[shipment.status].eventLabel,
-				location: 'BAG STORE Warehouse',
+				location: `${brand.wordmark} Warehouse`,
 				createdAt: shipment.createdAt
 			}
 		];

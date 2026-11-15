@@ -151,34 +151,34 @@
 </script>
 
 <svelte:head>
-	<title>Katalog — {admin.settings.logo}</title>
+	<title>Katalog — {admin.settings.brand.name}</title>
 	<meta
 		name="description"
-		content="Katalog lengkap {admin.settings
-			.logo}: everyday tote, shoulder bag, crossbody, clutch dan bucket bag."
+		content="Katalog lengkap {admin.settings.brand
+			.name}: everyday tote, shoulder bag, crossbody, clutch dan bucket bag."
 	/>
 </svelte:head>
 
-<div class="forma-root min-h-screen w-full bg-[#FBFBFA] text-[#242424]">
+<div class="forma-root min-h-screen w-full bg-brand-surface text-brand-ink">
 	<StoreHeader base="/" />
 
 	<main class="mx-auto max-w-[1400px] px-5 pt-8 pb-16 sm:px-8 sm:pt-12 lg:px-12 lg:pb-24">
 		<!-- Intro -->
 		<div class="mb-6 flex flex-col gap-5 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
 			<div>
-				<p class="mb-3 text-[10px] font-semibold tracking-[0.22em] text-[#D9534F] uppercase">
+				<p class="mb-3 text-[10px] font-semibold tracking-[0.22em] text-brand-accent uppercase">
 					The full line
 				</p>
 				<h1 class="font-display text-4xl tracking-tight sm:text-5xl">
-					Katalog<span class="text-[#D9534F]">.</span>
+					Katalog<span class="text-brand-accent">.</span>
 				</h1>
-				<p class="mt-3 max-w-md text-sm text-[#6B6762]">
+				<p class="mt-3 max-w-md text-sm text-brand-muted">
 					Semua bentuk yang kami buat, satu per satu. Saring sesuai kebutuhanmu.
 				</p>
 			</div>
 			<a
 				href="/#koleksi"
-				class="self-start border-b border-[#242424]/40 pb-1 text-xs hover:border-[#D9534F] hover:text-[#D9534F] sm:self-auto"
+				class="self-start border-b border-brand-ink/40 pb-1 text-xs hover:border-brand-accent hover:text-brand-accent sm:self-auto"
 			>
 				Kembali ke beranda
 				<ArrowUpRight class="inline h-3.5 w-3.5 align-[-2px]" strokeWidth={1.6} />
@@ -187,7 +187,7 @@
 
 		<!-- Search + filter toolbar -->
 		<div
-			class="sticky top-[76px] z-30 -mx-5 mb-5 border-b border-[#EAE8E4] bg-[#FBFBFA]/95 px-5 py-3 backdrop-blur sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12"
+			class="sticky top-[76px] z-30 -mx-5 mb-5 border-b border-brand-border bg-brand-surface/95 px-5 py-3 backdrop-blur sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12"
 		>
 			<div class="flex items-center gap-2">
 				<div class="relative min-w-0 flex-1">
@@ -208,7 +208,7 @@
 
 				<button
 					type="button"
-					class="relative flex h-11 shrink-0 items-center gap-2 border border-[#242424] bg-[#242424] px-4 text-[11px] tracking-[0.12em] text-white uppercase transition hover:bg-[#D9534F] lg:hidden"
+					class="relative flex h-11 shrink-0 items-center gap-2 border border-brand-ink bg-brand-ink px-4 text-[11px] tracking-[0.12em] text-white uppercase transition hover:bg-brand-accent lg:hidden"
 					aria-expanded={sheetOpen}
 					onclick={() => (sheetOpen = true)}
 				>
@@ -216,7 +216,7 @@
 					<span class="hidden sm:inline">Filter</span>
 					{#if filterCount > 0}
 						<span
-							class="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-white px-1 text-[10px] text-[#242424] tabular-nums"
+							class="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-white px-1 text-[10px] text-brand-ink tabular-nums"
 						>
 							{filterCount}
 						</span>
@@ -233,8 +233,8 @@
 							class="shrink-0 rounded-full border px-4 py-2 text-[11px] transition {filters.categories.includes(
 								option.value
 							)
-								? 'border-[#242424] bg-[#242424] text-white'
-								: 'border-[#EAE8E4] bg-white hover:border-[#242424]'}"
+								? 'border-brand-ink bg-brand-ink text-white'
+								: 'border-brand-border bg-white hover:border-brand-ink'}"
 							aria-pressed={filters.categories.includes(option.value)}
 							onclick={() => toggleCategory(option.value)}
 						>
@@ -249,12 +249,12 @@
 			<!-- Desktop sidebar -->
 			<aside class="hidden lg:block">
 				<div class="sticky top-[170px] max-h-[calc(100vh-190px)] overflow-y-auto pr-2 pb-8">
-					<div class="mb-6 flex items-center justify-between border-b border-[#EAE8E4] pb-4">
+					<div class="mb-6 flex items-center justify-between border-b border-brand-border pb-4">
 						<h2 class="text-[11px] tracking-[0.18em] uppercase">Filter</h2>
 						{#if filterCount > 0}
 							<button
 								type="button"
-								class="text-[11px] text-[#6B6762] underline underline-offset-4 transition hover:text-[#D9534F]"
+								class="text-[11px] text-brand-muted underline underline-offset-4 transition hover:text-brand-accent"
 								onclick={resetAll}
 							>
 								Reset
@@ -268,12 +268,12 @@
 			<div class="min-w-0">
 				<!-- Result count + sort -->
 				<div class="mb-5 flex items-center justify-between gap-4">
-					<p class="text-[11px] tracking-[0.1em] text-[#6B6762] uppercase">
+					<p class="text-[11px] tracking-[0.1em] text-brand-muted uppercase">
 						{results.length} produk
 					</p>
 
 					<label class="flex items-center gap-2">
-						<span class="text-[11px] tracking-[0.1em] text-[#6B6762] uppercase">Urut</span>
+						<span class="text-[11px] tracking-[0.1em] text-brand-muted uppercase">Urut</span>
 						<NativeSelect
 							value={filters.sort}
 							aria-label="Urutkan produk"
@@ -294,7 +294,7 @@
 						{#each chips as chip (chip.key)}
 							<button
 								type="button"
-								class="flex items-center gap-1.5 rounded-full border border-[#242424] bg-[#242424] px-3 py-1.5 text-[11px] text-white transition hover:bg-[#D9534F]"
+								class="flex items-center gap-1.5 rounded-full border border-brand-ink bg-brand-ink px-3 py-1.5 text-[11px] text-white transition hover:bg-brand-accent"
 								onclick={() => removeChip(chip)}
 							>
 								{chip.label}
@@ -303,7 +303,7 @@
 						{/each}
 						<button
 							type="button"
-							class="px-2 py-1.5 text-[11px] text-[#6B6762] underline underline-offset-4 transition hover:text-[#D9534F]"
+							class="px-2 py-1.5 text-[11px] text-brand-muted underline underline-offset-4 transition hover:text-brand-accent"
 							onclick={resetAll}
 						>
 							Hapus semua
@@ -313,25 +313,25 @@
 
 				<!-- Results -->
 				{#if results.length === 0}
-					<div class="border border-[#EAE8E4] px-6 py-16 text-center">
+					<div class="border border-brand-border px-6 py-16 text-center">
 						<p class="font-display text-2xl">
-							Tidak ada yang cocok<span class="text-[#D9534F]">.</span>
+							Tidak ada yang cocok<span class="text-brand-accent">.</span>
 						</p>
-						<p class="mx-auto mt-3 max-w-sm text-sm text-[#6B6762]">
+						<p class="mx-auto mt-3 max-w-sm text-sm text-brand-muted">
 							Coba longgarkan filtermu, atau tanya langsung ke tim kami — kami bantu carikan yang
 							tepat.
 						</p>
 						<div class="mt-7 flex flex-wrap items-center justify-center gap-3">
 							<button
 								type="button"
-								class="bg-[#242424] px-5 py-3 text-[10px] tracking-[0.16em] text-white uppercase transition hover:bg-[#D9534F]"
+								class="bg-brand-ink px-5 py-3 text-[10px] tracking-[0.16em] text-white uppercase transition hover:bg-brand-accent"
 								onclick={resetAll}
 							>
 								Hapus semua filter
 							</button>
 							<a
 								href="/#kontak"
-								class="border border-[#C9C6BD] px-5 py-3 text-[10px] tracking-[0.16em] uppercase transition hover:border-[#242424]"
+								class="border border-[#C9C6BD] px-5 py-3 text-[10px] tracking-[0.16em] uppercase transition hover:border-brand-ink"
 							>
 								Tanya via WhatsApp
 							</a>
@@ -345,7 +345,7 @@
 					</div>
 				{/if}
 
-				<p class="mt-10 text-center text-[10px] text-[#6B6762]">
+				<p class="mt-10 text-center text-[10px] text-brand-muted">
 					*Katalog, harga, dan foto mengikuti data yang aktif di dashboard.
 				</p>
 			</div>
@@ -360,7 +360,7 @@
 			<div class="flex items-center justify-between gap-3">
 				<button
 					type="button"
-					class="px-1 py-3 text-[11px] tracking-[0.12em] text-[#6B6762] uppercase underline underline-offset-4 transition hover:text-[#D9534F] disabled:opacity-40"
+					class="px-1 py-3 text-[11px] tracking-[0.12em] text-brand-muted uppercase underline underline-offset-4 transition hover:text-brand-accent disabled:opacity-40"
 					disabled={filterCount === 0}
 					onclick={resetAll}
 				>
@@ -368,7 +368,7 @@
 				</button>
 				<button
 					type="button"
-					class="flex-1 bg-[#242424] px-5 py-4 text-[10px] tracking-[0.16em] text-white uppercase transition hover:bg-[#D9534F]"
+					class="flex-1 bg-brand-ink px-5 py-4 text-[10px] tracking-[0.16em] text-white uppercase transition hover:bg-brand-accent"
 					onclick={() => (sheetOpen = false)}
 				>
 					Tampilkan {results.length} produk

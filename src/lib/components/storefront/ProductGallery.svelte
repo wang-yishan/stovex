@@ -73,7 +73,7 @@
 
 		{#if badge}
 			<span
-				class="absolute top-4 left-4 bg-[#FBFBFA]/90 px-3 py-2 text-[9px] tracking-[0.18em] uppercase"
+				class="absolute top-4 left-4 bg-brand-surface/90 px-3 py-2 text-[9px] tracking-[0.18em] uppercase"
 			>
 				{badge}
 			</span>
@@ -110,7 +110,7 @@
 					type="button"
 					class="aspect-[3/4] w-[64px] shrink-0 overflow-hidden border transition duration-200 sm:w-[78px] {i ===
 					active
-						? 'border-[#242424] opacity-100'
+						? 'border-brand-ink opacity-100'
 						: 'border-transparent opacity-70 hover:opacity-100'}"
 					aria-label={`Lihat gambar ${i + 1}`}
 					aria-current={i === active}

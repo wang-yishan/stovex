@@ -49,7 +49,7 @@ class CartStore {
 			(line, i) =>
 				`${i + 1}. ${line.name}${line.variant ? ` (${line.variant})` : ''} — ${formatIDR(line.price)}`
 		);
-		const message = `Halo ${admin.settings.logo}, saya ingin memesan:\n${items.join('\n')}\n\nTotal: ${formatIDR(this.total)}`;
+		const message = `Halo ${admin.settings.brand.name}, saya ingin memesan:\n${items.join('\n')}\n\nTotal: ${formatIDR(this.total)}`;
 		const digits = admin.settings.whatsappNumber.replace(/[^0-9]/g, '');
 		window.open(
 			`https://wa.me/${digits}?text=${encodeURIComponent(message)}`,

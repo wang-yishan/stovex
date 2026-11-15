@@ -9,17 +9,24 @@ import {
 	SEED_MEDIA,
 	SEED_MOVEMENTS,
 	SEED_PRODUCTS,
-	SEED_SETTINGS,
 	SEED_SHIPMENTS,
 	SHIPMENT_STATUS_META,
 	emptyPage,
 	lowThreshold,
 	nowISO,
 	seedPages,
+	seedSettings,
 	seedVersions,
 	uid
 } from './data';
-import { categoryApi, collectionApi, notificationApi, productApi, shipmentApi } from './api.ts';
+import {
+	categoryApi,
+	collectionApi,
+	notificationApi,
+	productApi,
+	settingsApi,
+	shipmentApi
+} from './api.ts';
 import type {
 	AppNotification,
 	Category,
@@ -64,7 +71,7 @@ class AdminStore {
 	pages = $state<StorePage[]>(seedPages());
 	pageVersions = $state<PageVersion[]>(seedVersions(seedPages()));
 	media = $state<MediaItem[]>(SEED_MEDIA);
-	settings = $state<StoreSettings>(structuredClone(SEED_SETTINGS));
+	settings = $state<StoreSettings>(seedSettings());
 
 	sidebarCollapsed = $state(false);
 	moreSheetOpen = $state(false);
@@ -513,9 +520,33 @@ class AdminStore {
 
 	/* --- media / settings (minimal, powers page editor selects + storefront) --- */
 
-	saveSettings(next: StoreSettings): void {
-		this.settings = structuredClone($state.snapshot(next) as StoreSettings);
-		this.showToast('Settings saved (this session)', 'success');
+	/**
+	 * Replace the cached settings with what SQLite holds. Called by the root
+	 * layout on every load so the storefront and the dashboard read the same
+	 * brand values the merchant saved.
+	 *
+	 * `$state.snapshot` (not `structuredClone`) — the caller may hand us the
+	 * reactive `admin.settings` proxy, which cannot be cloned.
+	 */
+	hydrateSettings(data: StoreSettings): void {
+		this.settings = $state.snapshot(data) as StoreSettings;
+	}
+
+	/**
+	 * Persist a settings patch, then mirror the saved row into the cache.
+	 * The cache only updates once the server confirms, like every other
+	 * mutation in this store.
+	 */
+	async saveSettings(patch: Partial<StoreSettings>): Promise<boolean> {
+		try {
+			const { settings } = await settingsApi.save(patch);
+			this.settings = $state.snapshot(settings) as StoreSettings;
+			this.showToast('Brand settings saved', 'success');
+			return true;
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+			return false;
+		}
 	}
 
 	addMedia(items: MediaItem[]): void {
@@ -536,7 +567,11 @@ class AdminStore {
 		for (const page of this.pages) {
 			if (JSON.stringify(page).includes(item.url)) used.push(page.title);
 		}
-		if (this.settings.logo === item.url || this.settings.defaultSeo.image === item.url)
+		if (
+			this.settings.brand.logoUrl === item.url ||
+			this.settings.brand.faviconUrl === item.url ||
+			this.settings.defaultSeo.image === item.url
+		)
 			used.push('Store settings');
 		return [...new Set(used)];
 	}

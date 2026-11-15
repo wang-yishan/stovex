@@ -60,13 +60,13 @@
 	<!-- Category -->
 	{#if facets.categories.length > 0}
 		<section>
-			<h3 class="mb-3 text-[10px] tracking-[0.18em] text-[#6B6762] uppercase">Kategori</h3>
+			<h3 class="mb-3 text-[10px] tracking-[0.18em] text-brand-muted uppercase">Kategori</h3>
 			<ul class="space-y-1">
 				{#each facets.categories as option (option.value)}
 					<li>
 						<button
 							type="button"
-							class="flex w-full items-center justify-between gap-3 py-1.5 text-left text-[13px] transition hover:text-[#D9534F]"
+							class="flex w-full items-center justify-between gap-3 py-1.5 text-left text-[13px] transition hover:text-brand-accent"
 							aria-pressed={filters.categories.includes(option.value)}
 							onclick={() => toggleCategory(option.value)}
 						>
@@ -75,7 +75,7 @@
 									class="flex h-4 w-4 items-center justify-center border transition {filters.categories.includes(
 										option.value
 									)
-										? 'border-[#242424] bg-[#242424] text-white'
+										? 'border-brand-ink bg-brand-ink text-white'
 										: 'border-[#C9C6BD] bg-transparent'}"
 								>
 									{#if filters.categories.includes(option.value)}
@@ -97,13 +97,13 @@
 	<!-- Collection -->
 	{#if facets.collections.length > 0}
 		<section>
-			<h3 class="mb-3 text-[10px] tracking-[0.18em] text-[#6B6762] uppercase">Koleksi</h3>
+			<h3 class="mb-3 text-[10px] tracking-[0.18em] text-brand-muted uppercase">Koleksi</h3>
 			<ul class="space-y-1">
 				{#each facets.collections as option (option.value)}
 					<li>
 						<button
 							type="button"
-							class="flex w-full items-center justify-between gap-3 py-1.5 text-left text-[13px] transition hover:text-[#D9534F]"
+							class="flex w-full items-center justify-between gap-3 py-1.5 text-left text-[13px] transition hover:text-brand-accent"
 							aria-pressed={filters.collections.includes(option.value)}
 							onclick={() => toggleCollection(option.value)}
 						>
@@ -112,7 +112,7 @@
 									class="flex h-4 w-4 items-center justify-center border transition {filters.collections.includes(
 										option.value
 									)
-										? 'border-[#242424] bg-[#242424] text-white'
+										? 'border-brand-ink bg-brand-ink text-white'
 										: 'border-[#C9C6BD] bg-transparent'}"
 								>
 									{#if filters.collections.includes(option.value)}
@@ -134,15 +134,15 @@
 	<!-- Colour -->
 	{#if facets.colors.length > 0}
 		<section>
-			<h3 class="mb-3 text-[10px] tracking-[0.18em] text-[#6B6762] uppercase">Warna</h3>
+			<h3 class="mb-3 text-[10px] tracking-[0.18em] text-brand-muted uppercase">Warna</h3>
 			<div class="flex flex-wrap gap-2">
 				{#each facets.colors as option (option.value)}
 					{@const active = filters.colors.includes(option.value)}
 					<button
 						type="button"
 						class="flex items-center gap-2 border px-3 py-2 text-[12px] transition {active
-							? 'border-[#242424] bg-[#242424] text-white'
-							: 'border-[#EAE8E4] bg-transparent hover:border-[#242424]'}"
+							? 'border-brand-ink bg-brand-ink text-white'
+							: 'border-brand-border bg-transparent hover:border-brand-ink'}"
 						aria-pressed={active}
 						onclick={() => toggleColor(option.value)}
 					>
@@ -161,15 +161,15 @@
 	<!-- Size -->
 	{#if facets.sizes.length > 0}
 		<section>
-			<h3 class="mb-3 text-[10px] tracking-[0.18em] text-[#6B6762] uppercase">Ukuran</h3>
+			<h3 class="mb-3 text-[10px] tracking-[0.18em] text-brand-muted uppercase">Ukuran</h3>
 			<div class="flex flex-wrap gap-2">
 				{#each facets.sizes as option (option.value)}
 					{@const active = filters.sizes.includes(option.value)}
 					<button
 						type="button"
 						class="border px-4 py-2 text-[12px] transition {active
-							? 'border-[#242424] bg-[#242424] text-white'
-							: 'border-[#EAE8E4] bg-transparent hover:border-[#242424]'}"
+							? 'border-brand-ink bg-brand-ink text-white'
+							: 'border-brand-border bg-transparent hover:border-brand-ink'}"
 						aria-pressed={active}
 						onclick={() => toggleSize(option.value)}
 					>
@@ -183,7 +183,7 @@
 
 	<!-- Price -->
 	<section>
-		<h3 class="mb-3 text-[10px] tracking-[0.18em] text-[#6B6762] uppercase">Rentang harga</h3>
+		<h3 class="mb-3 text-[10px] tracking-[0.18em] text-brand-muted uppercase">Rentang harga</h3>
 		<div class="flex items-center gap-2">
 			<label class="flex-1">
 				<span class="sr-only">Harga minimum</span>
@@ -213,18 +213,18 @@
 
 	<!-- Availability -->
 	<section>
-		<h3 class="mb-3 text-[10px] tracking-[0.18em] text-[#6B6762] uppercase">Ketersediaan</h3>
+		<h3 class="mb-3 text-[10px] tracking-[0.18em] text-brand-muted uppercase">Ketersediaan</h3>
 		<ul class="space-y-1">
 			<li>
 				<button
 					type="button"
-					class="flex w-full items-center gap-2.5 py-1.5 text-left text-[13px] transition hover:text-[#D9534F]"
+					class="flex w-full items-center gap-2.5 py-1.5 text-left text-[13px] transition hover:text-brand-accent"
 					aria-pressed={filters.inStock}
 					onclick={() => onchange({ ...filters, inStock: !filters.inStock })}
 				>
 					<span
 						class="flex h-4 w-4 items-center justify-center border transition {filters.inStock
-							? 'border-[#242424] bg-[#242424] text-white'
+							? 'border-brand-ink bg-brand-ink text-white'
 							: 'border-[#C9C6BD] bg-transparent'}"
 					>
 						{#if filters.inStock}
@@ -237,13 +237,13 @@
 			<li>
 				<button
 					type="button"
-					class="flex w-full items-center gap-2.5 py-1.5 text-left text-[13px] transition hover:text-[#D9534F]"
+					class="flex w-full items-center gap-2.5 py-1.5 text-left text-[13px] transition hover:text-brand-accent"
 					aria-pressed={filters.onSale}
 					onclick={() => onchange({ ...filters, onSale: !filters.onSale })}
 				>
 					<span
 						class="flex h-4 w-4 items-center justify-center border transition {filters.onSale
-							? 'border-[#242424] bg-[#242424] text-white'
+							? 'border-brand-ink bg-brand-ink text-white'
 							: 'border-[#C9C6BD] bg-transparent'}"
 					>
 						{#if filters.onSale}
@@ -256,13 +256,13 @@
 			<li>
 				<button
 					type="button"
-					class="flex w-full items-center gap-2.5 py-1.5 text-left text-[13px] transition hover:text-[#D9534F]"
+					class="flex w-full items-center gap-2.5 py-1.5 text-left text-[13px] transition hover:text-brand-accent"
 					aria-pressed={filters.featuredOnly}
 					onclick={() => onchange({ ...filters, featuredOnly: !filters.featuredOnly })}
 				>
 					<span
 						class="flex h-4 w-4 items-center justify-center border transition {filters.featuredOnly
-							? 'border-[#242424] bg-[#242424] text-white'
+							? 'border-brand-ink bg-brand-ink text-white'
 							: 'border-[#C9C6BD] bg-transparent'}"
 					>
 						{#if filters.featuredOnly}

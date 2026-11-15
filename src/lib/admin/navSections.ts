@@ -8,6 +8,7 @@ import {
 	Megaphone,
 	Menu,
 	Package,
+	Palette,
 	PanelsTopLeft,
 	PlugZap,
 	Settings,
@@ -32,6 +33,7 @@ export type NavId =
 	| 'media'
 	| 'promotions'
 	| 'navigation'
+	| 'brand'
 	| 'store-settings'
 	| 'integrations'
 	| 'users-perms';
@@ -78,6 +80,7 @@ export const NAV_SECTIONS: NavSection[] = [
 	{
 		label: 'SYSTEM',
 		items: [
+			{ id: 'brand', label: 'Brand Identity', icon: Palette },
 			{ id: 'store-settings', label: 'Store Settings', icon: Settings },
 			{ id: 'integrations', label: 'Integrations', icon: PlugZap },
 			{ id: 'users-perms', label: 'Users & Permissions', icon: ShieldCheck }
@@ -98,6 +101,7 @@ export const ROUTE_BY_NAV_ID: Record<NavId, string> = {
 	media: '/dashboard/media',
 	promotions: '/dashboard/promotions',
 	navigation: '/dashboard/navigation',
+	brand: '/dashboard/brand',
 	'store-settings': '/dashboard/store-settings',
 	integrations: '/dashboard/integrations',
 	'users-perms': '/dashboard/users-perms'
@@ -115,6 +119,7 @@ const KNOWN_SLUGS: Record<string, NavId> = {
 	media: 'media',
 	promotions: 'promotions',
 	navigation: 'navigation',
+	brand: 'brand',
 	'store-settings': 'store-settings',
 	integrations: 'integrations',
 	'users-perms': 'users-perms'

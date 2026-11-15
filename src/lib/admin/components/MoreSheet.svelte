@@ -87,7 +87,7 @@
 			class="rounded-b-[16px] border-t bg-[#FBFBFA] px-5 py-3 text-[11px] text-[#5A5A5A]"
 			style="border-color: var(--border);"
 		>
-			BAG STORE • Admin v2.4 • {footerMode}
+			{admin.settings.brand.wordmark} • Admin v2.4 • {footerMode}
 		</div>
 	</div>
 {/if}
