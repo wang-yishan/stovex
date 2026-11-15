@@ -77,6 +77,74 @@
 	});
 
 	let wished = $state(false);
+	let bannerOpen = $state(true);
+
+	type Review = {
+		id: string;
+		author: string;
+		date: string;
+		rating: number;
+		text?: string;
+		images: string[];
+	};
+
+	type ReviewFilter = 'all' | 'with-image' | 'text-only';
+
+	const reviewFilters: { value: ReviewFilter; label: string }[] = [
+		{ value: 'all', label: 'Semua' },
+		{ value: 'with-image', label: 'Dengan gambar' },
+		{ value: 'text-only', label: 'Teks saja' }
+	];
+
+	let reviewFilter = $state<ReviewFilter>('all');
+
+	let reviews = $derived.by<Review[]>(() => {
+		if (!product) return [];
+		const photos = gallery.map((g) => g.src).filter(Boolean);
+		return [
+			{
+				id: `${product.id}-rv-1`,
+				author: 'Nadia',
+				date: '12 Okt 2026',
+				rating: 5,
+				text: `Bahan ${product.name} terasa kokoh dan finishing-nya rapi. Warnanya sesuai foto.`,
+				images: photos[0] ? [photos[0]] : []
+			},
+			{
+				id: `${product.id}-rv-2`,
+				author: 'Raka',
+				date: '3 Okt 2026',
+				rating: 4,
+				text: 'Ukuran pas untuk kebutuhan harian, jahitan bersih. Pengiriman juga cepat.',
+				images: []
+			},
+			{
+				id: `${product.id}-rv-3`,
+				author: 'Sari',
+				date: '28 Sep 2026',
+				rating: 5,
+				text: 'Suka detailnya, nyaman dipakai seharian dan mudah dipadukan.',
+				images: photos.slice(1, 3)
+			},
+			{
+				id: `${product.id}-rv-4`,
+				author: 'Dimas',
+				date: '20 Sep 2026',
+				rating: 4,
+				images: photos[2] ? [photos[2]] : photos[0] ? [photos[0]] : []
+			}
+		];
+	});
+
+	let filteredReviews = $derived.by(() => {
+		return reviews.filter((review) => {
+			const hasText = Boolean(review.text?.trim());
+			const hasImages = review.images.length > 0;
+			if (reviewFilter === 'with-image') return hasImages;
+			if (reviewFilter === 'text-only') return hasText && !hasImages;
+			return true;
+		});
+	});
 
 	function selectColor(value: string) {
 		selectedColor = selectedColor === value ? null : value;
@@ -381,26 +449,60 @@
 				</div>
 			</section>
 
-			<!-- Detail strip -->
-			<section class="mt-12 grid grid-cols-2 gap-2 sm:mt-16 sm:grid-cols-4 sm:gap-3">
-				{#each gallery.slice(0, 4) as image, i (image.src + i)}
-					<img
-						class="aspect-[4/5] w-full bg-[#F5F3EF] object-cover"
-						src={image.src}
-						alt={image.alt}
-						loading="lazy"
-					/>
-				{/each}
-			</section>
-
 			<!-- Specifications -->
 			<section class="mt-16 sm:mt-24 lg:max-w-4xl">
-				<Accordion
-					items={[
-						{
-							id: 'spec',
-							title: 'Spesifikasi produk',
-							facts: [
+				{#if (product.bannerImages?.length ?? 0) > 0}
+					<div class="border-t border-b border-brand-border">
+						<button
+							type="button"
+							class="flex w-full items-center justify-between gap-4 py-5 text-left"
+							aria-expanded={bannerOpen}
+							onclick={() => (bannerOpen = !bannerOpen)}
+						>
+							<span class="text-[10px] tracking-[0.16em] uppercase">Banner Produk</span>
+							<svg
+								class="h-4 w-4 shrink-0 transition-transform duration-200 {bannerOpen
+									? 'rotate-180'
+									: ''}"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.6"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								aria-hidden="true"
+							>
+								<path d="m6 9 6 6 6-6" />
+							</svg>
+						</button>
+						{#if bannerOpen}
+							<div class="pb-6">
+								<div class="relative left-1/2 w-screen -translate-x-1/2">
+									<div class="space-y-0">
+										{#each product.bannerImages ?? [] as img, i (img.id)}
+											<div class="w-full bg-[#F5F3EF]">
+												{#if img.url}
+													<img
+														src={img.url}
+														alt={img.alt ?? `${product.name} detail ${i + 1}`}
+														class="block h-auto w-full"
+														loading="lazy"
+													/>
+												{/if}
+											</div>
+										{/each}
+									</div>
+								</div>
+							</div>
+						{/if}
+					</div>
+					<div class="[&>div]:border-t-0">
+						<Accordion
+							items={[
+								{
+									id: 'spec',
+									title: 'Spesifikasi produk',
+									facts: [
 								{ label: 'Bahan', value: product.material?.trim() || '—' },
 								{ label: 'Kategori', value: category?.name ?? '—' },
 								{
@@ -444,7 +546,128 @@
 							]
 						}
 					]}
-				/>
+						/>
+					</div>
+				{:else}
+					<Accordion
+						items={[
+							{
+								id: 'spec',
+								title: 'Spesifikasi produk',
+								facts: [
+									{ label: 'Bahan', value: product.material?.trim() || '—' },
+									{ label: 'Kategori', value: category?.name ?? '—' },
+									{
+										label: 'Warna',
+										value: colors.length > 0 ? colors.map((c) => c.value).join(', ') : '—'
+									},
+									{
+										label: 'Ukuran',
+										value: sizes.length > 0 ? sizes.map((s) => s.value).join(', ') : 'One Size'
+									},
+									{ label: 'Varian', value: variantLabel(product, variant) },
+									{
+										label: 'Stok',
+										value:
+											product.trackInventory && Number.isFinite(stock)
+												? `${stock} unit`
+												: 'On request'
+									}
+								]
+							},
+							{
+								id: 'shipping',
+								title: 'Pengiriman',
+								paragraphs: [
+									'Detail pengiriman dan estimasi tiba dikonfirmasikan oleh tim kami melalui WhatsApp setelah pesanan masuk.',
+									'Gratis ongkir untuk pembelian di atas Rp750.000. Pengiriman ke seluruh Indonesia.'
+								]
+							},
+							{
+								id: 'care',
+								title: 'Perawatan produk',
+								paragraphs: [
+									'Simpan di tempat kering, jauh dari paparan langsung matahari dan cairan. Bersihkan dengan kain lembap yang lembut.'
+								]
+							},
+							{
+								id: 'returns',
+								title: 'Retur & penukaran',
+								paragraphs: [
+									'Hubungi tim toko untuk kebijakan retur dan penukaran yang berlaku pada produk ini.'
+								]
+							}
+						]}
+					/>
+				{/if}
+			</section>
+
+			<!-- Reviews -->
+			<section class="mt-16 border-t border-brand-border pt-10 sm:mt-24 sm:pt-14 lg:max-w-4xl">
+				<div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+					<div>
+						<p class="text-[10px] tracking-[0.18em] text-brand-muted uppercase">Ulasan</p>
+						<h2 class="mt-2 font-display text-[28px] leading-tight sm:text-[34px]">
+							Apa kata pembeli
+						</h2>
+					</div>
+					<div class="flex flex-wrap gap-2" role="group" aria-label="Filter ulasan">
+						{#each reviewFilters as filter (filter.value)}
+							<button
+								type="button"
+								class="border px-3 py-2 text-[10px] tracking-[0.12em] uppercase transition {reviewFilter ===
+								filter.value
+									? 'border-brand-ink bg-brand-ink text-white'
+									: 'border-[#D9D6CE] text-brand-ink hover:border-brand-ink'}"
+								aria-pressed={reviewFilter === filter.value}
+								onclick={() => (reviewFilter = filter.value)}
+							>
+								{filter.label}
+							</button>
+						{/each}
+					</div>
+				</div>
+
+				{#if filteredReviews.length === 0}
+					<p class="mt-8 text-[13px] leading-7 text-[#68675F]">
+						Belum ada ulasan untuk filter ini.
+					</p>
+				{:else}
+					<ul class="mt-8 space-y-4">
+						{#each filteredReviews as review (review.id)}
+							<li class="border border-brand-border bg-white p-5 sm:p-6">
+								<div class="flex items-start justify-between gap-4">
+									<div>
+										<p class="text-[12px] font-medium text-brand-ink">{review.author}</p>
+										<p class="mt-1 text-[10px] tracking-[0.08em] text-brand-muted uppercase">
+											{review.date}
+										</p>
+									</div>
+									<div class="flex items-center gap-0.5 text-brand-ink" aria-label={`Rating ${review.rating} dari 5`}>
+										{#each Array.from({ length: 5 }) as _, i (i)}
+											<span class="text-[11px]">{i < review.rating ? '★' : '☆'}</span>
+										{/each}
+									</div>
+								</div>
+								{#if review.text}
+									<p class="mt-4 text-[13px] leading-7 text-[#68675F]">{review.text}</p>
+								{/if}
+								{#if review.images.length > 0}
+									<div class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
+										{#each review.images as image, i (image + i)}
+											<img
+												src={image}
+												alt={`Foto ulasan ${review.author} ${i + 1}`}
+												class="aspect-square w-full bg-[#F5F3EF] object-cover"
+												loading="lazy"
+											/>
+										{/each}
+									</div>
+								{/if}
+							</li>
+						{/each}
+					</ul>
+				{/if}
 			</section>
 
 			<!-- Recommendations -->

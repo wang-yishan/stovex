@@ -299,17 +299,39 @@
 				<p class="mt-1 max-w-[480px] text-[12px] text-muted-foreground">
 					{admin.settings.footerText}
 				</p>
+				{#if (admin.settings.footerMediaLinks ?? []).length}
+					<div class="mt-3 flex flex-wrap gap-2">
+						{#each admin.settings.footerMediaLinks as link (link.id)}
+							<span
+								class="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-[11px] text-muted-foreground"
+							>
+								{#if link.logoUrl}
+									<img src={link.logoUrl} alt="" class="h-3.5 w-3.5 object-contain" />
+								{/if}
+								{link.name || link.url || 'Media link'}
+							</span>
+						{/each}
+					</div>
+				{/if}
 			</div>
 			<div class="space-y-1 text-[12px] text-muted-foreground">
-				<div>Instagram {admin.settings.social.instagram}</div>
-				<div>Facebook {admin.settings.social.facebook}</div>
-				<div>TikTok {admin.settings.social.tiktok}</div>
+				<div>
+					Instagram
+					{admin.settings.instagramUrl || admin.settings.social.instagram || '-'}
+				</div>
+				<div>
+					Facebook
+					{admin.settings.facebookUrl || admin.settings.social.facebook || '-'}
+				</div>
+				<div>TikTok {admin.settings.social.tiktok || '-'}</div>
 				<a
-					href={`https://wa.me/${admin.settings.whatsappNumber.replace(/[^0-9]/g, '')}`}
+					href={admin.settings.whatsappUrl ||
+						`https://wa.me/${admin.settings.whatsappNumber.replace(/[^0-9]/g, '')}`}
 					target="_blank"
 					rel="noopener"
 					class="inline-flex items-center gap-1 font-medium text-foreground"
-					><MessageCircle class="h-3.5 w-3.5" /> WhatsApp {admin.settings.whatsappNumber}</a
+					><MessageCircle class="h-3.5 w-3.5" /> WhatsApp
+					{admin.settings.whatsappUrl || admin.settings.whatsappNumber}</a
 				>
 			</div>
 		</footer>

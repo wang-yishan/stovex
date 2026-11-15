@@ -5,13 +5,54 @@
    The row is written through a partial merge: the Brand page and the Store
    Settings page edit disjoint fields and neither can clobber the other. */
 
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { db } from '#lib/server/db/index.ts';
 import { storeSetting } from '#lib/server/db/schema.ts';
 import { seedSettings } from '#lib/admin/data.ts';
 import type { BrandColors, BrandFonts, BrandFontKey, StoreSettings } from '#lib/admin/types.ts';
 
 const SETTINGS_ID = 'default';
+
+/**
+ * Older databases may be missing columns added after the initial schema.
+ * Add them in-place so reads/writes keep working without a manual db:push.
+ */
+let columnsEnsured = false;
+async function ensureStoreSettingColumns(): Promise<void> {
+	if (columnsEnsured) return;
+	try {
+		const database = db as unknown as {
+			all?: (q: unknown) => Promise<Array<{ name: string }>>;
+			run?: (q: unknown) => Promise<unknown>;
+		};
+		if (typeof database.all !== 'function' || typeof database.run !== 'function') return;
+
+		const info = await database.all(sql`PRAGMA table_info(store_setting)`);
+		const names = new Set((info ?? []).map((c) => c.name));
+		if (names.size === 0) {
+			// Table not created yet — ensureSeeded/create path will handle it.
+			columnsEnsured = true;
+			return;
+		}
+		if (!names.has('facebook_url')) {
+			await database.run(sql`ALTER TABLE store_setting ADD COLUMN facebook_url text NOT NULL DEFAULT ''`);
+		}
+		if (!names.has('instagram_url')) {
+			await database.run(sql`ALTER TABLE store_setting ADD COLUMN instagram_url text NOT NULL DEFAULT ''`);
+		}
+		if (!names.has('whatsapp_url')) {
+			await database.run(sql`ALTER TABLE store_setting ADD COLUMN whatsapp_url text NOT NULL DEFAULT ''`);
+		}
+		if (!names.has('footer_media_links')) {
+			await database.run(
+				sql`ALTER TABLE store_setting ADD COLUMN footer_media_links text NOT NULL DEFAULT '[]'`
+			);
+		}
+		columnsEnsured = true;
+	} catch {
+		// Best-effort: if this fails we'll fall back to defaults on read.
+	}
+}
 
 /** The fonts a merchant can pick. Every family ships with the project. */
 export const BRAND_FONTS: { key: BrandFontKey; label: string }[] = [
@@ -149,6 +190,32 @@ export function parseSettingsPatch(
 		};
 	}
 
+	if (raw.facebookUrl !== undefined) {
+		patch.facebookUrl = str(raw.facebookUrl, current.facebookUrl, 300);
+	}
+	if (raw.instagramUrl !== undefined) {
+		patch.instagramUrl = str(raw.instagramUrl, current.instagramUrl, 300);
+	}
+	if (raw.whatsappUrl !== undefined) {
+		patch.whatsappUrl = str(raw.whatsappUrl, current.whatsappUrl, 300);
+	}
+
+	if (raw.footerMediaLinks !== undefined) {
+		const list = Array.isArray(raw.footerMediaLinks) ? raw.footerMediaLinks : [];
+		patch.footerMediaLinks = list
+			.slice(0, 24)
+			.map((item) => {
+				const link = (item ?? {}) as Record<string, unknown>;
+				return {
+					id: str(link.id, '', 40) || `fm-${Math.random().toString(36).slice(2, 8)}`,
+					logoUrl: str(link.logoUrl, '', 400),
+					name: str(link.name, '', 80),
+					url: str(link.url, '', 300)
+				};
+			})
+			.filter((link) => link.name.length > 0 || link.url.length > 0 || link.logoUrl.length > 0);
+	}
+
 	if (raw.defaultSeo !== undefined) {
 		const seo = (raw.defaultSeo ?? {}) as Record<string, unknown>;
 		patch.defaultSeo = {
@@ -194,6 +261,12 @@ function rowToSettings(row: typeof storeSetting.$inferSelect): StoreSettings {
 		headerLinks: row.headerLinks?.length ? row.headerLinks : seed.headerLinks,
 		footerText: row.footerText || seed.footerText,
 		social: { ...seed.social, ...(row.social ?? {}) },
+		facebookUrl: (row as Record<string, unknown>).facebookUrl as string || seed.facebookUrl,
+		instagramUrl: (row as Record<string, unknown>).instagramUrl as string || seed.instagramUrl,
+		whatsappUrl: (row as Record<string, unknown>).whatsappUrl as string || seed.whatsappUrl,
+		footerMediaLinks: Array.isArray((row as Record<string, unknown>).footerMediaLinks)
+			? ((row as Record<string, unknown>).footerMediaLinks as StoreSettings['footerMediaLinks'])
+			: seed.footerMediaLinks,
 		defaultSeo: { ...seed.defaultSeo, ...(row.defaultSeo ?? {}) }
 	};
 }
@@ -207,6 +280,7 @@ function rowToSettings(row: typeof storeSetting.$inferSelect): StoreSettings {
  */
 export async function getSettings(): Promise<StoreSettings> {
 	try {
+		await ensureStoreSettingColumns();
 		await ensureSeeded();
 		const rows = await db
 			.select()
@@ -224,7 +298,9 @@ export async function getSettings(): Promise<StoreSettings> {
 
 /** Merge a patch into the stored settings and persist the result. */
 export async function saveSettings(patch: Partial<StoreSettings>): Promise<StoreSettings> {
+	await ensureStoreSettingColumns();
 	const current = await getSettings();
+	const seed = seedSettings();
 	const next: StoreSettings = {
 		brand: { ...current.brand, ...(patch.brand ?? {}) },
 		whatsappNumber: patch.whatsappNumber ?? current.whatsappNumber,
@@ -232,6 +308,10 @@ export async function saveSettings(patch: Partial<StoreSettings>): Promise<Store
 		headerLinks: patch.headerLinks ?? current.headerLinks,
 		footerText: patch.footerText ?? current.footerText,
 		social: { ...current.social, ...(patch.social ?? {}) },
+		facebookUrl: patch.facebookUrl ?? current.facebookUrl ?? seed.facebookUrl,
+		instagramUrl: patch.instagramUrl ?? current.instagramUrl ?? seed.instagramUrl,
+		whatsappUrl: patch.whatsappUrl ?? current.whatsappUrl ?? seed.whatsappUrl,
+		footerMediaLinks: patch.footerMediaLinks ?? current.footerMediaLinks ?? seed.footerMediaLinks,
 		defaultSeo: { ...current.defaultSeo, ...(patch.defaultSeo ?? {}) }
 	};
 
@@ -251,6 +331,10 @@ export async function saveSettings(patch: Partial<StoreSettings>): Promise<Store
 			whatsappTemplate: next.whatsappTemplate,
 			footerText: next.footerText,
 			social: next.social,
+			facebookUrl: next.facebookUrl,
+			instagramUrl: next.instagramUrl,
+			whatsappUrl: next.whatsappUrl,
+			footerMediaLinks: next.footerMediaLinks,
 			defaultSeo: next.defaultSeo,
 			headerLinks: next.headerLinks,
 			updatedAt: new Date().toISOString()
@@ -270,6 +354,10 @@ export async function saveSettings(patch: Partial<StoreSettings>): Promise<Store
 				whatsappTemplate: next.whatsappTemplate,
 				footerText: next.footerText,
 				social: next.social,
+				facebookUrl: next.facebookUrl,
+				instagramUrl: next.instagramUrl,
+				whatsappUrl: next.whatsappUrl,
+				footerMediaLinks: next.footerMediaLinks,
 				defaultSeo: next.defaultSeo,
 				headerLinks: next.headerLinks,
 				updatedAt: new Date().toISOString()
@@ -287,6 +375,7 @@ export async function saveSettings(patch: Partial<StoreSettings>): Promise<Store
  * row, so the insert is a no-op on conflict instead of a hard failure.
  */
 export async function ensureSeeded(): Promise<void> {
+	await ensureStoreSettingColumns();
 	const existing = await db.select({ id: storeSetting.id }).from(storeSetting).limit(1);
 	if (existing.length > 0) return;
 
@@ -307,6 +396,10 @@ export async function ensureSeeded(): Promise<void> {
 			whatsappTemplate: seed.whatsappTemplate,
 			footerText: seed.footerText,
 			social: seed.social,
+			facebookUrl: seed.facebookUrl,
+			instagramUrl: seed.instagramUrl,
+			whatsappUrl: seed.whatsappUrl,
+			footerMediaLinks: seed.footerMediaLinks,
 			defaultSeo: seed.defaultSeo,
 			headerLinks: seed.headerLinks,
 			updatedAt: new Date().toISOString()

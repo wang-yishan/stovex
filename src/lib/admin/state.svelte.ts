@@ -570,7 +570,8 @@ class AdminStore {
 		if (
 			this.settings.brand.logoUrl === item.url ||
 			this.settings.brand.faviconUrl === item.url ||
-			this.settings.defaultSeo.image === item.url
+			this.settings.defaultSeo.image === item.url ||
+			(this.settings.footerMediaLinks ?? []).some((link) => link.logoUrl === item.url)
 		)
 			used.push('Store settings');
 		return [...new Set(used)];

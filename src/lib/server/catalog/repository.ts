@@ -8,6 +8,7 @@ import {
 	category,
 	collection,
 	product,
+	productBannerImage,
 	productImage,
 	productVariant,
 	stockMovement
@@ -48,6 +49,15 @@ function rowToImage(row: typeof productImage.$inferSelect) {
 	};
 }
 
+function rowToBannerImage(row: typeof productBannerImage.$inferSelect) {
+	return {
+		id: row.id,
+		url: row.url,
+		isPrimary: false,
+		alt: row.alt ?? undefined
+	};
+}
+
 function rowToVariant(row: typeof productVariant.$inferSelect) {
 	return {
 		id: row.id,
@@ -67,21 +77,36 @@ export async function getCatalog(): Promise<CatalogData> {
 	await ensureSeeded();
 	await backfillSeedImages();
 
-	const [productRows, imageRows, variantRows, categoryRows, collectionRows, movementRows] =
-		await Promise.all([
-			db.select().from(product).orderBy(asc(product.createdAt)),
-			db.select().from(productImage).orderBy(asc(productImage.position)),
-			db.select().from(productVariant),
-			db.select().from(category),
-			db.select().from(collection).orderBy(asc(collection.order)),
-			db.select().from(stockMovement).orderBy(desc(stockMovement.createdAt))
-		]);
+	const [
+		productRows,
+		imageRows,
+		bannerRows,
+		variantRows,
+		categoryRows,
+		collectionRows,
+		movementRows
+	] = await Promise.all([
+		db.select().from(product).orderBy(asc(product.createdAt)),
+		db.select().from(productImage).orderBy(asc(productImage.position)),
+		db.select().from(productBannerImage).orderBy(asc(productBannerImage.position)),
+		db.select().from(productVariant),
+		db.select().from(category),
+		db.select().from(collection).orderBy(asc(collection.order)),
+		db.select().from(stockMovement).orderBy(desc(stockMovement.createdAt))
+	]);
 
 	const imagesByProduct = new Map<string, ReturnType<typeof rowToImage>[]>();
 	for (const row of imageRows) {
 		const list = imagesByProduct.get(row.productId) ?? [];
 		list.push(rowToImage(row));
 		imagesByProduct.set(row.productId, list);
+	}
+
+	const bannerImagesByProduct = new Map<string, ReturnType<typeof rowToBannerImage>[]>();
+	for (const row of bannerRows) {
+		const list = bannerImagesByProduct.get(row.productId) ?? [];
+		list.push(rowToBannerImage(row));
+		bannerImagesByProduct.set(row.productId, list);
 	}
 
 	const variantsByProduct = new Map<string, ReturnType<typeof rowToVariant>[]>();
@@ -101,6 +126,7 @@ export async function getCatalog(): Promise<CatalogData> {
 		categoryId: row.categoryId,
 		collectionIds: row.collectionIds ?? [],
 		images: imagesByProduct.get(row.id) ?? [],
+		bannerImages: bannerImagesByProduct.get(row.id) ?? [],
 		basePrice: row.basePrice,
 		compareAtPrice: row.compareAtPrice ?? undefined,
 		sku: row.sku ?? undefined,
@@ -186,6 +212,7 @@ export async function saveProduct(input: Product): Promise<Product> {
 		await tx.insert(product).values(row).onConflictDoUpdate({ target: product.id, set: row });
 
 		await tx.delete(productImage).where(eq(productImage.productId, input.id));
+		await tx.delete(productBannerImage).where(eq(productBannerImage.productId, input.id));
 		await tx.delete(productVariant).where(eq(productVariant.productId, input.id));
 
 		if (input.images.length > 0) {
@@ -195,6 +222,18 @@ export async function saveProduct(input: Product): Promise<Product> {
 					productId: input.id,
 					url: image.url ?? '',
 					isPrimary: image.isPrimary,
+					alt: image.alt ?? null,
+					position: index
+				}))
+			);
+		}
+
+		if (input.bannerImages.length > 0) {
+			await tx.insert(productBannerImage).values(
+				input.bannerImages.map((image, index) => ({
+					id: image.id,
+					productId: input.id,
+					url: image.url ?? '',
 					alt: image.alt ?? null,
 					position: index
 				}))
@@ -225,6 +264,7 @@ export async function saveProduct(input: Product): Promise<Product> {
 export async function deleteProduct(id: string): Promise<void> {
 	await db.transaction(async (tx) => {
 		await tx.delete(productImage).where(eq(productImage.productId, id));
+		await tx.delete(productBannerImage).where(eq(productBannerImage.productId, id));
 		await tx.delete(productVariant).where(eq(productVariant.productId, id));
 		await tx.delete(product).where(eq(product.id, id));
 	});
@@ -250,6 +290,7 @@ export async function duplicateProduct(id: string): Promise<Product | null> {
 		updatedAt: nowISO(),
 		sku: src.sku ? `${src.sku}-COPY` : '',
 		images: src.images.map((image) => ({ ...image, id: uid('img-') })),
+		bannerImages: (src.bannerImages ?? []).map((image) => ({ ...image, id: uid('ban-') })),
 		variants: src.variants.map((variant) => ({
 			...structuredClone(variant),
 			id: uid('var-'),

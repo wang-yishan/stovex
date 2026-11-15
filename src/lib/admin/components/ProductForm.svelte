@@ -54,6 +54,7 @@
 
 	// Working draft (reactive copy; original stays untouched until save)
 	let draft = $state<Product>($state.snapshot(initial) as Product);
+	if (!draft.bannerImages) draft.bannerImages = [];
 	let initialJson = $state(JSON.stringify(initial));
 	let dirty = $derived(JSON.stringify(draft) !== initialJson);
 	let inventoryTotal = $derived(
@@ -148,6 +149,68 @@
 		if (rest.length > 0 && !rest.some((i) => i.isPrimary))
 			rest[0] = { ...rest[0]!, isPrimary: true };
 		draft.images = rest;
+	}
+
+	/* --- Product banners: detail/explanation images uploaded by seller --- */
+	let bannerUploadError = $state('');
+	let bannerUploading = $state(false);
+	let bannerFileInput = $state<HTMLInputElement | null>(null);
+
+	async function onBannerFiles(e: Event) {
+		const input = e.currentTarget as HTMLInputElement;
+		const files = input.files ? Array.from(input.files) : [];
+		const ok = files.filter((file) => {
+			if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+				bannerUploadError = 'Only jpg / png / webp allowed.';
+				return false;
+			}
+			if (file.size > 5 * 1024 * 1024) {
+				bannerUploadError = 'Max 5MB per image.';
+				return false;
+			}
+			return true;
+		});
+		if (ok.length === 0) {
+			input.value = '';
+			return;
+		}
+
+		bannerUploading = true;
+		bannerUploadError = '';
+		try {
+			const saved = await uploadImages(ok);
+			const added = saved.map((file, i) => ({
+				id: uid('ban'),
+				url: file.url,
+				isPrimary: false,
+				alt: ok[i]?.name
+			}));
+			draft.bannerImages = [...(draft.bannerImages ?? []), ...added];
+			admin.showToast(
+				`${saved.length} banner${saved.length > 1 ? 's' : ''} saved to disk`,
+				'success'
+			);
+		} catch (cause) {
+			bannerUploadError = cause instanceof Error ? cause.message : 'Upload failed';
+		} finally {
+			bannerUploading = false;
+			input.value = '';
+		}
+	}
+
+	function moveBannerImage(id: string, dir: 1 | -1) {
+		const list = draft.bannerImages ?? [];
+		const i = list.findIndex((img) => img.id === id);
+		const j = i + dir;
+		if (i < 0 || j < 0 || j >= list.length) return;
+		const next = [...list];
+		const [moved] = next.splice(i, 1);
+		next.splice(j, 0, moved!);
+		draft.bannerImages = next;
+	}
+
+	function removeBannerImage(id: string) {
+		draft.bannerImages = (draft.bannerImages ?? []).filter((i) => i.id !== id);
 	}
 
 	/* --- Attribute builder (ref Gy): seeded Color/Size, comma-separated values --- */
@@ -651,6 +714,114 @@
 										>
 									</div>
 								{/if}
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
+
+			<!-- Product banners -->
+			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+				<h3 class="mb-1 flex items-center gap-2 text-[13px] font-semibold">
+					<Image class="h-4 w-4 shrink-0" />Banner Produk
+				</h3>
+				<p class="mb-3 text-[11px] text-[#636363]">
+					Gambar banner/detail produk untuk penjelasan produk. Upload, atur urutan, atau hapus.
+				</p>
+				<div
+					class="rounded-[10px] border border-dashed bg-[#FBFBFA] p-4 text-center"
+					style="border-color: var(--border);"
+				>
+					<input
+						type="file"
+						multiple
+						accept="image/jpeg,image/png,image/webp"
+						class="hidden"
+						bind:this={bannerFileInput}
+						onchange={onBannerFiles}
+					/>
+					<Button
+						variant="outline"
+						size="default"
+						type="button"
+						onclick={() => bannerFileInput?.click()}
+					>
+						<Upload class="h-4 w-4 shrink-0" />Upload banner
+					</Button>
+					<p class="mt-2 text-[11px] text-[#636363]">
+						jpg/png/webp max 5MB • Disimpan ke disk • Ditampilkan sebagai detail produk
+					</p>
+					{#if bannerUploading}
+						<div class="mt-3 flex items-center gap-2 text-[11px] text-[#5A5A5A]">
+							<span
+								class="h-3 w-3 animate-spin rounded-full border-2 border-[#EAEAEA] border-t-[#242424]"
+							></span>
+							Menyimpan banner…
+						</div>
+					{/if}
+					{#if bannerUploadError}<p class="mt-2 text-[11px] text-[#D9534F]">
+							{bannerUploadError}
+						</p>{/if}
+				</div>
+				{#if (draft.bannerImages?.length ?? 0) > 0}
+					<div class="mt-4 space-y-3">
+						{#each draft.bannerImages ?? [] as img, i (img.id)}
+							<div
+								class="flex items-center gap-3 rounded-[10px] border bg-white p-2"
+								style="border-color: var(--border);"
+							>
+								<div
+									class="h-16 w-24 shrink-0 overflow-hidden rounded-[8px] border bg-[#F5F5F4]"
+									style="border-color: var(--border);"
+								>
+									{#if img.url}
+										<img
+											src={img.url}
+											alt={img.alt ?? `Banner ${i + 1}`}
+											class="h-full w-full object-cover"
+										/>
+									{:else}
+										<div class="flex h-full items-center justify-center text-[10px] font-bold">
+											Banner
+										</div>
+									{/if}
+								</div>
+								<div class="min-w-0 flex-1">
+									<div class="text-[12px] font-medium">Banner {i + 1}</div>
+									<div class="truncate text-[11px] text-[#636363]">
+										{img.alt || 'Penjelasan detail produk'}
+									</div>
+								</div>
+								<div class="flex shrink-0 items-center gap-1">
+									<Button
+										variant="outline"
+										size="icon-sm"
+										type="button"
+										onclick={() => moveBannerImage(img.id, -1)}
+										aria-label="Pindah banner ke atas"
+									>
+										<ChevronUp class="h-3.5 w-3.5 text-[#5A5A5A]" />
+									</Button>
+									<Button
+										variant="outline"
+										size="icon-sm"
+										type="button"
+										onclick={() => moveBannerImage(img.id, 1)}
+										aria-label="Pindah banner ke bawah"
+									>
+										<ChevronDown class="h-3.5 w-3.5 text-[#5A5A5A]" />
+									</Button>
+									<Button
+										variant="outline"
+										size="icon-sm"
+										class="hover:bg-destructive/10!"
+										type="button"
+										onclick={() => removeBannerImage(img.id)}
+										aria-label="Hapus banner"
+									>
+										<Trash2 class="h-3.5 w-3.5 text-[#5A5A5A]" />
+									</Button>
+								</div>
 							</div>
 						{/each}
 					</div>

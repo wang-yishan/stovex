@@ -64,7 +64,7 @@
 			<StatusBadge status={product.status} />
 			{#if product.featured}
 				<span
-					class="shrink-0 rounded-full border bg-[#FFF8E6] px-2 py-0.5 text-[10px] text-[#8A6A24]"
+					class="rounded-full border bg-[#FFF8E6] px-2 py-0.5 text-[10px] text-[#8A6A24]"
 					style="border-color: #F3D9A0;">Featured</span
 				>
 			{/if}
@@ -72,8 +72,13 @@
 	{/snippet}
 	{#snippet actions()}
 		{#if product}
-			<Button href={resolvePath(`/dashboard/products/${product.id}/edit`)}>
-				<PenLine class="h-4 w-4 shrink-0" /> Edit
+			<Button
+				href={resolvePath(`/dashboard/products/${product.id}/edit`)}
+				aria-label="Edit product"
+				class="sm:px-4"
+			>
+				<PenLine class="h-4 w-4 shrink-0" />
+				<span class="hidden sm:inline">Edit</span>
 			</Button>
 			<div class="group relative">
 				<Button variant="outline" size="icon" aria-label="More actions"
@@ -161,6 +166,35 @@
 					<p class="text-[12px] text-muted-foreground">{product.shortDescription}</p>
 					<p class="mt-3 text-[13px] leading-relaxed">{product.fullDescription}</p>
 				</div>
+
+				{#if (product.bannerImages?.length ?? 0) > 0}
+					<div class="rounded-[12px] border border-border bg-card p-4">
+						<h3 class="mb-3 text-[13px] font-semibold">Banner Produk</h3>
+						<p class="mb-3 text-[11px] text-muted-foreground">
+							Gambar penjelasan/detail produk yang diunggah penjual.
+						</p>
+						<div class="space-y-3">
+							{#each product.bannerImages ?? [] as img, i (img.id)}
+								<div
+									class="overflow-hidden rounded-[10px] border border-border bg-muted"
+								>
+									{#if img.url}
+										<img
+											src={img.url}
+											alt={img.alt ?? `${product.name} banner ${i + 1}`}
+											class="h-auto w-full object-cover"
+											loading="lazy"
+										/>
+									{:else}
+										<div class="flex aspect-[16/9] items-center justify-center text-[12px] font-medium text-muted-foreground">
+											Banner {i + 1}
+										</div>
+									{/if}
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
 
 				{#if product.hasVariants}
 					<div class="overflow-hidden rounded-[12px] border border-border bg-card">

@@ -87,6 +87,7 @@ export const SEED_PRODUCTS: Product[] = [
 				alt: 'Detail strap tas'
 			}
 		],
+		bannerImages: [],
 		basePrice: 890000,
 		compareAtPrice: 1150000,
 		sku: 'ECT-BGE-M',
@@ -171,6 +172,7 @@ export const SEED_PRODUCTS: Product[] = [
 				alt: 'Warna cream'
 			}
 		],
+		bannerImages: [],
 		basePrice: 1240000,
 		sku: 'MSB-CRM-OS',
 		status: 'active',
@@ -228,6 +230,7 @@ export const SEED_PRODUCTS: Product[] = [
 				alt: 'Tas hitam'
 			}
 		],
+		bannerImages: [],
 		basePrice: 950000,
 		compareAtPrice: 1100000,
 		sku: 'CCB-BLK-S',
@@ -299,6 +302,7 @@ export const SEED_PRODUCTS: Product[] = [
 				alt: 'Detail kanvas'
 			}
 		],
+		bannerImages: [],
 		basePrice: 650000,
 		sku: 'CSB-BGE-L',
 		status: 'active',
@@ -356,6 +360,7 @@ export const SEED_PRODUCTS: Product[] = [
 				alt: 'Kulit clutch'
 			}
 		],
+		bannerImages: [],
 		basePrice: 1500000,
 		compareAtPrice: 1800000,
 		sku: 'LCN-BLK-OS',
@@ -414,6 +419,7 @@ export const SEED_PRODUCTS: Product[] = [
 				alt: 'Anyaman rotan'
 			}
 		],
+		bannerImages: [],
 		basePrice: 1100000,
 		sku: 'WBB-TAN-L',
 		status: 'active',
@@ -471,6 +477,7 @@ export const SEED_PRODUCTS: Product[] = [
 				alt: 'Nylon sling'
 			}
 		],
+		bannerImages: [],
 		basePrice: 780000,
 		sku: 'SBM-GRY-S',
 		status: 'draft',
@@ -514,6 +521,7 @@ export const SEED_PRODUCTS: Product[] = [
 				alt: 'Handles satchel'
 			}
 		],
+		bannerImages: [],
 		basePrice: 1350000,
 		sku: 'SSC-CRM-M',
 		status: 'archived',
@@ -1352,6 +1360,7 @@ export function emptyProduct(): Product {
 		categoryId: '',
 		collectionIds: [],
 		images: [],
+		bannerImages: [],
 		basePrice: 0,
 		compareAtPrice: undefined,
 		sku: '',
@@ -1556,6 +1565,10 @@ export function seedSettings(): StoreSettings {
 		],
 		footerText: `${brand.wordmark} — ${brand.tagline}. Enquiries via WhatsApp.`,
 		social: { instagram: '@bagstore', facebook: 'bagstore', tiktok: '@bagstore' },
+		facebookUrl: '',
+		instagramUrl: '',
+		whatsappUrl: '',
+		footerMediaLinks: [],
 		defaultSeo: {
 			title: `${brand.name} — ${brand.tagline}`,
 			description: 'Everyday totes, shoulder bags and crossbodies in honest materials.',

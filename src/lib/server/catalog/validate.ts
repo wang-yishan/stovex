@@ -58,6 +58,18 @@ export function parseProductPayload(body: unknown): Product {
 			})
 		: [];
 
+	const bannerImages = Array.isArray(raw.bannerImages)
+		? raw.bannerImages.map((item) => {
+				const i = (item ?? {}) as Record<string, unknown>;
+				return {
+					id: str(i.id),
+					url: str(i.url),
+					isPrimary: bool(i.isPrimary),
+					alt: i.alt ? str(i.alt) : undefined
+				};
+			})
+		: [];
+
 	const status = STATUSES.includes(raw.status as ProductStatus)
 		? (raw.status as ProductStatus)
 		: 'draft';
@@ -74,6 +86,7 @@ export function parseProductPayload(body: unknown): Product {
 			? (raw.collectionIds as unknown[]).map((id) => str(id)).filter(Boolean)
 			: [],
 		images,
+		bannerImages,
 		basePrice: num(raw.basePrice),
 		compareAtPrice:
 			raw.compareAtPrice === undefined || raw.compareAtPrice === null

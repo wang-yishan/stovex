@@ -20,7 +20,13 @@
 -->
 
 {#if image && brand.logoUrl}
-	<img src={brand.logoUrl} alt={brand.name} class={className} />
+	<img
+		src={brand.logoUrl}
+		alt={brand.name}
+		class="block h-8 w-auto max-w-[12rem] object-contain {className}"
+		loading="eager"
+		decoding="async"
+	/>
 {:else}
 	<span class={className}>
 		{brand.wordmark}<span class="text-brand-accent">.</span>

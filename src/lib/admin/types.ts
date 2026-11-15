@@ -39,6 +39,8 @@ export interface Product {
 	categoryId: string;
 	collectionIds: string[];
 	images: ProductImage[];
+	/** Detail/explanation banners uploaded by seller, shown on the product page. */
+	bannerImages: ProductImage[];
 	basePrice: number;
 	compareAtPrice?: number;
 	sku?: string;
@@ -344,5 +346,11 @@ export interface StoreSettings {
 	headerLinks: { id: string; label: string; href: string }[];
 	footerText: string;
 	social: { instagram: string; facebook: string; tiktok: string };
+	/** Optional profile/chat URLs shown in the storefront (footer and other surfaces). */
+	facebookUrl: string;
+	instagramUrl: string;
+	whatsappUrl: string;
+	/** Custom media entries (logo, name, URL) for the footer and other surfaces. */
+	footerMediaLinks: { id: string; logoUrl: string; name: string; url: string }[];
 	defaultSeo: { title: string; description: string; image: string };
 }

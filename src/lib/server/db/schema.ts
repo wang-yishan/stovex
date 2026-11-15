@@ -67,6 +67,14 @@ export const productImage = sqliteTable('product_image', {
 	position: integer('position').notNull().default(0)
 });
 
+export const productBannerImage = sqliteTable('product_banner_image', {
+	id: text('id').primaryKey(),
+	productId: text('product_id').notNull(),
+	url: text('url').notNull().default(''),
+	alt: text('alt'),
+	position: integer('position').notNull().default(0)
+});
+
 export const productVariant = sqliteTable('product_variant', {
 	id: text('id').primaryKey(),
 	productId: text('product_id').notNull(),
@@ -185,6 +193,15 @@ export const storeSetting = sqliteTable('store_setting', {
 		.$type<StoreSettings['social']>()
 		.notNull()
 		.default({} as StoreSettings['social']),
+	/** Optional profile/chat URLs (Facebook, Instagram, WhatsApp). */
+	facebookUrl: text('facebook_url').notNull().default(''),
+	instagramUrl: text('instagram_url').notNull().default(''),
+	whatsappUrl: text('whatsapp_url').notNull().default(''),
+	/** Custom media entries (logo, name, URL) for footer/other surfaces. */
+	footerMediaLinks: text('footer_media_links', { mode: 'json' })
+		.$type<StoreSettings['footerMediaLinks']>()
+		.notNull()
+		.default([] as StoreSettings['footerMediaLinks']),
 	defaultSeo: text('default_seo', { mode: 'json' })
 		.$type<StoreSettings['defaultSeo']>()
 		.notNull()

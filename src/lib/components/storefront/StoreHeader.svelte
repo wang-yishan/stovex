@@ -59,10 +59,10 @@
 			<Menu class="h-5 w-5" strokeWidth={1.6} />
 		</button>
 
-		<a href={base || '/'} class="flex items-center gap-2">
+		<a href={base || '/'} class="flex shrink-0 items-center gap-2 overflow-hidden">
 			<BrandWordmark
 				image
-				class="max-h-8 w-auto object-contain text-[25px] leading-none font-semibold tracking-[0.18em]"
+				class="text-[25px] leading-none font-semibold tracking-[0.18em]"
 			/>
 		</a>
 

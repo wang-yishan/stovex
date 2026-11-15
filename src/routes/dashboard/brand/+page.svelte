@@ -2,7 +2,7 @@
 	import Topbar from '#lib/admin/components/Topbar.svelte';
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { uploadImages } from '#lib/admin/api.ts';
-	import { SEED_BRAND } from '#lib/admin/data.ts';
+	import { SEED_BRAND, seedSettings } from '#lib/admin/data.ts';
 	import {
 		BRAND_COLOR_ROLES,
 		BRAND_FONT_OPTIONS,
@@ -12,25 +12,44 @@
 		meetsAaText,
 		type BrandColorRole
 	} from '#lib/admin/brand.ts';
-	import type { BrandFontKey, BrandIdentity } from '#lib/admin/types.ts';
+	import type { BrandFontKey, BrandIdentity, StoreSettings } from '#lib/admin/types.ts';
 	import { Button } from '#lib/components/ui/button/index.ts';
 	import { Input } from '#lib/components/ui/input/index.ts';
 	import { Label } from '#lib/components/ui/label/index.ts';
 	import { NativeSelect } from '#lib/components/ui/native-select/index.ts';
-	import { Image, Palette, RotateCcw, Save, Type } from '@lucide/svelte';
+	import { Image, Link2, Palette, Plus, RotateCcw, Save, Trash2, Type } from '@lucide/svelte';
+
+	type FooterMediaLink = StoreSettings['footerMediaLinks'][number];
 
 	/**
-	 * A draft copy of the saved brand — edits land here until Save.
-	 * `$state.snapshot` unwraps the reactive proxy: `structuredClone` cannot
-	 * clone a proxy and would throw a DataCloneError in the browser.
+	 * Draft copies — edits land here until Save. `$state.snapshot` unwraps the
+	 * reactive proxy: `structuredClone` cannot clone a proxy and would throw a
+	 * DataCloneError in the browser.
 	 */
 	let draft = $state<BrandIdentity>($state.snapshot(admin.settings.brand) as BrandIdentity);
+	const seed = seedSettings();
+	let facebookUrl = $state(admin.settings.facebookUrl ?? seed.facebookUrl);
+	let instagramUrl = $state(admin.settings.instagramUrl ?? seed.instagramUrl);
+	let whatsappUrl = $state(admin.settings.whatsappUrl ?? seed.whatsappUrl);
+	let footerMediaLinks = $state<FooterMediaLink[]>(
+		structuredClone(
+			($state.snapshot(admin.settings.footerMediaLinks) as FooterMediaLink[]) ?? seed.footerMediaLinks
+		)
+	);
 	let saving = $state(false);
 	let uploading = $state<'logo' | 'favicon' | null>(null);
+	let uploadingMediaId = $state<string | null>(null);
 
-	// Unsaved edits: the draft differs from what the server holds. After a
+	// Unsaved edits: drafts differ from what the server holds. After a
 	// successful save the store catches up, so this flips back to false.
-	let dirty = $derived(JSON.stringify(draft) !== JSON.stringify(admin.settings.brand));
+	let dirty = $derived(
+		JSON.stringify(draft) !== JSON.stringify(admin.settings.brand) ||
+			facebookUrl !== (admin.settings.facebookUrl ?? seedSettings().facebookUrl) ||
+			instagramUrl !== (admin.settings.instagramUrl ?? seedSettings().instagramUrl) ||
+			whatsappUrl !== (admin.settings.whatsappUrl ?? seedSettings().whatsappUrl) ||
+			JSON.stringify(footerMediaLinks) !==
+				JSON.stringify(admin.settings.footerMediaLinks ?? seedSettings().footerMediaLinks)
+	);
 
 	const surface = $derived(draft.colors.surface);
 
@@ -78,14 +97,52 @@
 		setField(kind === 'logo' ? 'logoUrl' : 'faviconUrl', '');
 	}
 
+	function addMediaLink() {
+		footerMediaLinks = [
+			...footerMediaLinks,
+			{ id: `fm-${Date.now().toString(36)}`, logoUrl: '', name: '', url: '' }
+		];
+	}
+
+	function removeMediaLink(id: string) {
+		footerMediaLinks = footerMediaLinks.filter((link) => link.id !== id);
+	}
+
+	async function uploadMediaLogo(id: string, event: Event) {
+		const input = event.currentTarget as HTMLInputElement;
+		const file = input.files?.[0];
+		if (!file) return;
+
+		uploadingMediaId = id;
+		try {
+			const [uploaded] = await uploadImages([file]);
+			if (uploaded) {
+				footerMediaLinks = footerMediaLinks.map((link) =>
+					link.id === id ? { ...link, logoUrl: uploaded.url } : link
+				);
+				admin.showToast('Media logo uploaded', 'success');
+			}
+		} catch (cause) {
+			admin.showToast(cause instanceof Error ? cause.message : 'Upload failed', 'error');
+		} finally {
+			uploadingMediaId = null;
+			input.value = '';
+		}
+	}
+
 	function resetToDefault() {
 		// SEED_BRAND is a plain module constant — safe to clone directly.
 		draft = structuredClone(SEED_BRAND);
+		const defaults = seedSettings();
+		facebookUrl = defaults.facebookUrl;
+		instagramUrl = defaults.instagramUrl;
+		whatsappUrl = defaults.whatsappUrl;
+		footerMediaLinks = [];
 	}
 
 	async function save() {
 		saving = true;
-		await admin.saveSettings({ brand: draft });
+		await admin.saveSettings({ brand: draft, facebookUrl, instagramUrl, whatsappUrl, footerMediaLinks });
 		saving = false;
 	}
 </script>
@@ -381,6 +438,156 @@
 							{/each}
 						</NativeSelect>
 						<p class="text-[11px] text-muted-foreground">Body copy, labels and navigation.</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- Optional links & footer media -->
+			<section
+				class="rounded-[12px] border bg-white p-4 md:p-5"
+				style="border-color: var(--border);"
+			>
+				<div class="mb-4 flex items-center gap-2">
+					<Link2 class="h-4 w-4 text-muted-foreground" />
+					<div>
+						<h2 class="text-[13px] font-semibold">Links &amp; footer media (optional)</h2>
+						<p class="mt-0.5 text-[11px] text-muted-foreground">
+							Social profile URLs and custom media entries for the footer and other surfaces.
+						</p>
+					</div>
+				</div>
+
+				<div class="space-y-4">
+					<div class="grid gap-3 sm:grid-cols-3">
+						<div class="space-y-1.5">
+							<Label for="social-url-facebook">Facebook URL</Label>
+							<Input
+								id="social-url-facebook"
+								value={facebookUrl}
+								placeholder="https://facebook.com/yourstore"
+								oninput={(e) => {
+									facebookUrl = e.currentTarget.value;
+								}}
+							/>
+						</div>
+						<div class="space-y-1.5">
+							<Label for="social-url-instagram">Instagram URL</Label>
+							<Input
+								id="social-url-instagram"
+								value={instagramUrl}
+								placeholder="https://instagram.com/yourstore"
+								oninput={(e) => {
+									instagramUrl = e.currentTarget.value;
+								}}
+							/>
+						</div>
+						<div class="space-y-1.5">
+							<Label for="social-url-whatsapp">WhatsApp URL</Label>
+							<Input
+								id="social-url-whatsapp"
+								value={whatsappUrl}
+								placeholder="https://wa.me/6281234567890"
+								oninput={(e) => {
+									whatsappUrl = e.currentTarget.value;
+								}}
+							/>
+						</div>
+					</div>
+
+					<div class="border-t pt-4" style="border-color: var(--border);">
+						<div class="mb-3 flex items-center justify-between gap-3">
+							<div>
+								<div class="text-[12px] font-medium">Custom media links</div>
+								<div class="text-[11px] text-muted-foreground">
+									Add a logo/media image, name and URL (for footer and other purposes).
+								</div>
+							</div>
+							<Button variant="outline" size="sm" onclick={addMediaLink}>
+								<Plus class="h-3.5 w-3.5" />
+								Add item
+							</Button>
+						</div>
+
+						{#if footerMediaLinks.length === 0}
+							<div
+								class="rounded-[10px] bg-[#F5F5F4] px-4 py-6 text-center text-[12px] text-[#636363]"
+							>
+								No custom media links yet.
+							</div>
+						{:else}
+							<div class="space-y-3">
+								{#each footerMediaLinks as link (link.id)}
+									<div
+										class="rounded-[10px] border bg-[#FBFBFA] p-3"
+										style="border-color: var(--border);"
+									>
+										<div class="grid gap-3 md:grid-cols-[auto_1fr_1fr_auto] md:items-start">
+											<div class="space-y-1.5">
+												<div class="text-[11px] font-medium text-[#636363]">Logo/media</div>
+												<div class="flex items-center gap-2">
+													<div
+														class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border bg-white"
+														style="border-color: var(--border);"
+													>
+														{#if link.logoUrl}
+															<img src={link.logoUrl} alt="" class="h-full w-full object-contain" />
+														{:else}
+															<Image class="h-4 w-4 text-[#636363]" />
+														{/if}
+													</div>
+													<label
+														class="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full border border-input bg-card px-3 text-[11px] font-medium transition-colors hover:bg-muted"
+													>
+														{uploadingMediaId === link.id ? 'Uploading…' : 'Upload'}
+														<input
+															type="file"
+															accept="image/png,image/jpeg,image/webp,image/svg+xml"
+															class="sr-only"
+															onchange={(e) => void uploadMediaLogo(link.id, e)}
+														/>
+													</label>
+												</div>
+											</div>
+
+											<div class="space-y-1.5">
+												<Label for={`media-name-${link.id}`}>Name</Label>
+												<Input
+													id={`media-name-${link.id}`}
+													value={link.name}
+													placeholder="Partner or link name"
+													oninput={(e) => {
+														link.name = e.currentTarget.value;
+													}}
+												/>
+											</div>
+
+											<div class="space-y-1.5">
+												<Label for={`media-url-${link.id}`}>URL</Label>
+												<Input
+													id={`media-url-${link.id}`}
+													value={link.url}
+													placeholder="https://example.com"
+													oninput={(e) => {
+														link.url = e.currentTarget.value;
+													}}
+												/>
+											</div>
+
+											<div class="flex items-end justify-end md:pt-6">
+												<Button
+													variant="ghost"
+													size="icon-sm"
+													aria-label="Remove media link"
+													onclick={() => removeMediaLink(link.id)}
+												>
+													<Trash2 class="h-3.5 w-3.5 text-destructive" />
+												</Button>
+											</div>
+										</div>
+									</div>
+								{/each}
+							</div>
+						{/if}
 					</div>
 				</div>
 			</section>
