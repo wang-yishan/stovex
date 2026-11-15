@@ -39,6 +39,7 @@
 	import { Checkbox } from '#lib/components/ui/checkbox/index.ts';
 	import { Input } from '#lib/components/ui/input/index.ts';
 	import { NativeSelect } from '#lib/components/ui/native-select/index.ts';
+	import { Switch } from '#lib/components/ui/switch/index.ts';
 	import { Textarea } from '#lib/components/ui/textarea/index.ts';
 
 	let {
@@ -719,22 +720,7 @@
 				</h3>
 				<div class="mb-3 flex items-center gap-2">
 					<span class="text-[12px] font-medium">Track inventory</span>
-					<button
-						type="button"
-						role="switch"
-						aria-checked={draft.trackInventory}
-						aria-label="Track inventory"
-						class="inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border border-transparent p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 {draft.trackInventory
-							? 'bg-primary'
-							: 'bg-muted'}"
-						onclick={() => (draft.trackInventory = !draft.trackInventory)}
-					>
-						<span
-							class="pointer-events-none block h-5 w-5 rounded-full bg-card shadow-sm ring-0 transition-transform {draft.trackInventory
-								? 'translate-x-5'
-								: 'translate-x-0'}"
-						></span>
-					</button>
+					<Switch bind:checked={draft.trackInventory} aria-label="Track inventory" />
 					{#if !draft.trackInventory}
 						<span class="text-[11px] text-[#5A5A5A]"
 							>Stock not tracked — hide misleading quantities</span
@@ -795,22 +781,11 @@
 					</h3>
 					<div class="flex items-center gap-2">
 						<span class="text-[12px]">Enable variants</span>
-						<button
-							type="button"
-							role="switch"
-							aria-checked={draft.hasVariants}
+						<Switch
+							checked={draft.hasVariants}
+							onCheckedChange={() => toggleVariants()}
 							aria-label="Enable variants"
-							class="inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border border-transparent p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 {draft.hasVariants
-								? 'bg-primary'
-								: 'bg-muted'}"
-							onclick={toggleVariants}
-						>
-							<span
-								class="pointer-events-none block h-5 w-5 rounded-full bg-card shadow-sm ring-0 transition-transform {draft.hasVariants
-									? 'translate-x-5'
-									: 'translate-x-0'}"
-							></span>
-						</button>
+						/>
 					</div>
 				</div>
 
@@ -855,40 +830,46 @@
 														class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
 														>Values</label
 													>
-													<div
-														class="mt-1 flex min-h-[36px] flex-wrap items-center gap-1.5 rounded-[6px] border bg-white px-2 py-1.5"
-														style="border-color: var(--border);"
-													>
-														{#each a.values as v, i (i)}
-															<span
-																class="flex items-center gap-1 rounded-full border bg-[#F0F0EF] px-2 py-0.5 text-[11px]"
-																style="border-color: var(--border);"
-															>
-																{v}
-																<Button
-																	variant="ghost"
-																	size="xs"
-																	class="size-4 rounded-full p-0"
-																	onclick={() => removeValue(a.id, i)}
-																	aria-label="Remove value {v} from {a.name || 'attribute'}"
+													{#if a.values.length > 0}
+														<div
+															class="mt-1 flex min-h-[36px] flex-wrap items-center gap-1.5 rounded-[6px] border bg-[#FBFBFA] px-2 py-1.5"
+															style="border-color: var(--border);"
+															aria-label="Selected values for {a.name || 'attribute'}"
+														>
+															{#each a.values as v, i (i)}
+																<span
+																	class="flex items-center gap-1 rounded-full border bg-[#F0F0EF] px-2 py-0.5 text-[11px]"
+																	style="border-color: var(--border);"
 																>
-																	<X class="h-3 w-3" />
-																</Button>
-															</span>
-														{/each}
-														<input
-															id="attr-values-{a.id}"
-															class="min-w-[120px] flex-1 bg-transparent text-[12px] outline-none"
-															placeholder="Type a value and press Enter or comma"
-															value={chipInputs[a.id] ?? ''}
-															oninput={(e) =>
-																(chipInputs = {
-																	...chipInputs,
-																	[a.id]: (e.currentTarget as HTMLInputElement).value
-																})}
-															onkeydown={(e) => chipKeyDown(e, a.id)}
-														/>
-													</div>
+																	{v}
+																	<Button
+																		variant="ghost"
+																		size="xs"
+																		class="size-4 rounded-full p-0"
+																		onclick={() => removeValue(a.id, i)}
+																		aria-label="Remove value {v} from {a.name || 'attribute'}"
+																	>
+																		<X class="h-3 w-3" />
+																	</Button>
+																</span>
+															{/each}
+														</div>
+													{:else}
+														<p class="mt-1 text-[11px] text-[#636363]">No values added yet.</p>
+													{/if}
+													<Input
+														id="attr-values-{a.id}"
+														size="sm"
+														class="mt-2"
+														placeholder="Type a value and press Enter or comma"
+														value={chipInputs[a.id] ?? ''}
+														oninput={(e) =>
+															(chipInputs = {
+																...chipInputs,
+																[a.id]: (e.currentTarget as HTMLInputElement).value
+															})}
+														onkeydown={(e) => chipKeyDown(e, a.id)}
+													/>
 													<p class="mt-1 text-[10px] text-[#636363]">Press Enter or comma to add a value.</p>
 												</div>
 											</div>
@@ -1047,22 +1028,12 @@
 														</p>{/if}
 												</td>
 												<td class="px-3 py-2">
-													<button
-														type="button"
-														role="switch"
-														aria-checked={v.available}
+													<Switch
+														checked={v.available}
+														onCheckedChange={(on) => updateVariant(v.id, { available: on })}
 														aria-label="Toggle availability for {v.name}"
-														class="inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border border-transparent p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 {v.available
-															? 'bg-success'
-															: 'bg-muted'}"
-														onclick={() => updateVariant(v.id, { available: !v.available })}
-													>
-														<span
-															class="pointer-events-none block h-5 w-5 rounded-full bg-card shadow-sm ring-0 transition-transform {v.available
-																? 'translate-x-5'
-																: 'translate-x-0'}"
-														></span>
-													</button>
+														class="data-[state=checked]:bg-success"
+													/>
 												</td>
 												<td class="px-3 py-2">
 													<Button
@@ -1101,9 +1072,9 @@
 						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
 							>Category *</span
 						>
-						<div class="mt-1 flex gap-2">
+						<div class="mt-1 space-y-2">
 							<NativeSelect
-								class="flex-1"
+								class="w-full"
 								aria-invalid={Boolean(errors.categoryId)}
 								bind:value={draft.categoryId}
 							>
@@ -1114,13 +1085,12 @@
 							</NativeSelect>
 							<Button
 								variant="outline"
-								size="icon-lg"
-								class="shrink-0"
+								size="sm"
 								type="button"
 								onclick={() => (catModal = true)}
 								aria-label="Create category inline"
 							>
-								<Plus class="h-4 w-4" />
+								<Plus class="h-3.5 w-3.5 shrink-0" />Create category
 							</Button>
 						</div>
 						{#if errors.categoryId}<p class="mt-1 text-[11px] text-[#D9534F]">
@@ -1132,21 +1102,7 @@
 							>Featured</span
 						>
 						<div class="mt-2 flex items-center gap-2">
-							<Button
-								variant="ghost"
-								size="default"
-								class="h-6 w-11 shrink-0 rounded-full p-0.5 transition {draft.featured
-									? 'bg-primary'
-									: 'bg-muted'}"
-								onclick={() => (draft.featured = !draft.featured)}
-								aria-label="Toggle featured"
-							>
-								<span
-									class="block h-5 w-5 rounded-full bg-card transition-transform {draft.featured
-										? 'translate-x-5'
-										: ''}"
-								></span>
-							</Button>
+							<Switch bind:checked={draft.featured} aria-label="Toggle featured" />
 							<span class="text-[12px]"
 								>{draft.featured ? 'Featured in storefront' : 'Not featured'}</span
 							>
