@@ -5,7 +5,7 @@
 	import PageStatusBadge from '#lib/admin/components/PageStatusBadge.svelte';
 	import SectionRenderer from '#lib/admin/components/SectionRenderer.svelte';
 	import { admin } from '#lib/admin/state.svelte.ts';
-	import { ArrowLeft, History, PenLine } from '@lucide/svelte';
+	import { ArrowLeft, FileText, History, PenLine } from '@lucide/svelte';
 	import type { PageProps } from './$types';
 	import { resolvePath } from '#lib/admin/paths.ts';
 	import { Button } from '#lib/components/ui/button/index.ts';
@@ -18,13 +18,7 @@
 	let seoDesc = $derived(page?.seo.description || admin.settings.defaultSeo.description || '');
 	let canonical = $derived(page?.seo.canonical || `/${page?.slug ?? ''}`);
 
-	$effect(() => {
-		// unknown id → back to list
-		if (!page) {
-			// avoid flash loop on first paint when navigating; goto list.
-			void goto(resolve('/dashboard/pages'));
-		}
-	});
+	// Keep page view stable when data is missing so the "not found" fallback can render.
 
 	function fmtDate(iso: string) {
 		return new Date(iso).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
@@ -183,7 +177,16 @@
 		</div>
 	</div>
 {:else}
-	<div class="mx-auto max-w-[1280px] px-4 py-6 text-[13px] text-muted-foreground">
-		Page not found.
+	<div class="mx-auto max-w-[1280px] px-4 py-16 text-center">
+		<div
+			class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-muted"
+		>
+			<FileText class="h-6 w-6 text-muted-foreground" />
+		</div>
+		<h3 class="text-[14px] font-semibold">Page not found</h3>
+		<p class="mt-1 text-[12px] text-muted-foreground">
+			The page you’re looking for doesn’t exist or may have been removed.
+		</p>
+		<Button href={resolve('/dashboard/pages')} class="mt-4 px-4">Back to pages</Button>
 	</div>
 {/if}

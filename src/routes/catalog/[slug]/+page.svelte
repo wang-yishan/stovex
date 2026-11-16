@@ -9,16 +9,19 @@
 		isAvailable,
 		priceFor,
 		sizeOptionsFor,
+		skuFor,
 		stockFor,
 		variantLabel
 	} from '#lib/catalog/product.ts';
-	import { waLink } from '#lib/catalog/wa.ts';
+	import { generateOrderCode, productOrderItem, waLink, waMessage, waTextUrl } from '#lib/catalog/wa.ts';
 	import { catalogHref } from '#lib/catalog/links.ts';
+	import { orderApi } from '#lib/admin/api.ts';
 	import StoreHeader from '#lib/components/storefront/StoreHeader.svelte';
 	import StoreFooter from '#lib/components/storefront/StoreFooter.svelte';
 	import ProductGallery from '#lib/components/storefront/ProductGallery.svelte';
 	import ProductCard from '#lib/components/storefront/ProductCard.svelte';
 	import Accordion from '#lib/components/storefront/Accordion.svelte';
+	import OrderContactModal from '#lib/components/storefront/OrderContactModal.svelte';
 	import type { PageProps } from './$types';
 	import { ArrowUpRight, Heart, MessageCircle, Minus, Plus } from '@lucide/svelte';
 
@@ -78,6 +81,8 @@
 
 	let wished = $state(false);
 	let bannerOpen = $state(true);
+	let orderOpen = $state(false);
+	let orderCode = $state('');
 
 	type Review = {
 		id: string;
@@ -164,13 +169,59 @@
 
 	function openWhatsApp(mode: 'buy' | 'ask') {
 		if (!product) return;
-		const url = waLink({ product, variant, quantity, url: productUrl() }, mode);
-		window.open(url, '_blank', 'noopener,noreferrer');
+		const req = { product, variant, quantity, url: productUrl() };
+		if (mode === 'ask') {
+			const url = waLink(req, 'ask');
+			window.open(url, '_blank', 'noopener,noreferrer');
+			return;
+		}
+		orderCode = generateOrderCode();
+		orderOpen = true;
+	}
+
+	function buyHref(name: string, note: string): string {
+		if (!product) return '#';
+		const req = { product, variant, quantity, url: productUrl() };
+		const message = waMessage(req, 'buy', { orderCode, customerName: name, customerNote: note });
+		return waTextUrl(message);
+	}
+
+	function recordBuyOrder(detail: { name: string; note: string }): void {
+		if (!product) return;
+		const req = { product, variant, quantity, url: productUrl() };
+		const item = productOrderItem(req);
+		const message = waMessage(req, 'buy', {
+			orderCode,
+			customerName: detail.name,
+			customerNote: detail.note
+		});
+		void orderApi
+			.create({
+				code: orderCode,
+				source: 'product',
+				customerName: detail.name,
+				customerNote: detail.note,
+				items: [
+					{
+						productId: item.productId,
+						productName: item.productName,
+						variant: item.variant,
+						sku: item.sku,
+						quantity: item.quantity,
+						unitPrice: item.unitPrice
+					}
+				],
+				message
+			})
+			.catch(() => {
+				/* redirect to WhatsApp already happened; recording is best-effort */
+			});
+		orderOpen = false;
 	}
 
 	function addToCart() {
 		if (!product) return;
-		cart.add(product, price, variantLabel(product, variant));
+		cart.add(product, price, variantLabel(product, variant), skuFor(product, variant));
 	}
 </script>
 
@@ -716,6 +767,20 @@
 				</button>
 			</div>
 		</div>
+
+		{#if orderOpen}
+			<OrderContactModal
+				open={orderOpen}
+				orderCode={orderCode}
+				title="Beli via WhatsApp"
+				description="Isi nama dan catatan. Pesanan akan dikirim ke WhatsApp beserta kode pesanan."
+				getHref={buyHref}
+				onProceed={recordBuyOrder}
+				onClose={() => {
+					orderOpen = false;
+				}}
+			/>
+		{/if}
 	{/if}
 
 	<StoreFooter base="/" />

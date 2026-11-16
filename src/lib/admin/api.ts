@@ -7,6 +7,10 @@ import type {
 	AppNotification,
 	Category,
 	Collection,
+	Order,
+	OrderItem,
+	OrderSource,
+	OrderStatus,
 	Product,
 	ProductStatus,
 	Shipment,
@@ -139,10 +143,40 @@ export const notificationApi = {
 	remove: (id: string) => request<{ ok: true }>(`/api/notifications/${id}`, { method: 'DELETE' })
 };
 
+export interface CreateOrderPayload {
+	code?: string;
+	source: OrderSource;
+	customerName: string;
+	customerNote?: string;
+	items: Array<{
+		productId?: string;
+		productName: string;
+		variant?: string;
+		sku?: string;
+		quantity: number;
+		unitPrice: number;
+	}>;
+	message?: string;
+}
+
+export const orderApi = {
+	list: () => request<{ orders: Order[] }>('/api/orders'),
+	create: (input: CreateOrderPayload) =>
+		request<{ order: Order }>('/api/orders', {
+			method: 'POST',
+			body: JSON.stringify(input)
+		}),
+	setStatus: (id: string, status: OrderStatus, note?: string) =>
+		request<{ order: Order }>(`/api/orders/${id}/status`, {
+			method: 'POST',
+			body: JSON.stringify({ status, note })
+		})
+};
+
 /**
  * Store settings (brand identity + contact/social/SEO).
  * `save` sends a partial patch — the server merges it into the stored row,
- * so the Brand page and the Store Settings page never clobber each other.
+ * so unrelated sections never clobber each other.
  */
 export const settingsApi = {
 	load: () => request<{ settings: StoreSettings }>('/api/settings'),

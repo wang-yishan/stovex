@@ -1558,6 +1558,8 @@ export function seedSettings(): StoreSettings {
 		whatsappNumber: '6281234567890',
 		whatsappTemplate:
 			'Halo, saya tertarik dengan {{productName}} {{variant}} (SKU: {{sku}}) — {{price}}. {{url}}',
+		whatsappCartTemplate:
+			'Halo {{brandName}}, saya ingin memesan:\n{{items}}\n\nTotal: {{total}}',
 		headerLinks: [
 			{ id: 'hl-1', label: 'Shop', href: '#shop' },
 			{ id: 'hl-2', label: 'Categories', href: '#categories' },

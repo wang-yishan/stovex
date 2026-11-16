@@ -1,15 +1,19 @@
-/* Bag Store Admin — nav model + /dashboard path mapping (converted from ref/index.html). */
-
+/**
+ * @fileoverview Dashboard sidebar navigation model (sections, labels, Lucide icons).
+ *
+ * `navIdFromPath()` maps the current dashboard URL to the active nav id. Product
+ * detail/edit/new routes resolve to the `products` id so the sidebar keeps the
+ * Products item highlighted.
+ */
 import type { Component } from 'svelte';
 import {
 	Images,
 	Layers,
 	LayoutDashboard,
-	Megaphone,
 	Menu,
 	Package,
-	Palette,
 	PanelsTopLeft,
+	Palette,
 	PlugZap,
 	Settings,
 	Shapes,
@@ -17,7 +21,8 @@ import {
 	ShoppingCart,
 	Truck,
 	Users,
-	Warehouse
+	Warehouse,
+	Megaphone
 } from '@lucide/svelte';
 
 export type NavId =
@@ -34,7 +39,6 @@ export type NavId =
 	| 'promotions'
 	| 'navigation'
 	| 'brand'
-	| 'store-settings'
 	| 'integrations'
 	| 'users-perms';
 
@@ -80,8 +84,7 @@ export const NAV_SECTIONS: NavSection[] = [
 	{
 		label: 'SYSTEM',
 		items: [
-			{ id: 'brand', label: 'Brand Identity', icon: Palette },
-			{ id: 'store-settings', label: 'Store Settings', icon: Settings },
+			{ id: 'brand', label: 'Brand & Store Settings', icon: Palette },
 			{ id: 'integrations', label: 'Integrations', icon: PlugZap },
 			{ id: 'users-perms', label: 'Users & Permissions', icon: ShieldCheck }
 		]
@@ -102,7 +105,6 @@ export const ROUTE_BY_NAV_ID: Record<NavId, string> = {
 	promotions: '/dashboard/promotions',
 	navigation: '/dashboard/navigation',
 	brand: '/dashboard/brand',
-	'store-settings': '/dashboard/store-settings',
 	integrations: '/dashboard/integrations',
 	'users-perms': '/dashboard/users-perms'
 };
@@ -120,7 +122,6 @@ const KNOWN_SLUGS: Record<string, NavId> = {
 	promotions: 'promotions',
 	navigation: 'navigation',
 	brand: 'brand',
-	'store-settings': 'store-settings',
 	integrations: 'integrations',
 	'users-perms': 'users-perms'
 };

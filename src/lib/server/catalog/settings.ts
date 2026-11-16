@@ -1,9 +1,9 @@
-/* Store settings repository — the brand identity + contact/social/SEO
-   settings live in a single SQLite row so the storefront and the dashboard
-   always read the same values the merchant saved.
+/* Store settings repository — brand identity + contact/social/SEO + navigation
+   live in a single SQLite row so the storefront and the dashboard always
+   read the same values the merchant saved.
 
-   The row is written through a partial merge: the Brand page and the Store
-   Settings page edit disjoint fields and neither can clobber the other. */
+   The row is written through a partial merge (PUT): the dashboard saves a
+   combined patch from the Brand & Store Settings page. */
 
 import { eq, sql } from 'drizzle-orm';
 import { db } from '#lib/server/db/index.ts';
@@ -177,6 +177,9 @@ export function parseSettingsPatch(
 	if (raw.whatsappTemplate !== undefined) {
 		patch.whatsappTemplate = str(raw.whatsappTemplate, current.whatsappTemplate, 1000);
 	}
+	if (raw.whatsappCartTemplate !== undefined) {
+		patch.whatsappCartTemplate = str(raw.whatsappCartTemplate, current.whatsappCartTemplate, 1000);
+	}
 	if (raw.footerText !== undefined) {
 		patch.footerText = str(raw.footerText, current.footerText, 600);
 	}
@@ -258,6 +261,7 @@ function rowToSettings(row: typeof storeSetting.$inferSelect): StoreSettings {
 		},
 		whatsappNumber: row.whatsappNumber || seed.whatsappNumber,
 		whatsappTemplate: row.whatsappTemplate || seed.whatsappTemplate,
+		whatsappCartTemplate: (row as Record<string, unknown>).whatsappCartTemplate as string || seed.whatsappCartTemplate,
 		headerLinks: row.headerLinks?.length ? row.headerLinks : seed.headerLinks,
 		footerText: row.footerText || seed.footerText,
 		social: { ...seed.social, ...(row.social ?? {}) },
@@ -305,6 +309,7 @@ export async function saveSettings(patch: Partial<StoreSettings>): Promise<Store
 		brand: { ...current.brand, ...(patch.brand ?? {}) },
 		whatsappNumber: patch.whatsappNumber ?? current.whatsappNumber,
 		whatsappTemplate: patch.whatsappTemplate ?? current.whatsappTemplate,
+		whatsappCartTemplate: (patch as Partial<StoreSettings>).whatsappCartTemplate ?? (current as StoreSettings).whatsappCartTemplate ?? seed.whatsappCartTemplate,
 		headerLinks: patch.headerLinks ?? current.headerLinks,
 		footerText: patch.footerText ?? current.footerText,
 		social: { ...current.social, ...(patch.social ?? {}) },
@@ -329,6 +334,7 @@ export async function saveSettings(patch: Partial<StoreSettings>): Promise<Store
 			brandFonts: next.brand.fonts,
 			whatsappNumber: next.whatsappNumber,
 			whatsappTemplate: next.whatsappTemplate,
+			whatsappCartTemplate: (next as StoreSettings).whatsappCartTemplate ?? '',
 			footerText: next.footerText,
 			social: next.social,
 			facebookUrl: next.facebookUrl,
@@ -352,6 +358,7 @@ export async function saveSettings(patch: Partial<StoreSettings>): Promise<Store
 				brandFonts: next.brand.fonts,
 				whatsappNumber: next.whatsappNumber,
 				whatsappTemplate: next.whatsappTemplate,
+				whatsappCartTemplate: (next as StoreSettings).whatsappCartTemplate ?? '',
 				footerText: next.footerText,
 				social: next.social,
 				facebookUrl: next.facebookUrl,
@@ -394,6 +401,7 @@ export async function ensureSeeded(): Promise<void> {
 			brandFonts: seed.brand.fonts,
 			whatsappNumber: seed.whatsappNumber,
 			whatsappTemplate: seed.whatsappTemplate,
+			whatsappCartTemplate: seed.whatsappCartTemplate,
 			footerText: seed.footerText,
 			social: seed.social,
 			facebookUrl: seed.facebookUrl,

@@ -65,12 +65,25 @@
 
 {#if !shipment}
 	<Topbar
-		crumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shipping', href: '/dashboard/shipping' }, { label: 'Not found' }]}
+		crumbs={[
+			{ label: 'Dashboard', href: '/dashboard' },
+			{ label: 'Shipping', href: '/dashboard/shipping' },
+			{ label: 'Not found' }
+		]}
 		title="Shipment not found"
 		subtitle="This shipment may have been deleted."
 	/>
-	<div class="mx-auto w-full max-w-[1280px] px-4 py-10 text-center text-[13px] text-muted-foreground">
-		The requested shipment does not exist.
+	<div class="mx-auto w-full max-w-[1280px] px-4 py-16 text-center">
+		<div
+			class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-muted"
+		>
+			<Truck class="h-6 w-6 text-muted-foreground" />
+		</div>
+		<h3 class="text-[14px] font-semibold">Shipment not found</h3>
+		<p class="mt-1 text-[12px] text-muted-foreground">
+			The requested shipment does not exist or may have been removed.
+		</p>
+		<Button href="/dashboard/shipping" class="mt-4 px-4">Back to shipping</Button>
 	</div>
 {:else}
 	<Topbar

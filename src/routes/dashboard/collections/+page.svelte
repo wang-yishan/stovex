@@ -10,7 +10,7 @@
 	import { Textarea } from '#lib/components/ui/textarea/index.ts';
 	import { slugify } from '#lib/admin/data.ts';
 	import type { Collection } from '#lib/admin/types.ts';
-	import { ChevronDown, ChevronUp, PenLine, Plus, Trash2 } from '@lucide/svelte';
+	import { ChevronDown, ChevronUp, Layers, PenLine, Plus, Trash2 } from '@lucide/svelte';
 
 	const isMobile = $derived((innerWidth.current ?? 1024) < 768);
 
@@ -109,7 +109,31 @@
 	</div>
 
 	<div class="overflow-hidden rounded-[12px] border bg-white" style="border-color: var(--border);">
-		{#if !isMobile}
+		{#if sorted.length === 0}
+			<div class="px-6 py-16 text-center">
+				<div
+					class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border bg-muted"
+					style="border-color: var(--border);"
+				>
+					<Layers class="h-6 w-6 text-muted-foreground" />
+				</div>
+				<h3 class="text-[14px] font-semibold">
+					{search ? 'No collections found' : 'No collections yet'}
+				</h3>
+				<p class="mx-auto mt-1 max-w-[320px] text-[12px] text-muted-foreground">
+					{search
+						? 'Try a different search term.'
+						: 'Group products into collections to feature them on the storefront.'}
+				</p>
+				{#if search}
+					<Button variant="outline" class="mt-4 px-4" onclick={() => (search = '')}
+						>Clear search</Button
+					>
+				{:else}
+					<Button class="mt-4 px-5" onclick={startCreate}>Create collection</Button>
+				{/if}
+			</div>
+		{:else if !isMobile}
 			<div class="overflow-x-auto">
 				<table class="w-full text-left">
 					<thead>

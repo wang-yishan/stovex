@@ -44,10 +44,15 @@
 
 	let {
 		product: initial,
-		mode
+		mode,
+		embedded = false,
+		onDraftChange
 	}: {
 		product: Product;
 		mode: 'create' | 'edit';
+		embedded?: boolean;
+		/** Used by the import queue to observe validity and the current draft. */
+		onDraftChange?: (state: { valid: boolean; product: Product }) => void;
 	} = $props();
 
 	const VARIANTS_MAX = 50;
@@ -424,6 +429,14 @@
 		if (images.length === 0) e.images = 'Primary image required to publish';
 		else if (!images.some((i) => i.isPrimary)) e.images = 'Select primary image';
 		return e;
+	});
+
+	// Report draft validity to an embedding container (e.g. import queue slides).
+	$effect(() => {
+		onDraftChange?.({
+			valid: Object.keys(errors).length === 0,
+			product: $state.snapshot(draft) as Product
+		});
 	});
 
 	function backfillSeo() {
@@ -1365,6 +1378,7 @@
 		</div>
 
 		<!-- Publishing rail -->
+		{#if !embedded}
 		<div class="shrink-0 space-y-4 self-start lg:sticky lg:top-[88px] lg:w-[320px]">
 			<div class="rounded-[12px] border bg-white p-4" style="border-color: var(--border);">
 				<h3 class="text-[12px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase">
@@ -1446,6 +1460,7 @@
 				</p>
 			</div>
 		</div>
+		{/if}
 	</div>
 </div>
 

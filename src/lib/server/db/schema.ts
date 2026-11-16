@@ -163,6 +163,39 @@ export const notification = sqliteTable('notification', {
 });
 
 /* ------------------------------------------------------------------ *
+ * WhatsApp orders — captured from the storefront when a customer checks
+ * out via WhatsApp. Each order carries a human code (shared in the WA
+ * message) and stays `pending` until an admin verifies or cancels it.
+ * ------------------------------------------------------------------ */
+
+export const order = sqliteTable('order', {
+	id: text('id').primaryKey(),
+	code: text('code').notNull(),
+	source: text('source').notNull().default('cart'),
+	customerName: text('customer_name').notNull().default(''),
+	customerNote: text('customer_note').notNull().default(''),
+	total: integer('total').notNull().default(0),
+	status: text('status').notNull().default('pending'),
+	message: text('message').notNull().default(''),
+	verifiedAt: text('verified_at'),
+	adminNote: text('admin_note').notNull().default(''),
+	createdAt: text('created_at').notNull(),
+	updatedAt: text('updated_at').notNull()
+});
+
+export const orderItem = sqliteTable('order_item', {
+	id: text('id').primaryKey(),
+	orderId: text('order_id').notNull(),
+	productId: text('product_id').notNull().default(''),
+	productName: text('product_name').notNull().default(''),
+	variant: text('variant'),
+	sku: text('sku').notNull().default(''),
+	quantity: integer('quantity').notNull().default(1),
+	unitPrice: integer('unit_price').notNull().default(0),
+	subtotal: integer('subtotal').notNull().default(0)
+});
+
+/* ------------------------------------------------------------------ *
  * Store settings — the singleton row that carries the brand identity
  * (name, wordmark, colours, fonts) plus the contact/social/SEO fields
  * the storefront reads. One row, id = 'default'.
@@ -188,6 +221,7 @@ export const storeSetting = sqliteTable('store_setting', {
 	/* contact + channels */
 	whatsappNumber: text('whatsapp_number').notNull().default(''),
 	whatsappTemplate: text('whatsapp_template').notNull().default(''),
+	whatsappCartTemplate: text('whatsapp_cart_template').notNull().default(''),
 	footerText: text('footer_text').notNull().default(''),
 	social: text('social', { mode: 'json' })
 		.$type<StoreSettings['social']>()

@@ -180,6 +180,41 @@ export interface AttributeDraft {
 	values: string[];
 }
 
+/* --- WhatsApp orders (monitoring + verification) --- */
+
+export type OrderStatus = 'pending' | 'verified' | 'cancelled';
+export type OrderSource = 'product' | 'cart';
+
+export interface OrderItem {
+	productId: string;
+	productName: string;
+	/** Variant label, e.g. "Black / M". */
+	variant?: string;
+	sku: string;
+	quantity: number;
+	unitPrice: number;
+	subtotal: number;
+}
+
+export interface Order {
+	id: string;
+	/** Human code shared with the customer in WhatsApp, e.g. WA-1116-0042. */
+	code: string;
+	source: OrderSource;
+	customerName: string;
+	customerNote: string;
+	items: OrderItem[];
+	total: number;
+	status: OrderStatus;
+	/** Snapshot of the WhatsApp message sent for this order. */
+	message: string;
+	verifiedAt: string | null;
+	/** Internal admin note (filled on verify/cancel). */
+	adminNote: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
 /* Overview-only seed row types. */
 
 export interface OrderRow {
@@ -343,6 +378,8 @@ export interface StoreSettings {
 	brand: BrandIdentity;
 	whatsappNumber: string;
 	whatsappTemplate: string;
+	/** Message template for cart/checkout WhatsApp. */
+	whatsappCartTemplate: string;
 	headerLinks: { id: string; label: string; href: string }[];
 	footerText: string;
 	social: { instagram: string; facebook: string; tiktok: string };

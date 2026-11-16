@@ -23,6 +23,7 @@ import {
 	categoryApi,
 	collectionApi,
 	notificationApi,
+	orderApi,
 	productApi,
 	settingsApi,
 	shipmentApi
@@ -32,6 +33,8 @@ import type {
 	Category,
 	Collection,
 	MediaItem,
+	Order,
+	OrderStatus,
 	PageStatus,
 	PageVersion,
 	Product,
@@ -68,6 +71,7 @@ class AdminStore {
 	movements = $state<StockMovement[]>(SEED_MOVEMENTS);
 	shipments = $state<Shipment[]>(SEED_SHIPMENTS);
 	notifications = $state<AppNotification[]>([]);
+	orders = $state<Order[]>([]);
 	pages = $state<StorePage[]>(seedPages());
 	pageVersions = $state<PageVersion[]>(seedVersions(seedPages()));
 	media = $state<MediaItem[]>(SEED_MEDIA);
@@ -315,6 +319,11 @@ class AdminStore {
 		this.notifications = data;
 	}
 
+	/** Replace cached orders with what SQLite holds. */
+	hydrateOrders(data: Order[]): void {
+		this.orders = data;
+	}
+
 	async markNotificationRead(id: string): Promise<void> {
 		try {
 			const { notification } = await notificationApi.markRead(id);
@@ -337,6 +346,20 @@ class AdminStore {
 		try {
 			await notificationApi.remove(id);
 			this.notifications = this.notifications.filter((n) => n.id !== id);
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
+	}
+
+	/* --- orders --- */
+
+	async setOrderStatus(id: string, status: OrderStatus, note?: string): Promise<void> {
+		try {
+			const { order } = await orderApi.setStatus(id, status, note);
+			this.orders = this.orders.map((o) => (o.id === id ? order : o));
+			const label =
+				status === 'verified' ? 'Pesanan diverifikasi' : status === 'cancelled' ? 'Pesanan dibatalkan' : 'Status diperbarui';
+			this.showToast(label, status === 'cancelled' ? 'info' : 'success');
 		} catch (cause) {
 			this.showToast(errorMessage(cause), 'error');
 		}

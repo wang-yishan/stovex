@@ -1,15 +1,18 @@
 /* Storefront cart — shared between the landing page and the /catalog routes.
    Lives in a runes module so the basket survives client-side navigation. */
 
-import { admin } from '#lib/admin/state.svelte.ts';
 import { formatIDR } from '#lib/admin/data.ts';
+import { orderApi } from '#lib/admin/api.ts';
+import { cartWaMessage, waTextUrl } from '#lib/catalog/wa.ts';
 import type { Product } from '#lib/admin/types.ts';
 
 export interface CartLine {
 	id: string;
+	productId: string;
 	name: string;
 	price: number;
 	variant?: string;
+	sku?: string;
 }
 
 class CartStore {
@@ -21,9 +24,12 @@ class CartStore {
 	count = $derived(this.lines.length);
 	total = $derived(this.lines.reduce((sum, line) => sum + line.price, 0));
 
-	add(product: Product, price = product.basePrice, variant?: string): void {
+	add(product: Product, price = product.basePrice, variant?: string, sku?: string): void {
 		const id = `${product.id}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-		this.lines = [...this.lines, { id, name: product.name, price, variant }];
+		this.lines = [
+			...this.lines,
+			{ id, productId: product.id, name: product.name, price, variant, sku }
+		];
 		this.recent = [...this.recent, product.id];
 		setTimeout(() => {
 			this.recent = this.recent.filter((pid) => pid !== product.id);
@@ -38,24 +44,58 @@ class CartStore {
 		this.open = !this.open;
 	}
 
-	/** Order the basket through WhatsApp. */
-	checkout(): void {
-		if (this.lines.length === 0) {
-			this.open = false;
-			alert('Keranjang masih kosong. Pilih produk yang kamu suka terlebih dahulu.');
-			return;
-		}
-		const items = this.lines.map(
-			(line, i) =>
-				`${i + 1}. ${line.name}${line.variant ? ` (${line.variant})` : ''} — ${formatIDR(line.price)}`
-		);
-		const message = `Halo ${admin.settings.brand.name}, saya ingin memesan:\n${items.join('\n')}\n\nTotal: ${formatIDR(this.total)}`;
-		const digits = admin.settings.whatsappNumber.replace(/[^0-9]/g, '');
-		window.open(
-			`https://wa.me/${digits}?text=${encodeURIComponent(message)}`,
-			'_blank',
-			'noopener'
-		);
+	itemsText(): string {
+		return this.lines
+			.map(
+				(line, i) =>
+					`${i + 1}. ${line.name}${line.variant ? ` (${line.variant})` : ''} — ${formatIDR(line.price)}`
+			)
+			.join('\n');
+	}
+
+	checkoutMessage(customerName: string, customerNote: string, orderCode: string): string {
+		return cartWaMessage(this.itemsText(), this.total, { customerName, customerNote, orderCode });
+	}
+
+	checkoutUrl(customerName: string, customerNote: string, orderCode: string): string {
+		return waTextUrl(this.checkoutMessage(customerName, customerNote, orderCode));
+	}
+
+	/** Record a pending cart order (fire-and-forget) and clear the basket. */
+	recordCheckout(customerName: string, customerNote: string, orderCode: string): void {
+		if (this.lines.length === 0) return;
+		const snapshot = this.lines.map((line) => ({ ...line }));
+		const total = snapshot.reduce((sum, line) => sum + line.price, 0);
+		const items = snapshot
+			.map(
+				(line, i) =>
+					`${i + 1}. ${line.name}${line.variant ? ` (${line.variant})` : ''} — ${formatIDR(line.price)}`
+			)
+			.join('\n');
+		const message = cartWaMessage(items, total, { customerName, customerNote, orderCode });
+
+		void orderApi
+			.create({
+				code: orderCode,
+				source: 'cart',
+				customerName,
+				customerNote,
+				items: snapshot.map((line) => ({
+					productId: line.productId,
+					productName: line.name,
+					variant: line.variant,
+					sku: line.sku,
+					quantity: 1,
+					unitPrice: line.price
+				})),
+				message
+			})
+			.catch(() => {
+				/* redirect to WhatsApp already happened; recording is best-effort */
+			});
+
+		this.lines = [];
+		this.open = false;
 	}
 }
 

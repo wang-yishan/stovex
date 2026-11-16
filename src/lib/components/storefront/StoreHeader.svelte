@@ -2,9 +2,10 @@
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { cart } from '#lib/catalog/cart.svelte.ts';
 	import { formatIDR } from '#lib/admin/data.ts';
-	import { generalWaLinkWithGreeting } from '#lib/catalog/wa.ts';
+	import { generateOrderCode, generalWaLinkWithGreeting } from '#lib/catalog/wa.ts';
 	import { catalogHref } from '#lib/catalog/links.ts';
 	import BrandWordmark from '#lib/components/storefront/BrandWordmark.svelte';
+	import OrderContactModal from '#lib/components/storefront/OrderContactModal.svelte';
 	import { Menu, MessageCircle, Search, ShoppingBag, Trash2, X } from '@lucide/svelte';
 
 	interface Props {
@@ -18,6 +19,8 @@
 	let { base = '' }: Props = $props();
 
 	let mobileMenuOpen = $state(false);
+	let checkoutOpen = $state(false);
+	let checkoutCode = $state('');
 
 	const ANCHOR_MAP: Record<string, string> = {
 		'#shop': 'koleksi',
@@ -157,7 +160,11 @@
 							<button
 								type="button"
 								class="mt-3 w-full bg-brand-ink px-5 py-3 text-[11px] tracking-[0.12em] text-white uppercase transition hover:bg-brand-accent"
-								onclick={() => cart.checkout()}
+								onclick={() => {
+									cart.open = false;
+									checkoutCode = generateOrderCode();
+									checkoutOpen = true;
+								}}
 							>
 								Pesan via WhatsApp
 							</button>
@@ -183,6 +190,23 @@
 		</nav>
 	{/if}
 </header>
+
+{#if checkoutOpen}
+	<OrderContactModal
+		open={checkoutOpen}
+		orderCode={checkoutCode}
+		title="Checkout pesanan"
+		description="Isi nama dan catatan, lalu pesanan keranjang akan dikirim ke WhatsApp beserta kode pesanan."
+		getHref={(name, note) => cart.checkoutUrl(name, note, checkoutCode)}
+		onProceed={({ name, note }) => {
+			cart.recordCheckout(name, note, checkoutCode);
+			checkoutOpen = false;
+		}}
+		onClose={() => {
+			checkoutOpen = false;
+		}}
+	/>
+{/if}
 
 <style>
 	.nav-link {
