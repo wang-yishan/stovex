@@ -4,10 +4,20 @@
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { NAV_SECTIONS, ROUTE_BY_NAV_ID, navIdFromPath } from '#lib/admin/navSections.ts';
 	import { Button } from '#lib/components/ui/button/index.ts';
-	import { ChevronDown, PanelLeftClose, PanelLeftOpen, ShoppingBag } from '@lucide/svelte';
+	import { LogOut, PanelLeftClose, PanelLeftOpen, ShoppingBag } from '@lucide/svelte';
+	import {
+		profileDisplayName,
+		profileImageUrl,
+		profileInitials,
+		type ProfileUser
+	} from '#lib/admin/user.ts';
 
 	let collapsed = $derived(admin.sidebarCollapsed);
 	let activeId = $derived(navIdFromPath(page.url.pathname));
+	let user = $derived(page.data.user as ProfileUser | null);
+	let displayName = $derived(profileDisplayName(user));
+	let initials = $derived(profileInitials(user));
+	let avatarUrl = $derived(profileImageUrl(user));
 
 	const routeHref = (id: keyof typeof ROUTE_BY_NAV_ID): string => resolvePath(ROUTE_BY_NAV_ID[id]);
 </script>
@@ -130,16 +140,35 @@
 				class="flex items-center gap-2.5 rounded-lg border bg-[#FBFBFA] p-2.5"
 				style="border-color: var(--border);"
 			>
-				<div
-					class="flex h-7 w-7 items-center justify-center rounded-full bg-[#EDEDEB] text-[11px] font-semibold"
+				<a
+					href={resolvePath('/dashboard/profile')}
+					class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#EDEDEB] text-[11px] font-semibold transition-opacity hover:opacity-80"
+					aria-label="Profile"
 				>
-					IK
-				</div>
+					{#if avatarUrl}
+						<img src={avatarUrl} alt="" class="h-7 w-7 rounded-full object-cover" />
+					{:else}
+						{initials}
+					{/if}
+				</a>
 				<div class="min-w-0 flex-1">
-					<div class="truncate text-[12px] font-medium">I. Kim</div>
-					<div class="truncate text-[10px] text-[#5A5A5A]">Owner</div>
+					<a
+						href={resolvePath('/dashboard/profile')}
+						class="block truncate text-[12px] font-medium transition-colors hover:text-foreground hover:underline"
+						>{displayName}</a
+					>
+					<div class="truncate text-[10px] text-[#5A5A5A]">Signed in</div>
 				</div>
-				<ChevronDown class="h-4 w-4 text-[#636363]" />
+				<form method="POST" action="/logout">
+					<button
+						type="submit"
+						class="inline-flex h-7 w-7 items-center justify-center rounded-md text-[#636363] transition-colors hover:bg-muted hover:text-foreground"
+						aria-label="Sign out"
+						title="Sign out"
+					>
+						<LogOut class="h-4 w-4" />
+					</button>
+				</form>
 			</div>
 		</div>
 	{/if}

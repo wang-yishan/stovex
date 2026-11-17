@@ -2,6 +2,60 @@ import * as XLSX from 'xlsx';
 import { emptyProduct, slugify, uid } from '#lib/admin/data.ts';
 import type { Product } from '#lib/admin/types.ts';
 
+/** Column definition for the import template and documentation. */
+export const IMPORT_COLUMNS: { key: string; label: string; required: boolean; note: string }[] = [
+	{ key: 'name', label: 'name', required: true, note: 'Product name (required).' },
+	{
+		key: 'slug',
+		label: 'slug',
+		required: false,
+		note: 'URL slug. Auto-generated from name if left empty.'
+	},
+	{ key: 'basePrice', label: 'basePrice', required: true, note: 'Regular price in IDR (> 0).' },
+	{
+		key: 'compareAtPrice',
+		label: 'compareAtPrice',
+		required: false,
+		note: 'Original/compare-at price in IDR; must be greater than basePrice when set.'
+	},
+	{ key: 'sku', label: 'sku', required: false, note: 'SKU / product code. Must be unique.' },
+	{ key: 'stock', label: 'stock', required: false, note: 'Stock quantity (number).' },
+	{
+		key: 'lowStockThreshold',
+		label: 'lowStockThreshold',
+		required: false,
+		note: 'Low-stock warning threshold (number).'
+	},
+	{
+		key: 'category',
+		label: 'category',
+		required: false,
+		note: 'Category id or name. Can be adjusted on the review slide.'
+	},
+	{ key: 'shortDescription', label: 'shortDescription', required: false, note: 'Short summary.' },
+	{
+		key: 'fullDescription',
+		label: 'fullDescription',
+		required: false,
+		note: 'Full product description.'
+	},
+	{ key: 'material', label: 'material', required: false, note: 'Material / bahan.' },
+	{
+		key: 'featured',
+		label: 'featured',
+		required: false,
+		note: 'Featured flag: true/false, yes/no, 1/0.'
+	},
+	{
+		key: 'trackInventory',
+		label: 'trackInventory',
+		required: false,
+		note: 'Track inventory: true/false, yes/no, 1/0 (defaults to true).'
+	},
+	{ key: 'seoTitle', label: 'seoTitle', required: false, note: 'SEO title.' },
+	{ key: 'seoDescription', label: 'seoDescription', required: false, note: 'SEO description.' }
+];
+
 /** Normalise a header/cell key for matching (case/space/punctuation-insensitive). */
 function normKey(key: string): string {
 	return key
@@ -118,12 +172,98 @@ function asRows(data: unknown): Record<string, unknown>[] {
 export async function parseXlsx(file: File): Promise<Product[]> {
 	const buffer = await file.arrayBuffer();
 	const workbook = XLSX.read(buffer, { type: 'array' });
-	const sheetName = workbook.SheetNames[0];
+	// Prefer the "Products" sheet (template layout) when present.
+	const preferred = workbook.SheetNames.find((n) => n.toLowerCase() === 'products');
+	const sheetName = preferred ?? workbook.SheetNames[0];
 	if (!sheetName) return [rowToProduct({}, 0)];
 	const sheet = workbook.Sheets[sheetName];
 	const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: '' });
 	if (rows.length === 0) return [rowToProduct({}, 0)];
 	return rows.map((r, i) => rowToProduct(r, i));
+}
+
+/** Download a ready-to-fill XLSX template (3 example rows + column guide). */
+export function downloadXlsxTemplate(): void {
+	const headers = IMPORT_COLUMNS.map((c) => c.label);
+	const exampleRows = [
+		{
+			name: 'Everyday Canvas Tote',
+			slug: 'everyday-canvas-tote',
+			basePrice: 890000,
+			compareAtPrice: 1150000,
+			sku: 'ECT-BGE-M',
+			stock: 18,
+			lowStockThreshold: 5,
+			category: 'Tote',
+			shortDescription: 'Lightweight canvas tote for daily essentials.',
+			fullDescription: 'Organic canvas tote with reinforced handles and an interior pocket.',
+			material: 'Organic cotton canvas',
+			featured: 'yes',
+			trackInventory: 'yes',
+			seoTitle: 'Everyday Canvas Tote',
+			seoDescription: 'Shop the Everyday Canvas Tote in organic cotton.'
+		},
+		{
+			name: 'Mini Shoulder Bag Cream',
+			slug: 'mini-shoulder-bag-cream',
+			basePrice: 1240000,
+			compareAtPrice: '',
+			sku: 'MSB-CRM-OS',
+			stock: 3,
+			lowStockThreshold: 5,
+			category: 'Shoulder',
+			shortDescription: 'Compact shoulder bag with a chain strap.',
+			fullDescription: 'Cream textured mini shoulder bag with interior card slots.',
+			material: 'Textured leather',
+			featured: 'no',
+			trackInventory: 'yes',
+			seoTitle: '',
+			seoDescription: ''
+		},
+		{
+			name: 'Crossbody Classic Black',
+			slug: '',
+			basePrice: 950000,
+			compareAtPrice: 1100000,
+			sku: 'CCB-BLK-S',
+			stock: 0,
+			lowStockThreshold: 3,
+			category: 'Crossbody',
+			shortDescription: 'Classic black crossbody for everyday use.',
+			fullDescription: 'Pebbled leather crossbody with adjustable strap and zip closure.',
+			material: 'Pebbled leather',
+			featured: 'no',
+			trackInventory: 'yes',
+			seoTitle: '',
+			seoDescription: ''
+		}
+	];
+
+	const productSheet = XLSX.utils.json_to_sheet(
+		exampleRows.map((row) => {
+			const record: Record<string, unknown> = {};
+			for (const h of headers) record[h] = (row as Record<string, unknown>)[h] ?? '';
+			return record;
+		}),
+		{ header: headers }
+	);
+
+	const guideSheet = XLSX.utils.aoa_to_sheet([
+		['Column', 'Required', 'Notes'],
+		...IMPORT_COLUMNS.map((c) => [c.key, c.required ? 'Required' : 'Optional', c.note]),
+		[],
+		['How to use'],
+		['1. Fill the "Products" sheet. Keep the header row unchanged.'],
+		['2. Each row becomes one product. Replace or add rows as needed (3 examples provided).'],
+		['3. Images are not imported — upload them later via Edit after saving.'],
+		['4. Imported products are saved as drafts. Variants are configured per product in Edit.'],
+		['5. Upload the completed file on the XLSX tab to review and save.']
+	]);
+
+	const workbook = XLSX.utils.book_new();
+	XLSX.utils.book_append_sheet(workbook, productSheet, 'Products');
+	XLSX.utils.book_append_sheet(workbook, guideSheet, 'Info');
+	XLSX.writeFile(workbook, 'product-import-template.xlsx');
 }
 
 /** Parse JSON text (single object or array) into product drafts. */

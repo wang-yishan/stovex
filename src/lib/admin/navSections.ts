@@ -21,8 +21,10 @@ import {
 	ShoppingCart,
 	Truck,
 	Users,
+	User,
 	Warehouse,
-	Megaphone
+	Megaphone,
+	PackageOpen
 } from '@lucide/svelte';
 
 export type NavId =
@@ -30,6 +32,7 @@ export type NavId =
 	| 'products'
 	| 'categories'
 	| 'collections'
+	| 'bundles'
 	| 'inventory'
 	| 'orders'
 	| 'shipping'
@@ -40,7 +43,8 @@ export type NavId =
 	| 'navigation'
 	| 'brand'
 	| 'integrations'
-	| 'users-perms';
+	| 'users-perms'
+	| 'profile';
 
 export interface NavItem {
 	id: NavId;
@@ -55,12 +59,14 @@ export interface NavSection {
 
 export const NAV_SECTIONS: NavSection[] = [
 	{ label: 'GENERAL', items: [{ id: 'overview', label: 'Overview', icon: LayoutDashboard }] },
+	{ label: 'ACCOUNT', items: [{ id: 'profile', label: 'Profile', icon: User }] },
 	{
 		label: 'CATALOG',
 		items: [
 			{ id: 'products', label: 'Products', icon: Package },
 			{ id: 'categories', label: 'Categories', icon: Shapes },
 			{ id: 'collections', label: 'Collections', icon: Layers },
+			{ id: 'bundles', label: 'Product Bundles', icon: PackageOpen },
 			{ id: 'inventory', label: 'Inventory', icon: Warehouse }
 		]
 	},
@@ -96,6 +102,7 @@ export const ROUTE_BY_NAV_ID: Record<NavId, string> = {
 	products: '/dashboard/products',
 	categories: '/dashboard/categories',
 	collections: '/dashboard/collections',
+	bundles: '/dashboard/bundles',
 	inventory: '/dashboard/inventory',
 	orders: '/dashboard/orders',
 	shipping: '/dashboard/shipping',
@@ -106,13 +113,15 @@ export const ROUTE_BY_NAV_ID: Record<NavId, string> = {
 	navigation: '/dashboard/navigation',
 	brand: '/dashboard/brand',
 	integrations: '/dashboard/integrations',
-	'users-perms': '/dashboard/users-perms'
+	'users-perms': '/dashboard/users-perms',
+	profile: '/dashboard/profile'
 };
 
 const KNOWN_SLUGS: Record<string, NavId> = {
 	products: 'products',
 	categories: 'categories',
 	collections: 'collections',
+	bundles: 'bundles',
 	inventory: 'inventory',
 	orders: 'orders',
 	shipping: 'shipping',
@@ -123,7 +132,8 @@ const KNOWN_SLUGS: Record<string, NavId> = {
 	navigation: 'navigation',
 	brand: 'brand',
 	integrations: 'integrations',
-	'users-perms': 'users-perms'
+	'users-perms': 'users-perms',
+	profile: 'profile'
 };
 
 /** Maps an href to a nav id; product detail/edit/new routes keep the `products` prefix

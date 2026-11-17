@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { CircleAlert, CircleCheck, ChevronLeft, ChevronRight, LoaderCircle } from '@lucide/svelte';
@@ -9,7 +10,7 @@
 	import type { Product } from '#lib/admin/types.ts';
 	import { Button } from '#lib/components/ui/button/index.ts';
 
-	let { products: initial }: { products: Product[] } = $props();
+	let { products }: { products: Product[] } = $props();
 
 	type SlideState = {
 		product: Product;
@@ -19,15 +20,18 @@
 		error: string;
 	};
 
-	let slides = $state<SlideState[]>(
-		initial.map((p) => ({
+	function toSlides(items: Product[]): SlideState[] {
+		return items.map((p) => ({
 			product: $state.snapshot(p) as Product,
 			valid: false,
 			done: false,
 			saved: false,
 			error: ''
-		}))
-	);
+		}));
+	}
+
+	// Capture the import batch once; the queue is rebuilt by remounting the component.
+	let slides = $state<SlideState[]>(untrack(() => toSlides(products)));
 
 	let current = $state(0);
 	let saving = $state(false);
@@ -117,31 +121,64 @@
 
 <div class="space-y-4">
 	<!-- Stepper header -->
-	<div class="rounded-[12px] border bg-white p-4" style="border-color: var(--border);">
-		<div class="flex flex-wrap items-center justify-between gap-3">
-			<div>
-				<p class="text-[13px] font-semibold">
-					Product {current + 1} of {slides.length}
-				</p>
-				<p class="mt-0.5 text-[11px] text-[#5A5A5A]">
-					Review each slide, fill missing fields, then mark it Done. All slides must be Done before
-					saving.
-				</p>
+	<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+		<div class="flex flex-col gap-3">
+			<div class="flex flex-wrap items-start justify-between gap-3">
+				<div class="min-w-0">
+					<p class="text-[14px] font-semibold text-[#242424]">
+						Product {current + 1} of {slides.length}
+					</p>
+					<p class="mt-0.5 truncate text-[12px] text-[#5A5A5A]">
+						{currentSlide?.product.name?.trim() || 'Untitled product'}
+					</p>
+				</div>
+				<div class="flex items-center gap-2 text-[12px]">
+					<span
+						class="rounded-full px-2.5 py-1 font-medium {allDone
+							? 'bg-[#E9F7EF] text-[#1A7A52]'
+							: 'bg-[#F5F5F4] text-[#5A5A5A]'}"
+					>
+						{slides.filter((s) => s.done).length}/{slides.length} done
+					</span>
+					{#if currentSlide?.saved}
+						<span class="rounded-full bg-[#E9F7EF] px-2.5 py-1 font-medium text-[#1A7A52]">Saved</span>
+					{:else if currentSlide?.error}
+						<span class="rounded-full bg-[#FFF0F0] px-2.5 py-1 font-medium text-[#A33A37]"
+							>Needs fix</span
+						>
+					{:else if currentSlide?.done}
+						<span class="rounded-full bg-[#E9F7EF] px-2.5 py-1 font-medium text-[#1A7A52]">Done</span>
+					{:else if currentSlide?.valid}
+						<span class="rounded-full bg-[#F5F5F4] px-2.5 py-1 font-medium text-[#242424]"
+							>Ready to mark done</span
+						>
+					{:else}
+						<span class="rounded-full bg-[#F5F5F4] px-2.5 py-1 font-medium text-[#636363]"
+							>Fill required fields</span
+						>
+					{/if}
+				</div>
 			</div>
-			<div class="flex flex-wrap items-center gap-2">
+
+			<p class="text-[12px] text-[#5A5A5A]">
+				Review each product, complete missing fields, then mark it done. You can move between slides
+				with Prev/Next or the stepper below.
+			</p>
+
+			<div class="flex gap-2 overflow-x-auto pb-1">
 				{#each slides as s, i (s.product.id + '-' + i)}
 					<button
 						type="button"
-						class="flex h-7 min-w-7 items-center justify-center rounded-full border px-1.5 text-[11px] font-medium transition {i ===
+						class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-[13px] font-medium transition {i ===
 						current
-							? 'border-[#242424] bg-[#242424] text-white'
+							? 'border-[#242424] bg-[#242424] text-white shadow-sm'
 							: s.saved
 								? 'border-[#269B65] bg-[#E9F7EF] text-[#1A7A52]'
 								: s.error
 									? 'border-[#D9534F] bg-[#FFF0F0] text-[#A33A37]'
 									: s.done
-										? 'border-[#269B65] text-[#1A7A52]'
-										: 'text-[#5A5A5A]'}"
+										? 'border-[#269B65] bg-white text-[#1A7A52]'
+										: 'border-[var(--border)] bg-white text-[#5A5A5A] hover:border-[#242424] hover:text-[#242424]'}"
 						style="border-color: {i === current
 							? '#242424'
 							: s.saved || s.done
@@ -151,11 +188,12 @@
 									: 'var(--border)'};"
 						onclick={() => (current = i)}
 						aria-label={`Go to product ${i + 1}`}
+						aria-current={i === current ? 'step' : undefined}
 					>
 						{#if s.saved || s.done}
-							<CircleCheck class="h-3.5 w-3.5" />
+							<CircleCheck class="h-4 w-4" />
 						{:else if s.error}
-							<CircleAlert class="h-3.5 w-3.5" />
+							<CircleAlert class="h-4 w-4" />
 						{:else}
 							{i + 1}
 						{/if}
@@ -164,37 +202,71 @@
 			</div>
 		</div>
 
-		<div class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t pt-3" style="border-color: var(--border);">
-			<div class="flex items-center gap-2">
-				<Button variant="outline" size="sm" type="button" onclick={prev} disabled={current === 0}>
-					<ChevronLeft class="h-4 w-4" /> Prev
-				</Button>
+		<div
+			class="mt-4 grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-t pt-4"
+			style="border-color: var(--border);"
+		>
+			<div class="flex justify-start">
 				<Button
 					variant="outline"
-					size="sm"
 					type="button"
+					class="h-10 min-w-[112px] justify-center gap-1.5 px-4 text-[13px]"
+					onclick={prev}
+					disabled={current === 0}
+				>
+					<ChevronLeft class="h-4 w-4" /> Prev
+				</Button>
+			</div>
+
+			<div class="flex flex-col items-center justify-center gap-1">
+				<span class="text-[12px] font-medium text-[#242424]">Slide {current + 1} / {slides.length}</span>
+				{#if currentSlide?.valid && !currentSlide?.done}
+					<span class="text-[11px] text-[#1A7A52]">Valid — ready to mark done</span>
+				{:else if currentSlide?.error}
+					<span class="text-[11px] text-[#A33A37]">Fix errors, then try again</span>
+				{/if}
+			</div>
+
+			<div class="flex justify-end">
+				<Button
+					variant="outline"
+					type="button"
+					class="h-10 min-w-[112px] justify-center gap-1.5 px-4 text-[13px]"
 					onclick={next}
 					disabled={current === slides.length - 1}
 				>
 					Next <ChevronRight class="h-4 w-4" />
 				</Button>
 			</div>
+		</div>
+
+		<div class="mt-3 flex flex-wrap items-center justify-between gap-2">
+			<p class="text-[12px] text-[#636363]">
+				{#if allDone}
+					All products are marked done. You can save them as drafts.
+				{:else}
+					Mark this product done when its required fields are valid.
+				{/if}
+			</p>
 			<div class="flex flex-wrap items-center gap-2">
-				<span class="text-[11px] text-[#5A5A5A]">
-					{slides.filter((s) => s.done).length}/{slides.length} done
-				</span>
 				<Button
 					variant={currentSlide?.done ? 'outline' : 'default'}
-					size="sm"
 					type="button"
+					class="h-10 px-4 text-[13px]"
 					disabled={!currentSlide?.valid || saving}
 					onclick={markDone}
 				>
 					<CircleCheck class="h-4 w-4" />
-					{currentSlide?.done ? 'Done' : 'Mark done'}
+					{currentSlide?.done ? 'Marked done' : 'Mark as done'}
 				</Button>
-				<Button variant="default" size="sm" type="button" disabled={!allDone || saving} onclick={saveAll}>
-					{#if saving}<LoaderCircle class="h-4 w-4 animate-spin" /> Saving…{:else}Save all as drafts{/if}
+				<Button
+					variant="default"
+					type="button"
+					class="h-10 px-4 text-[13px]"
+					disabled={!allDone || saving}
+					onclick={saveAll}
+				>
+					{#if saving}<LoaderCircle class="h-4 w-4 animate-spin" /> Saving…{:else}Save all as drafts ({savedCount}/{slides.length}){/if}
 				</Button>
 			</div>
 		</div>
@@ -210,9 +282,6 @@
 					<p class="mt-0.5 text-[11px]">{currentSlide.error}</p>
 				</div>
 			</div>
-		{/if}
-		{#if currentSlide?.valid && !currentSlide?.done}
-			<p class="mt-2 text-[11px] text-[#1A7A52]">This slide is valid — mark it Done when ready.</p>
 		{/if}
 	</div>
 
