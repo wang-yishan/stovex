@@ -244,6 +244,8 @@ export const storeSetting = sqliteTable('store_setting', {
 		.$type<StoreSettings['headerLinks']>()
 		.notNull()
 		.default([] as StoreSettings['headerLinks']),
+	/** Cap on the number of admin accounts (pending + active). */
+	maxAdmins: integer('max_admins').notNull().default(5),
 	updatedAt: text('updated_at').notNull()
 });
 

@@ -1,14 +1,24 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { APIError } from 'better-auth/api';
+import { eq } from 'drizzle-orm';
 import { auth, googleEnabled } from '#lib/server/auth.ts';
+import { db } from '#lib/server/db/index.ts';
+import { user } from '#lib/server/db/auth.schema.ts';
+import { canRegisterAdmin } from '#lib/server/admin-users.ts';
+import { getSettings } from '#lib/server/catalog/settings.ts';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (locals.user && locals.user.emailVerified) {
+	const user = locals.user as
+		{ role?: string; status?: string; emailVerified?: boolean } | undefined;
+
+	// Owner and activated admins go straight to the dashboard.
+	if (user && (user.role === 'owner' || (user.role === 'admin' && user.status === 'active'))) {
 		throw redirect(302, '/dashboard');
 	}
-	if (locals.user && !locals.user.emailVerified) {
-		throw redirect(302, '/verify-email');
+	// A pending admin must wait for owner activation — send them to the login notice.
+	if (user && user.role === 'admin' && user.status !== 'active') {
+		throw redirect(302, '/login?pending=1');
 	}
 	return { googleEnabled };
 };
@@ -24,6 +34,17 @@ export const actions: Actions = {
 		if (!name || !username || !email || !password) {
 			return fail(400, {
 				message: 'All fields are required.',
+				name,
+				username,
+				email
+			});
+		}
+
+		// Admin sign-ups are capped by the owner (store settings → "Max admins").
+		const settings = await getSettings();
+		if (!(await canRegisterAdmin(settings.maxAdmins))) {
+			return fail(400, {
+				message: `Kuota admin sudah penuh (maksimal ${settings.maxAdmins} admin). Hubungi owner.`,
 				name,
 				username,
 				email
@@ -47,7 +68,20 @@ export const actions: Actions = {
 			return fail(500, { message: 'Unexpected error. Please try again.', name, username, email });
 		}
 
-		throw redirect(302, `/verify-email?email=${encodeURIComponent(email)}`);
+		// Belt & braces: the account is an admin pending owner activation
+		// (the defaults already do this — this survives config drift).
+		try {
+			await db
+				.update(user)
+				.set({ role: 'admin', status: 'pending', updatedAt: new Date() })
+				.where(eq(user.email, email.toLowerCase()));
+		} catch (cause) {
+			console.error('[signup] could not mark the account as pending admin:', cause);
+		}
+
+		// No session on sign-up: the admin can sign in, but the dashboard stays
+		// locked until the owner activates the account from the admin list.
+		throw redirect(302, `/login?pending=1&registered=${encodeURIComponent(email)}`);
 	},
 
 	google: async ({ request }) => {

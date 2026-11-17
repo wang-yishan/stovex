@@ -390,4 +390,6 @@ export interface StoreSettings {
 	/** Custom media entries (logo, name, URL) for the footer and other surfaces. */
 	footerMediaLinks: { id: string; logoUrl: string; name: string; url: string }[];
 	defaultSeo: { title: string; description: string; image: string };
+	/** Maximum number of admin accounts (pending + active) allowed to register. */
+	maxAdmins: number;
 }

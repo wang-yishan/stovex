@@ -1,19 +1,22 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { APIError } from 'better-auth/api';
 import { auth, googleEnabled } from '#lib/server/auth.ts';
+import { findUserByIdentifier } from '#lib/server/admin-users.ts';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	if (locals.user && locals.user.emailVerified) {
-		throw redirect(302, url.searchParams.get('next') || '/dashboard');
+	const next = url.searchParams.get('next') || '/dashboard';
+	const user = locals.user as
+		{ role?: string; status?: string; emailVerified?: boolean } | undefined;
+
+	if (user && (user.role === 'owner' || (user.role === 'admin' && user.status === 'active'))) {
+		throw redirect(302, next);
 	}
-	if (locals.user && !locals.user.emailVerified) {
-		throw redirect(302, '/verify-email');
+	if (user && user.role === 'admin' && user.status !== 'active') {
+		// Already signed in but not activated: show the pending notice, don't loop.
+		return { googleEnabled, next, pending: true };
 	}
-	return {
-		googleEnabled,
-		next: url.searchParams.get('next') || '/dashboard'
-	};
+	return { googleEnabled, next, pending: url.searchParams.get('pending') === '1' };
 };
 
 export const actions: Actions = {
@@ -25,6 +28,17 @@ export const actions: Actions = {
 
 		if (!identifier || !password) {
 			return fail(400, { message: 'Email/username and password are required.', identifier });
+		}
+
+		// Pending admins can authenticate, but the dashboard stays locked until
+		// the owner activates them — tell them up front instead of bouncing them.
+		const account = await findUserByIdentifier(identifier);
+		if (account && account.role === 'admin' && account.status !== 'active') {
+			return fail(403, {
+				message:
+					'Akun admin Anda masih menunggu aktivasi. Owner akan mengaktifkan akun ini dari daftar admin.',
+				identifier
+			});
 		}
 
 		try {

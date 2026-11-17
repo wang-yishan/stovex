@@ -35,17 +35,28 @@ async function ensureStoreSettingColumns(): Promise<void> {
 			return;
 		}
 		if (!names.has('facebook_url')) {
-			await database.run(sql`ALTER TABLE store_setting ADD COLUMN facebook_url text NOT NULL DEFAULT ''`);
+			await database.run(
+				sql`ALTER TABLE store_setting ADD COLUMN facebook_url text NOT NULL DEFAULT ''`
+			);
 		}
 		if (!names.has('instagram_url')) {
-			await database.run(sql`ALTER TABLE store_setting ADD COLUMN instagram_url text NOT NULL DEFAULT ''`);
+			await database.run(
+				sql`ALTER TABLE store_setting ADD COLUMN instagram_url text NOT NULL DEFAULT ''`
+			);
 		}
 		if (!names.has('whatsapp_url')) {
-			await database.run(sql`ALTER TABLE store_setting ADD COLUMN whatsapp_url text NOT NULL DEFAULT ''`);
+			await database.run(
+				sql`ALTER TABLE store_setting ADD COLUMN whatsapp_url text NOT NULL DEFAULT ''`
+			);
 		}
 		if (!names.has('footer_media_links')) {
 			await database.run(
 				sql`ALTER TABLE store_setting ADD COLUMN footer_media_links text NOT NULL DEFAULT '[]'`
+			);
+		}
+		if (!names.has('max_admins')) {
+			await database.run(
+				sql`ALTER TABLE store_setting ADD COLUMN max_admins integer NOT NULL DEFAULT 5`
 			);
 		}
 		columnsEnsured = true;
@@ -93,6 +104,14 @@ function str(value: unknown, fallback = '', max = 500): string {
 function phone(value: unknown, fallback: string): string {
 	const digits = typeof value === 'string' ? value.replace(/[^\d]/g, '') : '';
 	return digits ? digits.slice(0, 20) : fallback;
+}
+
+/** The admin cap: a whole number between 1 and 100, defaulting to 5. */
+export const DEFAULT_MAX_ADMINS = 5;
+function clampMaxAdmins(value: unknown): number {
+	const n = typeof value === 'number' ? value : Number.parseInt(String(value ?? ''), 10);
+	if (!Number.isFinite(n)) return DEFAULT_MAX_ADMINS;
+	return Math.min(100, Math.max(1, Math.floor(n)));
 }
 
 /**
@@ -184,6 +203,15 @@ export function parseSettingsPatch(
 		patch.footerText = str(raw.footerText, current.footerText, 600);
 	}
 
+	if (raw.maxAdmins !== undefined) {
+		const n = clampMaxAdmins(raw.maxAdmins);
+		if (String(n) !== String(raw.maxAdmins).trim() && !(typeof raw.maxAdmins === 'number')) {
+			errors.maxAdmins = 'Use a whole number between 1 and 100';
+		} else {
+			patch.maxAdmins = n;
+		}
+	}
+
 	if (raw.social !== undefined) {
 		const social = (raw.social ?? {}) as Record<string, unknown>;
 		patch.social = {
@@ -261,17 +289,20 @@ function rowToSettings(row: typeof storeSetting.$inferSelect): StoreSettings {
 		},
 		whatsappNumber: row.whatsappNumber || seed.whatsappNumber,
 		whatsappTemplate: row.whatsappTemplate || seed.whatsappTemplate,
-		whatsappCartTemplate: (row as Record<string, unknown>).whatsappCartTemplate as string || seed.whatsappCartTemplate,
+		whatsappCartTemplate:
+			((row as Record<string, unknown>).whatsappCartTemplate as string) ||
+			seed.whatsappCartTemplate,
 		headerLinks: row.headerLinks?.length ? row.headerLinks : seed.headerLinks,
 		footerText: row.footerText || seed.footerText,
 		social: { ...seed.social, ...(row.social ?? {}) },
-		facebookUrl: (row as Record<string, unknown>).facebookUrl as string || seed.facebookUrl,
-		instagramUrl: (row as Record<string, unknown>).instagramUrl as string || seed.instagramUrl,
-		whatsappUrl: (row as Record<string, unknown>).whatsappUrl as string || seed.whatsappUrl,
+		facebookUrl: ((row as Record<string, unknown>).facebookUrl as string) || seed.facebookUrl,
+		instagramUrl: ((row as Record<string, unknown>).instagramUrl as string) || seed.instagramUrl,
+		whatsappUrl: ((row as Record<string, unknown>).whatsappUrl as string) || seed.whatsappUrl,
 		footerMediaLinks: Array.isArray((row as Record<string, unknown>).footerMediaLinks)
 			? ((row as Record<string, unknown>).footerMediaLinks as StoreSettings['footerMediaLinks'])
 			: seed.footerMediaLinks,
-		defaultSeo: { ...seed.defaultSeo, ...(row.defaultSeo ?? {}) }
+		defaultSeo: { ...seed.defaultSeo, ...(row.defaultSeo ?? {}) },
+		maxAdmins: clampMaxAdmins((row as Record<string, unknown>).maxAdmins)
 	};
 }
 
@@ -309,7 +340,10 @@ export async function saveSettings(patch: Partial<StoreSettings>): Promise<Store
 		brand: { ...current.brand, ...(patch.brand ?? {}) },
 		whatsappNumber: patch.whatsappNumber ?? current.whatsappNumber,
 		whatsappTemplate: patch.whatsappTemplate ?? current.whatsappTemplate,
-		whatsappCartTemplate: (patch as Partial<StoreSettings>).whatsappCartTemplate ?? (current as StoreSettings).whatsappCartTemplate ?? seed.whatsappCartTemplate,
+		whatsappCartTemplate:
+			(patch as Partial<StoreSettings>).whatsappCartTemplate ??
+			(current as StoreSettings).whatsappCartTemplate ??
+			seed.whatsappCartTemplate,
 		headerLinks: patch.headerLinks ?? current.headerLinks,
 		footerText: patch.footerText ?? current.footerText,
 		social: { ...current.social, ...(patch.social ?? {}) },
@@ -317,7 +351,8 @@ export async function saveSettings(patch: Partial<StoreSettings>): Promise<Store
 		instagramUrl: patch.instagramUrl ?? current.instagramUrl ?? seed.instagramUrl,
 		whatsappUrl: patch.whatsappUrl ?? current.whatsappUrl ?? seed.whatsappUrl,
 		footerMediaLinks: patch.footerMediaLinks ?? current.footerMediaLinks ?? seed.footerMediaLinks,
-		defaultSeo: { ...current.defaultSeo, ...(patch.defaultSeo ?? {}) }
+		defaultSeo: { ...current.defaultSeo, ...(patch.defaultSeo ?? {}) },
+		maxAdmins: patch.maxAdmins ?? current.maxAdmins ?? seed.maxAdmins
 	};
 
 	await db
@@ -343,6 +378,7 @@ export async function saveSettings(patch: Partial<StoreSettings>): Promise<Store
 			footerMediaLinks: next.footerMediaLinks,
 			defaultSeo: next.defaultSeo,
 			headerLinks: next.headerLinks,
+			maxAdmins: next.maxAdmins,
 			updatedAt: new Date().toISOString()
 		})
 		.onConflictDoUpdate({
@@ -367,6 +403,7 @@ export async function saveSettings(patch: Partial<StoreSettings>): Promise<Store
 				footerMediaLinks: next.footerMediaLinks,
 				defaultSeo: next.defaultSeo,
 				headerLinks: next.headerLinks,
+				maxAdmins: next.maxAdmins,
 				updatedAt: new Date().toISOString()
 			}
 		});
@@ -410,6 +447,7 @@ export async function ensureSeeded(): Promise<void> {
 			footerMediaLinks: seed.footerMediaLinks,
 			defaultSeo: seed.defaultSeo,
 			headerLinks: seed.headerLinks,
+			maxAdmins: seed.maxAdmins,
 			updatedAt: new Date().toISOString()
 		})
 		.onConflictDoNothing({ target: storeSetting.id });

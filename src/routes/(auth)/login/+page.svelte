@@ -17,6 +17,15 @@
 		<p class="mt-1 text-[13px] text-[#5A5A5A]">Access your dashboard</p>
 	</div>
 
+	{#if data.pending}
+		<div
+			class="mb-4 rounded-md border border-[#f0d9a8] bg-[#fdf6e7] px-3 py-2 text-[13px] text-[#8A6A24]"
+		>
+			Pendaftaran berhasil — akun admin Anda <strong>menunggu aktivasi owner</strong>. Anda akan
+			bisa masuk ke dashboard setelah owner mengaktifkan akun ini dari daftar admin.
+		</div>
+	{/if}
+
 	{#if form?.message}
 		<div
 			class="mb-4 rounded-md border border-[#f0c2c0] bg-[#fef2f2] px-3 py-2 text-[13px] text-[#A33A37]"

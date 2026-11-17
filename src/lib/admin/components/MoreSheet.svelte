@@ -5,11 +5,25 @@
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { NAV_SECTIONS, ROUTE_BY_NAV_ID, navIdFromPath } from '#lib/admin/navSections.ts';
 	import { Button } from '#lib/components/ui/button/index.ts';
-	import { X } from '@lucide/svelte';
+	import { LogOut, X } from '@lucide/svelte';
 
 	let activeId = $derived(navIdFromPath(page.url.pathname));
 	let footerMode = $derived(
 		activeId.startsWith('products') ? 'Full product spec linked' : 'Monitoring-only mode'
+	);
+	let user = $derived(page.data.user as { role?: string } | null);
+	let isOwner = $derived(user?.role === 'owner');
+
+	/** Owner-only pages: settings, integrations and admin management. */
+	const OWNER_ONLY_NAV: ReadonlySet<string> = new Set(['brand', 'integrations', 'users-perms']);
+	let sections = $derived(
+		(isOwner
+			? NAV_SECTIONS
+			: NAV_SECTIONS.map((section) => ({
+					...section,
+					items: section.items.filter((item) => !OWNER_ONLY_NAV.has(item.id))
+				}))
+		).filter((s) => s.label !== 'GENERAL')
 	);
 
 	const go = (id: keyof typeof ROUTE_BY_NAV_ID): void => {
@@ -50,7 +64,7 @@
 		</div>
 
 		<div class="space-y-5 overflow-y-auto px-3 pb-4">
-			{#each NAV_SECTIONS.filter((s) => s.label !== 'GENERAL') as section (section.label)}
+			{#each sections as section (section.label)}
 				<div>
 					<div
 						class="mb-2 px-3 text-[10px] font-semibold tracking-[0.12em] text-[#636363] uppercase"
@@ -78,6 +92,18 @@
 								{/if}
 							</Button>
 						{/each}
+						{#if section.label === 'ACCOUNT'}
+							<form method="POST" action="/logout" class="w-full">
+								<Button
+									variant="outline"
+									type="submit"
+									class="h-12 w-full justify-start gap-3 rounded-[10px] bg-card px-3 text-[13px] hover:bg-muted"
+								>
+									<LogOut class="h-5 w-5 text-muted-foreground" strokeWidth={1.6} />
+									<span class="flex-1 text-left">Sign out</span>
+								</Button>
+							</form>
+						{/if}
 					</div>
 				</div>
 			{/each}

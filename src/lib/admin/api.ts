@@ -187,6 +187,41 @@ export const settingsApi = {
 		})
 };
 
+/** Admin account management (owner-only). */
+export interface AdminAccountDto {
+	id: string;
+	name: string;
+	email: string;
+	username: string | null;
+	nickname: string | null;
+	image: string | null;
+	role: string;
+	status: string;
+	emailVerified: boolean;
+	createdAt: string | null;
+}
+
+export interface AdminRosterDto {
+	owner: AdminAccountDto | null;
+	admins: AdminAccountDto[];
+	pendingCount: number;
+	activeCount: number;
+	maxAdmins: number;
+	slotsLeft: number;
+}
+
+export const adminUsersApi = {
+	list: () => request<{ roster: AdminRosterDto; maxAdmins: number }>('/api/admin-users'),
+	setStatus: (userId: string, action: 'activate' | 'deactivate') =>
+		request<{ user: AdminAccountDto; roster: AdminRosterDto; maxAdmins: number }>(
+			'/api/admin-users',
+			{
+				method: 'POST',
+				body: JSON.stringify({ userId, action })
+			}
+		)
+};
+
 /** Upload image files to disk; returns the stored URLs. */
 export async function uploadImages(files: File[]): Promise<{ url: string; name: string }[]> {
 	if (files.length === 0) return [];

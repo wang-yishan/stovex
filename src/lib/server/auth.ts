@@ -22,12 +22,16 @@ export const auth = betterAuth({
 		additionalFields: {
 			nickname: { type: 'string', required: false },
 			phone: { type: 'string', required: false },
-			address: { type: 'string', required: false }
+			address: { type: 'string', required: false },
+			role: { type: 'string', required: false, defaultValue: 'admin', input: false },
+			status: { type: 'string', required: false, defaultValue: 'pending', input: false }
 		}
 	},
 	emailAndPassword: {
 		enabled: true,
-		requireEmailVerification: true,
+		requireEmailVerification: false,
+		/** New sign-ups are pending admins — no session until the owner activates them. */
+		autoSignIn: false,
 		password: {
 			hash: hashPassword,
 			verify: verifyPassword
@@ -47,7 +51,7 @@ export const auth = betterAuth({
 	plugins: [
 		username(),
 		emailOTP({
-			sendVerificationOnSignUp: true,
+			sendVerificationOnSignUp: false,
 			overrideDefaultEmailVerification: true,
 			otpLength: 6,
 			expiresIn: 300,

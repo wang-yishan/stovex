@@ -14,10 +14,22 @@
 
 	let collapsed = $derived(admin.sidebarCollapsed);
 	let activeId = $derived(navIdFromPath(page.url.pathname));
-	let user = $derived(page.data.user as ProfileUser | null);
+	let user = $derived(page.data.user as (ProfileUser & { role?: string }) | null);
 	let displayName = $derived(profileDisplayName(user));
 	let initials = $derived(profileInitials(user));
 	let avatarUrl = $derived(profileImageUrl(user));
+	let isOwner = $derived(user?.role === 'owner');
+
+	/** Owner-only pages: settings, integrations and admin management. */
+	const OWNER_ONLY_NAV: ReadonlySet<string> = new Set(['brand', 'integrations', 'users-perms']);
+	let sections = $derived(
+		isOwner
+			? NAV_SECTIONS
+			: NAV_SECTIONS.map((section) => ({
+					...section,
+					items: section.items.filter((item) => !OWNER_ONLY_NAV.has(item.id))
+				})).filter((section) => section.items.length > 0)
+	);
 
 	const routeHref = (id: keyof typeof ROUTE_BY_NAV_ID): string => resolvePath(ROUTE_BY_NAV_ID[id]);
 </script>
@@ -74,7 +86,7 @@
 
 	<!-- nav -->
 	<div class="flex-1 overflow-x-hidden overflow-y-auto py-3">
-		{#each NAV_SECTIONS as section (section.label)}
+		{#each sections as section (section.label)}
 			<div class="mb-5 px-2">
 				{#if !collapsed}
 					<div
