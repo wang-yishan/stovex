@@ -6,11 +6,12 @@
 		Box,
 		ChevronDown,
 		ChevronLeft,
-		ChevronRight,
 		ChevronUp,
 		CircleAlert,
 		CircleCheck,
 		DollarSign,
+		Ellipsis,
+		GripVertical,
 		Image,
 		Info,
 		Layers,
@@ -24,6 +25,7 @@
 	} from '@lucide/svelte';
 	import Modal from '#lib/admin/components/Modal.svelte';
 	import StatusBadge from '#lib/admin/components/StatusBadge.svelte';
+	import SeoSnippetPreview from '#lib/admin/components/SeoSnippetPreview.svelte';
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { uploadImages } from '#lib/admin/api.ts';
 	import {
@@ -35,6 +37,9 @@
 		uid
 	} from '#lib/admin/data.ts';
 	import type { AttributeDraft, Product } from '#lib/admin/types.ts';
+	import { DragDropProvider } from '@dnd-kit-svelte/svelte';
+	import { isSortable, useSortable } from '@dnd-kit-svelte/svelte/sortable';
+	import type { DragEndEvent, DragOverEvent } from '@dnd-kit-svelte/svelte';
 	import { Button } from '#lib/components/ui/button/index.ts';
 	import { Checkbox } from '#lib/components/ui/checkbox/index.ts';
 	import { Input } from '#lib/components/ui/input/index.ts';
@@ -58,9 +63,9 @@
 	const VARIANTS_MAX = 50;
 
 	// Working draft (reactive copy; original stays untouched until save)
-	let draft = $state<Product>($state.snapshot(initial) as Product);
+	let draft = $state<Product>((() => $state.snapshot(initial) as Product)());
 	if (!draft.bannerImages) draft.bannerImages = [];
-	let initialJson = $state(JSON.stringify(initial));
+	let initialJson = $state((() => JSON.stringify($state.snapshot(initial)))());
 	let dirty = $derived(JSON.stringify(draft) !== initialJson);
 	let inventoryTotal = $derived(
 		draft.hasVariants
@@ -73,7 +78,7 @@
 	/* --- Slug: auto-derive until manually unlocked (ref Auto/Edit toggle). The
 	       effective slug is derived so no effect ever writes back into the draft;
 	       it is committed to the draft model at save time. --- */
-	let slugManual = $state(mode === 'edit');
+	let slugManual = $state((() => mode === 'edit')());
 	let slug = $derived(slugManual ? draft.slug : slugify(draft.name));
 	function toggleSlugLock() {
 		if (slugManual) {
@@ -140,20 +145,52 @@
 	function setPrimary(id: string) {
 		draft.images = draft.images.map((i) => ({ ...i, isPrimary: i.id === id }));
 	}
-	function moveImage(id: string, dir: 1 | -1) {
-		const i = draft.images.findIndex((img) => img.id === id);
-		const j = i + dir;
-		if (i < 0 || j < 0 || j >= draft.images.length) return;
-		const next = [...draft.images];
-		const [moved] = next.splice(i, 1);
-		next.splice(j, 0, moved!);
-		draft.images = next;
-	}
 	function removeImage(id: string) {
 		const rest = draft.images.filter((i) => i.id !== id);
 		if (rest.length > 0 && !rest.some((i) => i.isPrimary))
 			rest[0] = { ...rest[0]!, isPrimary: true };
 		draft.images = rest;
+		openImageMenu = null;
+	}
+
+	let openImageMenu = $state<string | null>(null);
+
+	function moveImageToPosition(id: string, position: number) {
+		const from = draft.images.findIndex((img) => img.id === id);
+		if (from < 0) return;
+		const to = Math.min(Math.max(Math.round(position) - 1, 0), draft.images.length - 1);
+		if (from === to) return;
+		const next = [...draft.images];
+		const [moved] = next.splice(from, 1);
+		next.splice(to, 0, moved!);
+		draft.images = next;
+	}
+
+	let imagesDragSnapshot = $state<Product['images'] | null>(null);
+
+	function onImagesDragStart() {
+		openImageMenu = null;
+		imagesDragSnapshot = $state.snapshot(draft.images) as Product['images'];
+	}
+
+	function onImagesDragOver(event: DragOverEvent) {
+		const { source, target } = event.operation;
+		if (!source || !target || source.id === target.id) return;
+		if (!isSortable(source) || !isSortable(target)) return;
+		const from = draft.images.findIndex((img) => img.id === source.id);
+		const to = draft.images.findIndex((img) => img.id === target.id);
+		if (from < 0 || to < 0 || from === to) return;
+		const next = [...draft.images];
+		const [moved] = next.splice(from, 1);
+		next.splice(to, 0, moved!);
+		draft.images = next;
+	}
+
+	function onImagesDragEnd(event: DragEndEvent) {
+		if (event.canceled && imagesDragSnapshot) {
+			draft.images = imagesDragSnapshot;
+		}
+		imagesDragSnapshot = null;
 	}
 
 	/* --- Product banners: detail/explanation images uploaded by seller --- */
@@ -203,19 +240,51 @@
 		}
 	}
 
-	function moveBannerImage(id: string, dir: 1 | -1) {
+	function removeBannerImage(id: string) {
+		draft.bannerImages = (draft.bannerImages ?? []).filter((i) => i.id !== id);
+		openBannerMenu = null;
+	}
+
+	let openBannerMenu = $state<string | null>(null);
+
+	function moveBannerToPosition(id: string, position: number) {
 		const list = draft.bannerImages ?? [];
-		const i = list.findIndex((img) => img.id === id);
-		const j = i + dir;
-		if (i < 0 || j < 0 || j >= list.length) return;
+		const from = list.findIndex((img) => img.id === id);
+		if (from < 0) return;
+		const to = Math.min(Math.max(Math.round(position) - 1, 0), list.length - 1);
+		if (from === to) return;
 		const next = [...list];
-		const [moved] = next.splice(i, 1);
-		next.splice(j, 0, moved!);
+		const [moved] = next.splice(from, 1);
+		next.splice(to, 0, moved!);
 		draft.bannerImages = next;
 	}
 
-	function removeBannerImage(id: string) {
-		draft.bannerImages = (draft.bannerImages ?? []).filter((i) => i.id !== id);
+	let bannersDragSnapshot = $state<Product['bannerImages'] | null>(null);
+
+	function onBannersDragStart() {
+		openBannerMenu = null;
+		bannersDragSnapshot = $state.snapshot(draft.bannerImages ?? []) as Product['bannerImages'];
+	}
+
+	function onBannersDragOver(event: DragOverEvent) {
+		const { source, target } = event.operation;
+		if (!source || !target || source.id === target.id) return;
+		if (!isSortable(source) || !isSortable(target)) return;
+		const list = draft.bannerImages ?? [];
+		const from = list.findIndex((img) => img.id === source.id);
+		const to = list.findIndex((img) => img.id === target.id);
+		if (from < 0 || to < 0 || from === to) return;
+		const next = [...list];
+		const [moved] = next.splice(from, 1);
+		next.splice(to, 0, moved!);
+		draft.bannerImages = next;
+	}
+
+	function onBannersDragEnd(event: DragEndEvent) {
+		if (event.canceled && bannersDragSnapshot) {
+			draft.bannerImages = bannersDragSnapshot;
+		}
+		bannersDragSnapshot = null;
 	}
 
 	/* --- Attribute builder (ref Gy): seeded Color/Size, comma-separated values --- */
@@ -346,7 +415,26 @@
 	}
 
 	/* --- SEO collapsible --- */
-	let seoOpen = $state(false);
+	let seoOpen = $state(
+		(() =>
+			mode === 'edit' ||
+			Boolean(initial.seoTitle?.trim() || initial.seoDescription?.trim()))()
+	);
+
+	let seoPreviewTitle = $derived(
+		draft.seoTitle?.trim() ||
+			(draft.name.trim() ? `${draft.name.trim()} — ${admin.settings.brand.name}` : '') ||
+			'Judul produk'
+	);
+	let seoPreviewUrl = $derived(
+		`${admin.settings.brand.domain}/catalog/${slug || draft.slug || 'your-slug'}`
+	);
+	let seoPreviewDescription = $derived(
+		draft.seoDescription?.trim() ||
+			draft.shortDescription?.trim() ||
+			admin.settings.defaultSeo.description?.trim() ||
+			'Deskripsi singkat produk akan tampil di sini.'
+	);
 
 	/* --- Inline create category / collection --- */
 	let catModal = $state(false);
@@ -653,83 +741,128 @@
 					{#if uploadError}<p class="mt-2 text-[11px] text-[#D9534F]">{uploadError}</p>{/if}
 				</div>
 				{#if draft.images.length > 0}
-					<div class="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-						{#each draft.images as img (img.id)}
-							<div
-								class="relative overflow-hidden rounded-[10px] border bg-[#F5F5F4] {img.isPrimary
-									? 'ring-2 ring-[#242424]'
-									: ''}"
-								style="border-color: {img.isPrimary ? '#242424' : 'var(--border)'};"
-							>
-								<div class="flex aspect-square items-center justify-center text-[10px] font-bold">
-									{#if img.url}
-										<img
-											src={img.url}
-											alt={img.alt ?? draft.name}
-											class="h-full w-full object-cover"
-										/>
-									{:else}
-										IMG
-									{/if}
-								</div>
-								<div class="absolute top-1 left-1 flex gap-1">
-									<Button
-										variant="outline"
-										size="icon-xs"
-										class="flex h-8 w-8 items-center justify-center rounded-full border sm:h-6 sm:w-6 {img.isPrimary
-											? 'border-primary bg-primary text-primary-foreground'
-											: 'bg-card/80'}"
-										onclick={() => setPrimary(img.id)}
-										aria-label={img.isPrimary ? 'Primary image' : 'Set as primary image'}
+					<DragDropProvider
+						onDragStart={onImagesDragStart}
+						onDragOver={onImagesDragOver}
+						onDragEnd={onImagesDragEnd}
+					>
+						<ol class="mt-4 space-y-2">
+							{#each draft.images as img, index (img.id)}
+								{@const sortable = useSortable({ id: img.id, index: () => index })}
+								<li
+									{@attach sortable.ref}
+									class="flex items-center gap-3 rounded-[10px] border p-2 transition {sortable.isDragging
+										.current
+										? 'border-dashed bg-[#FBFBFA] opacity-40'
+										: sortable.isDropTarget.current
+											? 'bg-[#F5F5F4]'
+											: 'bg-white'} {img.isPrimary ? 'ring-1 ring-[#242424]' : ''}"
+									style="border-color: {img.isPrimary ? '#242424' : 'var(--border)'};"
+								>
+									<div
+										{@attach sortable.handleRef}
+										class="flex cursor-grab touch-none items-center text-[#999] active:cursor-grabbing"
+										aria-label="Drag to reorder image"
 									>
-										<Star
-											class="h-4 w-4 sm:h-3 sm:w-3"
-											fill={img.isPrimary ? 'currentColor' : 'none'}
-										/>
-									</Button>
-								</div>
-								<div class="absolute top-1 right-1 flex gap-1">
-									<Button
-										variant="outline"
-										size="icon-xs"
-										class="bg-card/80"
-										type="button"
-										onclick={() => moveImage(img.id, -1)}
-										aria-label="Move image left"
-									>
-										<ChevronLeft class="h-4 w-4 sm:h-3 sm:w-3" />
-									</Button>
-									<Button
-										variant="outline"
-										size="icon-xs"
-										class="bg-card/80"
-										type="button"
-										onclick={() => moveImage(img.id, 1)}
-										aria-label="Move image right"
-									>
-										<ChevronRight class="h-4 w-4 sm:h-3 sm:w-3" />
-									</Button>
-									<Button
-										variant="outline"
-										size="icon-xs"
-										class="bg-card hover:bg-destructive/10!"
-										type="button"
-										onclick={() => removeImage(img.id)}
-										aria-label="Remove image"
-									>
-										<X class="h-4 w-4 sm:h-3 sm:w-3" />
-									</Button>
-								</div>
-								{#if img.isPrimary}
-									<div class="absolute right-1 bottom-1 left-1 text-center">
-										<span class="rounded-full bg-[#242424] px-2 py-0.5 text-[9px] text-white"
-											>Primary</span
-										>
+										<GripVertical class="h-4 w-4" />
 									</div>
-								{/if}
-							</div>
-						{/each}
-					</div>
+									<div
+										class="h-14 w-14 shrink-0 overflow-hidden rounded-[8px] border bg-[#F5F5F4]"
+										style="border-color: var(--border);"
+									>
+										{#if img.url}
+											<img
+												src={img.url}
+												alt={img.alt ?? draft.name}
+												class="h-full w-full object-cover"
+											/>
+										{:else}
+											<div class="flex h-full items-center justify-center text-[10px] font-bold">
+												IMG
+											</div>
+										{/if}
+									</div>
+									<div class="min-w-0 flex-1">
+										<div class="truncate text-[12px] font-medium">
+											{img.alt || `Image ${index + 1}`}
+										</div>
+										<div class="mt-1 flex items-center gap-2 text-[11px] text-[#636363]">
+											<span>Position</span>
+											<input
+												type="number"
+												min="1"
+												max={draft.images.length}
+												class="h-7 w-14 rounded-[6px] border bg-white px-2 text-center text-[11px] text-[#242424]"
+												style="border-color: var(--border);"
+												value={index + 1}
+												aria-label="Nomor urut gambar"
+												onchange={(e) => {
+													const v = Number((e.currentTarget as HTMLInputElement).value);
+													if (Number.isFinite(v)) moveImageToPosition(img.id, v);
+													(e.currentTarget as HTMLInputElement).value = String(
+														draft.images.findIndex((i) => i.id === img.id) + 1
+													);
+												}}
+												onkeydown={(e) => {
+													if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
+												}}
+											/>
+										</div>
+										{#if img.isPrimary}
+											<div class="mt-1">
+												<span class="rounded-full bg-[#242424] px-2 py-0.5 text-[9px] text-white"
+													>Primary</span
+												>
+											</div>
+										{/if}
+									</div>
+									<div class="relative shrink-0">
+										<Button
+											variant="outline"
+											size="icon-sm"
+											type="button"
+											aria-label="More actions"
+											aria-haspopup="menu"
+											aria-expanded={openImageMenu === img.id}
+											onclick={() => (openImageMenu = openImageMenu === img.id ? null : img.id)}
+										>
+											<Ellipsis class="h-4 w-4 text-[#5A5A5A]" />
+										</Button>
+										{#if openImageMenu === img.id}
+											<div
+												class="absolute top-full right-0 z-20 mt-1 min-w-[150px] rounded-[10px] border bg-white p-1 shadow-sm"
+												style="border-color: var(--border);"
+												role="menu"
+											>
+												<button
+													type="button"
+													class="flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[12px] hover:bg-[#F5F5F4]"
+													onclick={() => {
+														setPrimary(img.id);
+														openImageMenu = null;
+													}}
+												>
+													<Star
+														class="h-3.5 w-3.5"
+														fill={img.isPrimary ? 'currentColor' : 'none'}
+													/>
+													{img.isPrimary ? 'Primary' : 'Set as primary'}
+												</button>
+												<button
+													type="button"
+													class="flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[12px] text-[#A33A37] hover:bg-[#FFF0F0]"
+													onclick={() => removeImage(img.id)}
+												>
+													<Trash2 class="h-3.5 w-3.5" />
+													Delete
+												</button>
+											</div>
+										{/if}
+									</div>
+								</li>
+							{/each}
+						</ol>
+					</DragDropProvider>
 				{/if}
 			</div>
 
@@ -777,67 +910,108 @@
 						</p>{/if}
 				</div>
 				{#if (draft.bannerImages?.length ?? 0) > 0}
-					<div class="mt-4 space-y-3">
-						{#each draft.bannerImages ?? [] as img, i (img.id)}
-							<div
-								class="flex items-center gap-3 rounded-[10px] border bg-white p-2"
-								style="border-color: var(--border);"
-							>
-								<div
-									class="h-16 w-24 shrink-0 overflow-hidden rounded-[8px] border bg-[#F5F5F4]"
+					<DragDropProvider
+						onDragStart={onBannersDragStart}
+						onDragOver={onBannersDragOver}
+						onDragEnd={onBannersDragEnd}
+					>
+						<ol class="mt-4 space-y-2">
+							{#each draft.bannerImages ?? [] as img, index (img.id)}
+								{@const sortable = useSortable({ id: img.id, index: () => index })}
+								<li
+									{@attach sortable.ref}
+									class="flex items-center gap-3 rounded-[10px] border p-2 transition {sortable.isDragging
+										.current
+										? 'border-dashed bg-[#FBFBFA] opacity-40'
+										: sortable.isDropTarget.current
+											? 'bg-[#F5F5F4]'
+											: 'bg-white'}"
 									style="border-color: var(--border);"
 								>
-									{#if img.url}
-										<img
-											src={img.url}
-											alt={img.alt ?? `Banner ${i + 1}`}
-											class="h-full w-full object-cover"
-										/>
-									{:else}
-										<div class="flex h-full items-center justify-center text-[10px] font-bold">
-											Banner
-										</div>
-									{/if}
-								</div>
-								<div class="min-w-0 flex-1">
-									<div class="text-[12px] font-medium">Banner {i + 1}</div>
-									<div class="truncate text-[11px] text-[#636363]">
-										{img.alt || 'Penjelasan detail produk'}
+									<div
+										{@attach sortable.handleRef}
+										class="flex cursor-grab touch-none items-center text-[#999] active:cursor-grabbing"
+										aria-label="Drag to reorder banner"
+									>
+										<GripVertical class="h-4 w-4" />
 									</div>
-								</div>
-								<div class="flex shrink-0 items-center gap-1">
-									<Button
-										variant="outline"
-										size="icon-sm"
-										type="button"
-										onclick={() => moveBannerImage(img.id, -1)}
-										aria-label="Pindah banner ke atas"
+									<div
+										class="h-16 w-24 shrink-0 overflow-hidden rounded-[8px] border bg-[#F5F5F4]"
+										style="border-color: var(--border);"
 									>
-										<ChevronUp class="h-3.5 w-3.5 text-[#5A5A5A]" />
-									</Button>
-									<Button
-										variant="outline"
-										size="icon-sm"
-										type="button"
-										onclick={() => moveBannerImage(img.id, 1)}
-										aria-label="Pindah banner ke bawah"
-									>
-										<ChevronDown class="h-3.5 w-3.5 text-[#5A5A5A]" />
-									</Button>
-									<Button
-										variant="outline"
-										size="icon-sm"
-										class="hover:bg-destructive/10!"
-										type="button"
-										onclick={() => removeBannerImage(img.id)}
-										aria-label="Hapus banner"
-									>
-										<Trash2 class="h-3.5 w-3.5 text-[#5A5A5A]" />
-									</Button>
-								</div>
-							</div>
-						{/each}
-					</div>
+										{#if img.url}
+											<img
+												src={img.url}
+												alt={img.alt ?? `Banner ${index + 1}`}
+												class="h-full w-full object-cover"
+											/>
+										{:else}
+											<div class="flex h-full items-center justify-center text-[10px] font-bold">
+												Banner
+											</div>
+										{/if}
+									</div>
+									<div class="min-w-0 flex-1">
+										<div class="truncate text-[12px] font-medium">Banner {index + 1}</div>
+										<div class="truncate text-[11px] text-[#636363]">
+											{img.alt || 'Penjelasan detail produk'}
+										</div>
+										<div class="mt-1 flex items-center gap-2 text-[11px] text-[#636363]">
+											<span>Posisi</span>
+											<input
+												type="number"
+												min="1"
+												max={(draft.bannerImages ?? []).length}
+												class="h-7 w-14 rounded-[6px] border bg-white px-2 text-center text-[11px] text-[#242424]"
+												style="border-color: var(--border);"
+												value={index + 1}
+												aria-label="Nomor urut banner"
+												onchange={(e) => {
+													const v = Number((e.currentTarget as HTMLInputElement).value);
+													if (Number.isFinite(v)) moveBannerToPosition(img.id, v);
+													(e.currentTarget as HTMLInputElement).value = String(
+														(draft.bannerImages ?? []).findIndex((i) => i.id === img.id) + 1
+													);
+												}}
+												onkeydown={(e) => {
+													if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
+												}}
+											/>
+										</div>
+									</div>
+									<div class="relative shrink-0">
+										<Button
+											variant="outline"
+											size="icon-sm"
+											type="button"
+											aria-label="Aksi banner"
+											aria-haspopup="menu"
+											aria-expanded={openBannerMenu === img.id}
+											onclick={() => (openBannerMenu = openBannerMenu === img.id ? null : img.id)}
+										>
+											<Ellipsis class="h-4 w-4 text-[#5A5A5A]" />
+										</Button>
+										{#if openBannerMenu === img.id}
+											<div
+												class="absolute top-full right-0 z-20 mt-1 min-w-[140px] rounded-[10px] border bg-white p-1 shadow-sm"
+												style="border-color: var(--border);"
+												role="menu"
+											>
+												<button
+													type="button"
+													class="flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[12px] text-[#A33A37] hover:bg-[#FFF0F0]"
+													onclick={() => removeBannerImage(img.id)}
+												>
+													<Trash2 class="h-3.5 w-3.5" />
+													Hapus
+												</button>
+											</div>
+										{/if}
+									</div>
+								</li>
+							{/each}
+						</ol>
+					</DragDropProvider>
 				{/if}
 			</div>
 
@@ -1361,17 +1535,11 @@
 								placeholder="155 chars"
 							></Textarea>
 						</div>
-						<div class="rounded-[8px] border bg-[#FBFBFA] p-3" style="border-color: var(--border);">
-							<div class="truncate text-[11px] font-medium text-[#1A0DAB]">
-								{draft.seoTitle || draft.name || 'Your product title'}
-							</div>
-							<div class="truncate text-[10px] text-[#006621]">
-								{admin.settings.brand.domain}/products/{slug || 'your-slug'}
-							</div>
-							<div class="mt-1 line-clamp-2 text-[11px] text-[#545454]">
-								{draft.seoDescription || draft.shortDescription || 'Search preview Google-style'}
-							</div>
-						</div>
+						<SeoSnippetPreview
+							title={seoPreviewTitle}
+							url={seoPreviewUrl}
+							description={seoPreviewDescription}
+						/>
 					</div>
 				{/if}
 			</div>

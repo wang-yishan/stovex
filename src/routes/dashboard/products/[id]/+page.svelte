@@ -3,6 +3,7 @@
 	import StatusBadge from '#lib/admin/components/StatusBadge.svelte';
 	import StockBadge from '#lib/admin/components/StockBadge.svelte';
 	import ConfirmModal from '#lib/admin/components/ConfirmModal.svelte';
+	import SeoSnippetPreview from '#lib/admin/components/SeoSnippetPreview.svelte';
 	import { admin } from '#lib/admin/state.svelte.ts';
 	import { effectiveStock, formatIDR, stockStatus } from '#lib/admin/data.ts';
 	import { resolve } from '$app/paths';
@@ -40,6 +41,23 @@
 	);
 	let currentImage = $derived(
 		product?.images.find((i) => i.id === selectedImage) ?? product?.images[0]
+	);
+
+	let seoPreviewTitle = $derived(
+		product
+			? product.seoTitle?.trim() || `${product.name} — ${admin.settings.brand.name}`
+			: ''
+	);
+	let seoPreviewUrl = $derived(
+		product ? `${admin.settings.brand.domain}/catalog/${product.slug}` : ''
+	);
+	let seoPreviewDescription = $derived(
+		product
+			? product.seoDescription?.trim() ||
+					product.shortDescription?.trim() ||
+					admin.settings.defaultSeo.description?.trim() ||
+					''
+			: ''
 	);
 
 	function fmtDate(iso: string) {
@@ -357,20 +375,45 @@
 					<h3 class="text-[12px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
 						Publishing &amp; SEO
 					</h3>
-					<div class="mt-3 space-y-2 text-[12px]">
+					<div class="mt-3 space-y-3 text-[12px]">
 						<div class="flex justify-between">
 							<span class="text-muted-foreground">Status</span><StatusBadge
 								status={product.status}
 							/>
 						</div>
+
 						<div>
-							<span class="text-[11px] text-muted-foreground">SEO Title</span>
-							<p class="mt-0.5 text-[12px]">{product.seoTitle || '—'}</p>
+							<span class="text-[11px] font-semibold tracking-[0.06em] text-muted-foreground uppercase"
+								>SEO preview</span
+							>
+							<div class="mt-2">
+								<SeoSnippetPreview
+									title={seoPreviewTitle}
+									url={seoPreviewUrl}
+									description={seoPreviewDescription}
+								/>
+							</div>
+							<p class="mt-2 text-[10px] text-muted-foreground">
+								Preview menggunakan SEO title/description jika diisi, dengan fallback ke nama, deskripsi
+								singkat, atau default SEO toko.
+							</p>
 						</div>
-						<div>
-							<span class="text-[11px] text-muted-foreground">SEO Description</span>
-							<p class="mt-0.5 text-[12px]">{product.seoDescription || '—'}</p>
+
+						<div class="space-y-2 border-t border-border pt-3">
+							<div>
+								<span class="text-[11px] text-muted-foreground">SEO Title (tersimpan)</span>
+								<p class="mt-0.5 text-[12px] break-words">{product.seoTitle?.trim() || '—'}</p>
+							</div>
+							<div>
+								<span class="text-[11px] text-muted-foreground">SEO Description (tersimpan)</span>
+								<p class="mt-0.5 text-[12px] break-words">{product.seoDescription?.trim() || '—'}</p>
+							</div>
+							<div>
+								<span class="text-[11px] text-muted-foreground">Slug</span>
+								<p class="mono mt-0.5 text-[11px] break-all">/catalog/{product.slug}</p>
+							</div>
 						</div>
+
 						<div
 							class="flex justify-between border-t border-border pt-2 text-[11px] text-muted-foreground"
 						>
