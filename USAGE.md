@@ -98,7 +98,7 @@ untuk admin/staf yang ingin masuk ke dashboard.
 - **Tambah ke keranjang** — menyimpan produk untuk digabung dengan produk lain.
 - **Tanya produk ini** — membuka WhatsApp dengan pertanyaan yang sudah ditulis otomatis.
 - Informasi: spesifikasi, pengiriman, perawatan, retur & penukaran.
-- **Ulasan pembeli** — hanya bisa dilihat, belum bisa ditulis. ⏳
+- **Ulasan pembeli** — sementara dinonaktifkan dan tidak ditampilkan di toko (fitur disimpan). ⏳
 - **Produk terkait** di bagian bawah.
 
 ## A3. Alur belanja
@@ -140,7 +140,7 @@ untuk admin/staf yang ingin masuk ke dashboard.
   "Pesanan Saya". Cek status pesanan lewat chat WhatsApp. ⏳
 - **Tombol hati (wishlist)** di detail produk saat ini hanya sekedar tanda visual, belum
   menyimpan produk ke daftar favorit. ⏳
-- **Ulasan** yang tampil adalah contoh tampilan, bukan ulasan yang bisa dikirim pembeli. ⏳
+- **Ulasan pembeli** sementara dinonaktifkan di halaman produk; fiturnya tidak dihapus. ⏳
 - Kalau data toko gagal dimuat, akan muncul pesan **"Sebagian data gagal dimuat…"** dengan
   tombol **Coba lagi**.
 
@@ -379,7 +379,7 @@ Email login tidak bisa diubah dari halaman ini (hubungi pendukung aplikasi).
 | Integrations | Daftar penyedia sudah tampil, tapi tombol **Connect** belum berfungsi. |
 | Wishlist pembeli | Tombol hati hanya kosmetik, belum menyimpan favorit. |
 | Akun & riwayat pesanan pembeli | Belum ada. |
-| Ulasan pembeli | Baru bisa dilihat, belum bisa dikirim. |
+| Ulasan pembeli | Sementara dinonaktifkan (disembunyikan), fitur tidak dihapus. |
 | Pembayaran online | Belum ada — pemesanan lewat WhatsApp. |
 | Halaman (Pages) | Bisa diedit, tapi perubahan **belum tersimpan permanen** (hilang setelah reload). 📝 |
 | Overview | Sebagian angka (pesanan/aktivitas) masih data contoh; tombol **Today** belum berfungsi. |

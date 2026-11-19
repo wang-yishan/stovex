@@ -1,6 +1,7 @@
-/* GET /uploads/<file> — serves the files written by the upload endpoint.
-   Files live outside `static/` so they are served by this route in both dev
-   and production builds. */
+/* GET /uploads/<file> — serves legacy files that were saved to the local
+   upload folder before the move to Vercel Blob. New uploads are stored in
+   Vercel Blob and served from its public URL, but this route is kept so any
+   pre-existing /uploads/... URLs still resolve when the file exists locally. */
 
 import { error } from '@sveltejs/kit';
 import { readFile } from 'node:fs/promises';

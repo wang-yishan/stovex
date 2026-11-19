@@ -1,5 +1,5 @@
-/* POST /api/uploads — accepts multipart form data and writes the files to
-   disk. Returns the public URLs the dashboard attaches to a product. */
+/* POST /api/uploads — accepts multipart form data and uploads the files to
+   Vercel Blob. Returns the public URLs the dashboard attaches to a product. */
 
 import { error, json } from '@sveltejs/kit';
 import { MAX_UPLOAD_BYTES, saveUpload } from '#lib/server/catalog/upload.ts';

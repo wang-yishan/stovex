@@ -11,23 +11,23 @@
 
 {#if status === 'active'}
 	<span
-		class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border bg-[#F0FAF6] text-[#1A7A52] border-[#C7EBDB]"
+		class="inline-flex items-center gap-1 rounded-full border border-success/25 bg-success/10 px-2 py-0.5 text-[11px] font-medium text-success-text"
 	>
-		<span class="h-1 w-1 rounded-full bg-[#269B65]"></span>
+		<span class="h-1.5 w-1.5 rounded-full bg-success"></span>
 		Active
 	</span>
 {:else if status === 'draft'}
 	<span
-		class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border bg-[#F5F5F4] text-[#5A5A5A] border-[#EAEAEA]"
+		class="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
 	>
-		<span class="h-1 w-1 rounded-full bg-[#999]"></span>
+		<span class="h-1.5 w-1.5 rounded-full bg-muted-foreground/60"></span>
 		Draft
 	</span>
 {:else}
 	<span
-		class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border bg-[#F5F5F4] text-[#5A5A5A] border-[#EAEAEA]"
+		class="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
 	>
-		<span class="h-1 w-1 rounded-full bg-[#777]"></span>
+		<span class="h-1.5 w-1.5 rounded-full bg-muted-foreground/40"></span>
 		Archived
 	</span>
 {/if}

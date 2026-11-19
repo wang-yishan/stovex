@@ -158,8 +158,81 @@ class AdminStore {
 
 	async deleteProducts(ids: string[]): Promise<void> {
 		try {
-			for (const id of ids) await productApi.remove(id);
-			this.products = this.products.filter((p) => !ids.includes(p.id));
+			const { deleted } = await productApi.bulkDelete(ids);
+			this.products = this.products.filter((p) => !deleted.includes(p.id));
+			this.showToast(`${deleted.length} product${deleted.length === 1 ? '' : 's'} deleted`, 'success');
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
+	}
+
+	/** Create several products in one call; returns the saved rows. */
+	async bulkCreateProducts(products: Product[]): Promise<Product[]> {
+		try {
+			const { products: created } = await productApi.bulkCreate(products);
+			this.products = [...created, ...this.products];
+			this.showToast(`${created.length} product${created.length === 1 ? '' : 's'} added`, 'success');
+			return created;
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+			return [];
+		}
+	}
+
+	/** Partial-update several products in one call; mirrors saved rows into the cache. */
+	async bulkUpdateProducts(updates: Product[]): Promise<void> {
+		try {
+			const { products } = await productApi.bulkUpdate(updates);
+			this.products = this.products.map((p) => products.find((saved) => saved.id === p.id) ?? p);
+			const n = products.length;
+			this.showToast(`${n} product${n === 1 ? '' : 's'} updated`, 'success');
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+		}
+	}
+
+	/** Copy several products into new drafts. */
+	async bulkDuplicateProducts(ids: string[]): Promise<string[]> {
+		try {
+			const { products } = await productApi.bulkDuplicate(ids);
+			this.products = [...products, ...this.products];
+			const n = products.length;
+			this.showToast(`${n} product${n === 1 ? '' : 's'} duplicated`, 'success');
+			return products.map((p) => p.id);
+		} catch (cause) {
+			this.showToast(errorMessage(cause), 'error');
+			return [];
+		}
+	}
+
+	/** Adjust stock on several products/variants; mirrors the movements. */
+	async bulkAdjustStocks(adjustments: AdjustStockInput[]): Promise<void> {
+		try {
+			const { movements } = await productApi.bulkAdjustStock(adjustments);
+			const byProduct = new Map<string, StockMovement[]>();
+			for (const movement of movements) {
+				const list = byProduct.get(movement.productId) ?? [];
+				list.push(movement);
+				byProduct.set(movement.productId, list);
+			}
+			this.products = this.products.map((p) => {
+				const productMovements = byProduct.get(p.id);
+				if (!productMovements) return p;
+				let stock = p.stock;
+				const variantStocks = new Map<string, number>();
+				for (const v of p.variants) variantStocks.set(v.id, v.stock);
+				for (const movement of productMovements) {
+					if (movement.variantId) variantStocks.set(movement.variantId, movement.newStock);
+					else stock = movement.newStock;
+				}
+				return {
+					...p,
+					stock,
+					updatedAt: productMovements[productMovements.length - 1]?.createdAt ?? p.updatedAt,
+					variants: p.variants.map((v) => ({ ...v, stock: variantStocks.get(v.id) ?? v.stock }))
+				};
+			});
+			this.movements = [...movements, ...this.movements];
 		} catch (cause) {
 			this.showToast(errorMessage(cause), 'error');
 		}

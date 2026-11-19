@@ -182,8 +182,10 @@ export async function getCatalog(): Promise<CatalogData> {
 
 type ProductRow = typeof product.$inferInsert;
 
-/** Insert or update a product together with its images and variants. */
-export async function saveProduct(input: Product): Promise<Product> {
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+/** Insert/update/delete a product row inside a transaction. */
+async function writeProduct(tx: Tx, input: Product): Promise<void> {
 	const row: ProductRow = {
 		id: input.id,
 		name: input.name,
@@ -208,66 +210,96 @@ export async function saveProduct(input: Product): Promise<Product> {
 		lowStockThreshold: input.lowStockThreshold
 	};
 
+	await tx.insert(product).values(row).onConflictDoUpdate({ target: product.id, set: row });
+
+	await tx.delete(productImage).where(eq(productImage.productId, input.id));
+	await tx.delete(productBannerImage).where(eq(productBannerImage.productId, input.id));
+	await tx.delete(productVariant).where(eq(productVariant.productId, input.id));
+
+	if (input.images.length > 0) {
+		await tx.insert(productImage).values(
+			input.images.map((image, index) => ({
+				id: image.id,
+				productId: input.id,
+				url: image.url ?? '',
+				isPrimary: image.isPrimary,
+				alt: image.alt ?? null,
+				position: index
+			}))
+		);
+	}
+
+	if (input.bannerImages.length > 0) {
+		await tx.insert(productBannerImage).values(
+			input.bannerImages.map((image, index) => ({
+				id: image.id,
+				productId: input.id,
+				url: image.url ?? '',
+				alt: image.alt ?? null,
+				position: index
+			}))
+		);
+	}
+
+	if (input.variants.length > 0) {
+		await tx.insert(productVariant).values(
+			input.variants.map((variant) => ({
+				id: variant.id,
+				productId: input.id,
+				name: variant.name,
+				attributes: variant.attributes ?? [],
+				sku: variant.sku || null,
+				priceOverride: variant.priceOverride ?? null,
+				stock: variant.stock,
+				available: variant.available,
+				lowThreshold: variant.lowThreshold
+			}))
+		);
+	}
+}
+
+/** Insert or update a product together with its images and variants. */
+export async function saveProduct(input: Product): Promise<Product> {
+	await db.transaction((tx) => writeProduct(tx, input));
+	return input;
+}
+
+/** Insert or update several products in one transaction. */
+export async function saveProducts(inputs: Product[]): Promise<Product[]> {
+	if (inputs.length === 0) return [];
 	await db.transaction(async (tx) => {
-		await tx.insert(product).values(row).onConflictDoUpdate({ target: product.id, set: row });
-
-		await tx.delete(productImage).where(eq(productImage.productId, input.id));
-		await tx.delete(productBannerImage).where(eq(productBannerImage.productId, input.id));
-		await tx.delete(productVariant).where(eq(productVariant.productId, input.id));
-
-		if (input.images.length > 0) {
-			await tx.insert(productImage).values(
-				input.images.map((image, index) => ({
-					id: image.id,
-					productId: input.id,
-					url: image.url ?? '',
-					isPrimary: image.isPrimary,
-					alt: image.alt ?? null,
-					position: index
-				}))
-			);
-		}
-
-		if (input.bannerImages.length > 0) {
-			await tx.insert(productBannerImage).values(
-				input.bannerImages.map((image, index) => ({
-					id: image.id,
-					productId: input.id,
-					url: image.url ?? '',
-					alt: image.alt ?? null,
-					position: index
-				}))
-			);
-		}
-
-		if (input.variants.length > 0) {
-			await tx.insert(productVariant).values(
-				input.variants.map((variant) => ({
-					id: variant.id,
-					productId: input.id,
-					name: variant.name,
-					attributes: variant.attributes ?? [],
-					sku: variant.sku || null,
-					priceOverride: variant.priceOverride ?? null,
-					stock: variant.stock,
-					available: variant.available,
-					lowThreshold: variant.lowThreshold
-				}))
-			);
+		for (const input of inputs) {
+			await writeProduct(tx, input);
 		}
 	});
+	return inputs;
+}
 
-	return input;
+/** Delete a product row and everything hanging off it. */
+async function deleteProductTx(tx: Tx, id: string): Promise<void> {
+	await tx.delete(productImage).where(eq(productImage.productId, id));
+	await tx.delete(productBannerImage).where(eq(productBannerImage.productId, id));
+	await tx.delete(productVariant).where(eq(productVariant.productId, id));
+	await tx.delete(product).where(eq(product.id, id));
 }
 
 /** Remove a product and everything hanging off it. */
 export async function deleteProduct(id: string): Promise<void> {
-	await db.transaction(async (tx) => {
-		await tx.delete(productImage).where(eq(productImage.productId, id));
-		await tx.delete(productBannerImage).where(eq(productBannerImage.productId, id));
-		await tx.delete(productVariant).where(eq(productVariant.productId, id));
-		await tx.delete(product).where(eq(product.id, id));
-	});
+	await db.transaction((tx) => deleteProductTx(tx, id));
+}
+
+/** Delete several products in one transaction; returns the ids that existed. */
+export async function deleteProducts(ids: string[]): Promise<string[]> {
+	const catalog = await getCatalog();
+	const existing = catalog.products.filter((p) => ids.includes(p.id)).map((p) => p.id);
+	if (existing.length > 0) {
+		await db.transaction(async (tx) => {
+			for (const id of existing) {
+				await deleteProductTx(tx, id);
+			}
+		});
+	}
+	return existing;
 }
 
 /** Copy a product (and its images/variants) into a new draft. */
@@ -300,6 +332,16 @@ export async function duplicateProduct(id: string): Promise<Product | null> {
 
 	await saveProduct(copy);
 	return copy;
+}
+
+/** Copy several products into new drafts. */
+export async function duplicateProducts(ids: string[]): Promise<Product[]> {
+	const copies: Product[] = [];
+	for (const id of ids) {
+		const copy = await duplicateProduct(id);
+		if (copy) copies.push(copy);
+	}
+	return copies;
 }
 
 /** Bulk status change (publish / archive). */
@@ -368,6 +410,19 @@ export async function adjustStock(input: AdjustStockInput): Promise<StockMovemen
 	});
 
 	return movement;
+}
+
+/**
+ * Adjust stock on several products/variants; unknown products are skipped.
+ * Every change leaves a traceable movement record.
+ */
+export async function adjustStocks(adjustments: AdjustStockInput[]): Promise<StockMovement[]> {
+	const movements: StockMovement[] = [];
+	for (const adjustment of adjustments) {
+		const movement = await adjustStock(adjustment);
+		if (movement) movements.push(movement);
+	}
+	return movements;
 }
 
 /* --------------------------- categories/collections --------------------------- */

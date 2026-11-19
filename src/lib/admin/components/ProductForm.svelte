@@ -88,7 +88,7 @@
 		slugManual = !slugManual;
 	}
 
-	/* --- Media: multi-file upload (saved to disk), primary flag, reorder --- */
+	/* --- Media: multi-file upload (saved to Vercel Blob), primary flag, reorder --- */
 	let uploadError = $state('');
 	let uploading = $state(false);
 	let fileInput = $state<HTMLInputElement | null>(null);
@@ -118,7 +118,7 @@
 		uploading = true;
 		uploadError = '';
 		try {
-			// The bytes are written to disk by /api/uploads and served from /uploads.
+			// The files are uploaded to Vercel Blob by /api/uploads.
 			const saved = await uploadImages(ok);
 			const added = saved.map((file, i) => ({
 				id: uid('img'),
@@ -131,7 +131,7 @@
 				images[0] = { ...images[0]!, isPrimary: true };
 			draft.images = images;
 			admin.showToast(
-				`${saved.length} image${saved.length > 1 ? 's' : ''} saved to disk`,
+				`${saved.length} image${saved.length > 1 ? 's' : ''} uploaded`,
 				'success'
 			);
 		} catch (cause) {
@@ -229,7 +229,7 @@
 			}));
 			draft.bannerImages = [...(draft.bannerImages ?? []), ...added];
 			admin.showToast(
-				`${saved.length} banner${saved.length > 1 ? 's' : ''} saved to disk`,
+				`${saved.length} banner${saved.length > 1 ? 's' : ''} uploaded`,
 				'success'
 			);
 		} catch (cause) {
@@ -604,8 +604,7 @@
 	<div class="mb-4 flex items-center gap-2">
 		<a
 			href={resolve('/dashboard/products')}
-			class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-white transition hover:border-[#242424]"
-			style="border-color: var(--border);"
+			class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-white transition hover:border-foreground"
 			aria-label="Back to products"
 		>
 			<ChevronLeft class="h-5 w-5" />
@@ -619,13 +618,13 @@
 		<!-- Main column -->
 		<div class="min-w-0 flex-1 space-y-4">
 			<!-- Basic Info -->
-			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+			<div class="rounded-[12px] border border-border bg-card p-4 md:p-5">
 				<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold">
 					<Info class="h-4 w-4 shrink-0" />Basic Info
 				</h3>
 				<div class="space-y-3">
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 							>Name *</span
 						>
 						<Input
@@ -634,12 +633,12 @@
 							bind:value={draft.name}
 							placeholder="Everyday Canvas Tote"
 						/>
-						{#if errors.name}<p class="mt-1 text-[11px] text-[#D9534F]">{errors.name}</p>{/if}
+						{#if errors.name}<p class="mt-1 text-[11px] text-destructive">{errors.name}</p>{/if}
 					</div>
 					<div class="grid grid-cols-1 gap-3 md:grid-cols-2">
 						<div>
 							<span
-								class="flex items-center gap-1 text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+								class="flex items-center gap-1 text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 								>Slug *
 								<Button
 									variant="link"
@@ -659,11 +658,11 @@
 									draft.slug = slugify((e.currentTarget as HTMLInputElement).value);
 								}}
 							/>
-							{#if errors.slug}<p class="mt-1 text-[11px] text-[#D9534F]">{errors.slug}</p>{/if}
+							{#if errors.slug}<p class="mt-1 text-[11px] text-destructive">{errors.slug}</p>{/if}
 						</div>
 						<div>
 							<span
-								class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+								class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 								>SKU (unique)</span
 							>
 							<Input
@@ -673,11 +672,11 @@
 								bind:value={draft.sku}
 								placeholder="ECT-BGE-M"
 							/>
-							{#if errors.sku}<p class="mt-1 text-[11px] text-[#D9534F]">{errors.sku}</p>{/if}
+							{#if errors.sku}<p class="mt-1 text-[11px] text-destructive">{errors.sku}</p>{/if}
 						</div>
 					</div>
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 							>Short Description</span
 						>
 						<Textarea
@@ -688,7 +687,7 @@
 						></Textarea>
 					</div>
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 							>Full Description</span
 						>
 						<Textarea
@@ -699,7 +698,7 @@
 						></Textarea>
 					</div>
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 							>Material / Bahan</span
 						>
 						<Input class="mt-1" bind:value={draft.material} placeholder="Organic cotton canvas" />
@@ -708,13 +707,12 @@
 			</div>
 
 			<!-- Media -->
-			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+			<div class="rounded-[12px] border border-border bg-card p-4 md:p-5">
 				<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold">
 					<Image class="h-4 w-4 shrink-0" />Media — upload, reorder, primary
 				</h3>
 				<div
-					class="rounded-[10px] border border-dashed bg-[#FBFBFA] p-4 text-center"
-					style="border-color: var(--border);"
+					class="rounded-[10px] border border-dashed border-border bg-field p-4 text-center"
 				>
 					<input
 						type="file"
@@ -727,18 +725,18 @@
 					<Button variant="outline" size="default" type="button" onclick={() => fileInput?.click()}>
 						<Upload class="h-4 w-4 shrink-0" />Upload images
 					</Button>
-					<p class="mt-2 text-[11px] text-[#636363]">
-						jpg/png/webp max 5MB • Files are saved to disk • Primary required for publish
+					<p class="mt-2 text-[11px] text-muted-foreground">
+						jpg/png/webp max 5MB • Files are uploaded to Vercel Blob • Primary required for publish
 					</p>
 					{#if uploading}
-						<div class="mt-3 flex items-center gap-2 text-[11px] text-[#5A5A5A]">
+						<div class="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
 							<span
-								class="h-3 w-3 animate-spin rounded-full border-2 border-[#EAEAEA] border-t-[#242424]"
+								class="h-3 w-3 animate-spin rounded-full border-2 border-border border-t-foreground"
 							></span>
 							Saving files…
 						</div>
 					{/if}
-					{#if uploadError}<p class="mt-2 text-[11px] text-[#D9534F]">{uploadError}</p>{/if}
+					{#if uploadError}<p class="mt-2 text-[11px] text-destructive">{uploadError}</p>{/if}
 				</div>
 				{#if draft.images.length > 0}
 					<DragDropProvider
@@ -751,24 +749,23 @@
 								{@const sortable = useSortable({ id: img.id, index: () => index })}
 								<li
 									{@attach sortable.ref}
-									class="flex items-center gap-3 rounded-[10px] border p-2 transition {sortable.isDragging
+									class="flex items-center gap-3 rounded-[10px] border border-border p-2 transition {sortable.isDragging
 										.current
-										? 'border-dashed bg-[#FBFBFA] opacity-40'
+										? 'border-dashed border-border bg-field opacity-40'
 										: sortable.isDropTarget.current
-											? 'bg-[#F5F5F4]'
-											: 'bg-white'} {img.isPrimary ? 'ring-1 ring-[#242424]' : ''}"
-									style="border-color: {img.isPrimary ? '#242424' : 'var(--border)'};"
+											? 'bg-muted'
+											: 'bg-card'} {img.isPrimary ? 'ring-1 ring-primary' : ''}"
+									style={img.isPrimary ? "border-color: var(--primary);" : "border-color: var(--border);"}
 								>
 									<div
 										{@attach sortable.handleRef}
-										class="flex cursor-grab touch-none items-center text-[#999] active:cursor-grabbing"
+										class="flex cursor-grab touch-none items-center text-muted-foreground active:cursor-grabbing"
 										aria-label="Drag to reorder image"
 									>
 										<GripVertical class="h-4 w-4" />
 									</div>
 									<div
-										class="h-14 w-14 shrink-0 overflow-hidden rounded-[8px] border bg-[#F5F5F4]"
-										style="border-color: var(--border);"
+										class="h-14 w-14 shrink-0 overflow-hidden rounded-[8px] border bg-muted"
 									>
 										{#if img.url}
 											<img
@@ -786,14 +783,13 @@
 										<div class="truncate text-[12px] font-medium">
 											{img.alt || `Image ${index + 1}`}
 										</div>
-										<div class="mt-1 flex items-center gap-2 text-[11px] text-[#636363]">
+										<div class="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
 											<span>Position</span>
 											<input
 												type="number"
 												min="1"
 												max={draft.images.length}
-												class="h-7 w-14 rounded-[6px] border bg-white px-2 text-center text-[11px] text-[#242424]"
-												style="border-color: var(--border);"
+												class="h-7 w-14 rounded-[6px] border border-border bg-card px-2 text-center text-[11px] text-foreground"
 												value={index + 1}
 												aria-label="Nomor urut gambar"
 												onchange={(e) => {
@@ -810,7 +806,7 @@
 										</div>
 										{#if img.isPrimary}
 											<div class="mt-1">
-												<span class="rounded-full bg-[#242424] px-2 py-0.5 text-[9px] text-white"
+												<span class="rounded-full bg-primary px-2 py-0.5 text-[9px] text-primary-foreground"
 													>Primary</span
 												>
 											</div>
@@ -826,17 +822,16 @@
 											aria-expanded={openImageMenu === img.id}
 											onclick={() => (openImageMenu = openImageMenu === img.id ? null : img.id)}
 										>
-											<Ellipsis class="h-4 w-4 text-[#5A5A5A]" />
+											<Ellipsis class="h-4 w-4 text-muted-foreground" />
 										</Button>
 										{#if openImageMenu === img.id}
 											<div
 												class="absolute top-full right-0 z-20 mt-1 min-w-[150px] rounded-[10px] border bg-white p-1 shadow-sm"
-												style="border-color: var(--border);"
 												role="menu"
 											>
 												<button
 													type="button"
-													class="flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[12px] hover:bg-[#F5F5F4]"
+													class="flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[12px] hover:bg-muted"
 													onclick={() => {
 														setPrimary(img.id);
 														openImageMenu = null;
@@ -850,7 +845,7 @@
 												</button>
 												<button
 													type="button"
-													class="flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[12px] text-[#A33A37] hover:bg-[#FFF0F0]"
+													class="flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[12px] text-destructive hover:bg-destructive/10"
 													onclick={() => removeImage(img.id)}
 												>
 													<Trash2 class="h-3.5 w-3.5" />
@@ -867,16 +862,15 @@
 			</div>
 
 			<!-- Product banners -->
-			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+			<div class="rounded-[12px] border border-border bg-card p-4 md:p-5">
 				<h3 class="mb-1 flex items-center gap-2 text-[13px] font-semibold">
 					<Image class="h-4 w-4 shrink-0" />Banner Produk
 				</h3>
-				<p class="mb-3 text-[11px] text-[#636363]">
+				<p class="mb-3 text-[11px] text-muted-foreground">
 					Gambar banner/detail produk untuk penjelasan produk. Upload, atur urutan, atau hapus.
 				</p>
 				<div
-					class="rounded-[10px] border border-dashed bg-[#FBFBFA] p-4 text-center"
-					style="border-color: var(--border);"
+					class="rounded-[10px] border border-dashed border-border bg-field p-4 text-center"
 				>
 					<input
 						type="file"
@@ -894,18 +888,18 @@
 					>
 						<Upload class="h-4 w-4 shrink-0" />Upload banner
 					</Button>
-					<p class="mt-2 text-[11px] text-[#636363]">
-						jpg/png/webp max 5MB • Disimpan ke disk • Ditampilkan sebagai detail produk
+					<p class="mt-2 text-[11px] text-muted-foreground">
+						jpg/png/webp max 5MB • Diunggah ke Vercel Blob • Ditampilkan sebagai detail produk
 					</p>
 					{#if bannerUploading}
-						<div class="mt-3 flex items-center gap-2 text-[11px] text-[#5A5A5A]">
+						<div class="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
 							<span
-								class="h-3 w-3 animate-spin rounded-full border-2 border-[#EAEAEA] border-t-[#242424]"
+								class="h-3 w-3 animate-spin rounded-full border-2 border-border border-t-foreground"
 							></span>
 							Menyimpan banner…
 						</div>
 					{/if}
-					{#if bannerUploadError}<p class="mt-2 text-[11px] text-[#D9534F]">
+					{#if bannerUploadError}<p class="mt-2 text-[11px] text-destructive">
 							{bannerUploadError}
 						</p>{/if}
 				</div>
@@ -920,24 +914,22 @@
 								{@const sortable = useSortable({ id: img.id, index: () => index })}
 								<li
 									{@attach sortable.ref}
-									class="flex items-center gap-3 rounded-[10px] border p-2 transition {sortable.isDragging
+									class="flex items-center gap-3 rounded-[10px] border border-border p-2 transition {sortable.isDragging
 										.current
-										? 'border-dashed bg-[#FBFBFA] opacity-40'
+										? 'border-dashed border-border bg-field opacity-40'
 										: sortable.isDropTarget.current
-											? 'bg-[#F5F5F4]'
-											: 'bg-white'}"
-									style="border-color: var(--border);"
+											? 'bg-muted'
+											: 'bg-card'}"
 								>
 									<div
 										{@attach sortable.handleRef}
-										class="flex cursor-grab touch-none items-center text-[#999] active:cursor-grabbing"
+										class="flex cursor-grab touch-none items-center text-muted-foreground active:cursor-grabbing"
 										aria-label="Drag to reorder banner"
 									>
 										<GripVertical class="h-4 w-4" />
 									</div>
 									<div
-										class="h-16 w-24 shrink-0 overflow-hidden rounded-[8px] border bg-[#F5F5F4]"
-										style="border-color: var(--border);"
+										class="h-16 w-24 shrink-0 overflow-hidden rounded-[8px] border bg-muted"
 									>
 										{#if img.url}
 											<img
@@ -953,17 +945,16 @@
 									</div>
 									<div class="min-w-0 flex-1">
 										<div class="truncate text-[12px] font-medium">Banner {index + 1}</div>
-										<div class="truncate text-[11px] text-[#636363]">
+										<div class="truncate text-[11px] text-muted-foreground">
 											{img.alt || 'Penjelasan detail produk'}
 										</div>
-										<div class="mt-1 flex items-center gap-2 text-[11px] text-[#636363]">
+										<div class="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
 											<span>Posisi</span>
 											<input
 												type="number"
 												min="1"
 												max={(draft.bannerImages ?? []).length}
-												class="h-7 w-14 rounded-[6px] border bg-white px-2 text-center text-[11px] text-[#242424]"
-												style="border-color: var(--border);"
+												class="h-7 w-14 rounded-[6px] border border-border bg-card px-2 text-center text-[11px] text-foreground"
 												value={index + 1}
 												aria-label="Nomor urut banner"
 												onchange={(e) => {
@@ -989,17 +980,16 @@
 											aria-expanded={openBannerMenu === img.id}
 											onclick={() => (openBannerMenu = openBannerMenu === img.id ? null : img.id)}
 										>
-											<Ellipsis class="h-4 w-4 text-[#5A5A5A]" />
+											<Ellipsis class="h-4 w-4 text-muted-foreground" />
 										</Button>
 										{#if openBannerMenu === img.id}
 											<div
 												class="absolute top-full right-0 z-20 mt-1 min-w-[140px] rounded-[10px] border bg-white p-1 shadow-sm"
-												style="border-color: var(--border);"
 												role="menu"
 											>
 												<button
 													type="button"
-													class="flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[12px] text-[#A33A37] hover:bg-[#FFF0F0]"
+													class="flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[12px] text-destructive hover:bg-destructive/10"
 													onclick={() => removeBannerImage(img.id)}
 												>
 													<Trash2 class="h-3.5 w-3.5" />
@@ -1016,13 +1006,13 @@
 			</div>
 
 			<!-- Pricing IDR -->
-			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+			<div class="rounded-[12px] border border-border bg-card p-4 md:p-5">
 				<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold">
 					<DollarSign class="h-4 w-4 shrink-0" />Pricing — IDR
 				</h3>
 				<div class="grid grid-cols-1 gap-3 md:grid-cols-2">
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 							>Regular Price *</span
 						>
 						<Input
@@ -1037,13 +1027,13 @@
 									Number((e.currentTarget as HTMLInputElement).value) || 0
 								))}
 						/>
-						<div class="mt-1 text-[11px] text-[#5A5A5A]">{formatIDR(draft.basePrice)}</div>
-						{#if errors.basePrice}<p class="mt-1 text-[11px] text-[#D9534F]">
+						<div class="mt-1 text-[11px] text-muted-foreground">{formatIDR(draft.basePrice)}</div>
+						{#if errors.basePrice}<p class="mt-1 text-[11px] text-destructive">
 								{errors.basePrice}
 							</p>{/if}
 					</div>
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 							>Compare-at (optional, &gt; regular)</span
 						>
 						<Input
@@ -1060,11 +1050,11 @@
 							}}
 						/>
 						{#if draft.compareAtPrice !== undefined}
-							<div class="mt-1 text-[11px] text-[#5A5A5A] line-through">
+							<div class="mt-1 text-[11px] text-muted-foreground line-through">
 								{formatIDR(draft.compareAtPrice)}
 							</div>
 						{/if}
-						{#if errors.compareAtPrice}<p class="mt-1 text-[11px] text-[#D9534F]">
+						{#if errors.compareAtPrice}<p class="mt-1 text-[11px] text-destructive">
 								{errors.compareAtPrice}
 							</p>{/if}
 					</div>
@@ -1072,7 +1062,7 @@
 			</div>
 
 			<!-- Inventory -->
-			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+			<div class="rounded-[12px] border border-border bg-card p-4 md:p-5">
 				<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold">
 					<Box class="h-4 w-4 shrink-0" />Inventory
 				</h3>
@@ -1080,14 +1070,14 @@
 					<span class="text-[12px] font-medium">Track inventory</span>
 					<Switch bind:checked={draft.trackInventory} aria-label="Track inventory" />
 					{#if !draft.trackInventory}
-						<span class="text-[11px] text-[#5A5A5A]"
+						<span class="text-[11px] text-muted-foreground"
 							>Stock not tracked — hide misleading quantities</span
 						>
 					{/if}
 				</div>
 				<div class="grid grid-cols-2 gap-3">
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 							>Stock quantity</span
 						>
 						<Input
@@ -1104,14 +1094,14 @@
 								))}
 						/>
 						{#if draft.hasVariants}
-							<p class="mt-1 text-[10px] text-[#5A5A5A]">
+							<p class="mt-1 text-[10px] text-muted-foreground">
 								Sum of variants used when variants enabled
 							</p>
 						{/if}
-						{#if errors.stock}<p class="mt-1 text-[11px] text-[#D9534F]">{errors.stock}</p>{/if}
+						{#if errors.stock}<p class="mt-1 text-[11px] text-destructive">{errors.stock}</p>{/if}
 					</div>
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 							>Low-stock threshold</span
 						>
 						<Input
@@ -1124,7 +1114,7 @@
 								(draft.lowStockThreshold =
 									Number((e.currentTarget as HTMLInputElement).value) || 0)}
 						/>
-						{#if errors.lowStockThreshold}<p class="mt-1 text-[11px] text-[#D9534F]">
+						{#if errors.lowStockThreshold}<p class="mt-1 text-[11px] text-destructive">
 								{errors.lowStockThreshold}
 							</p>{/if}
 					</div>
@@ -1132,7 +1122,7 @@
 			</div>
 
 			<!-- Variants -->
-			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+			<div class="rounded-[12px] border border-border bg-card p-4 md:p-5">
 				<div class="mb-3 flex items-center justify-between">
 					<h3 class="flex items-center gap-2 text-[13px] font-semibold">
 						<Layers class="h-4 w-4 shrink-0" />Variants
@@ -1150,24 +1140,22 @@
 				{#if draft.hasVariants}
 					<div class="space-y-4">
 						<div
-							class="rounded-[10px] border bg-[#FBFBFA] p-3"
-							style="border-color: var(--border);"
+							class="rounded-[10px] border bg-field p-3"
 						>
-							<p class="mb-2 text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase">
+							<p class="mb-2 text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
 								Attribute builder (Color/Size)
 							</p>
 							<div class="space-y-3">
 								{#each attrs as a (a.id)}
 									<div
 										class="rounded-[8px] border bg-white p-3"
-										style="border-color: var(--border);"
 									>
 										<div class="flex items-start gap-2">
 											<div class="min-w-0 flex-1 space-y-3">
 												<div>
 													<label
 														for="attr-name-{a.id}"
-														class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+														class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 														>Attribute label</label
 													>
 													<Input
@@ -1185,19 +1173,17 @@
 												<div>
 													<label
 														for="attr-values-{a.id}"
-														class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+														class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 														>Values</label
 													>
 													{#if a.values.length > 0}
 														<div
-															class="mt-1 flex min-h-[36px] flex-wrap items-center gap-1.5 rounded-[6px] border bg-[#FBFBFA] px-2 py-1.5"
-															style="border-color: var(--border);"
+															class="mt-1 flex min-h-[36px] flex-wrap items-center gap-1.5 rounded-[6px] border bg-field px-2 py-1.5"
 															aria-label="Selected values for {a.name || 'attribute'}"
 														>
 															{#each a.values as v, i (i)}
 																<span
-																	class="flex items-center gap-1 rounded-full border bg-[#F0F0EF] px-2 py-0.5 text-[11px]"
-																	style="border-color: var(--border);"
+																	class="flex items-center gap-1 rounded-full border bg-accent px-2 py-0.5 text-[11px]"
 																>
 																	{v}
 																	<Button
@@ -1213,7 +1199,7 @@
 															{/each}
 														</div>
 													{:else}
-														<p class="mt-1 text-[11px] text-[#636363]">No values added yet.</p>
+														<p class="mt-1 text-[11px] text-muted-foreground">No values added yet.</p>
 													{/if}
 													<Input
 														id="attr-values-{a.id}"
@@ -1228,7 +1214,7 @@
 															})}
 														onkeydown={(e) => chipKeyDown(e, a.id)}
 													/>
-													<p class="mt-1 text-[10px] text-[#636363]">Press Enter or comma to add a value.</p>
+													<p class="mt-1 text-[10px] text-muted-foreground">Press Enter or comma to add a value.</p>
 												</div>
 											</div>
 											<Button
@@ -1239,7 +1225,7 @@
 												onclick={() => removeAttr(a.id)}
 												aria-label="Remove attribute {a.name || 'attribute'}"
 											>
-												<Trash2 class="h-3.5 w-3.5 text-[#5A5A5A]" />
+												<Trash2 class="h-3.5 w-3.5 text-muted-foreground" />
 											</Button>
 										</div>
 									</div>
@@ -1248,16 +1234,15 @@
 
 							<div
 								class="mt-3 rounded-[8px] border border-dashed bg-white p-3"
-								style="border-color: var(--border);"
 							>
-								<p class="mb-2 text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase">
+								<p class="mb-2 text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
 									Add attribute
 								</p>
 								<div class="space-y-2">
 									<div>
 										<label
 											for="new-attr-name"
-											class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+											class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 											>Attribute label</label
 										>
 										<Input
@@ -1271,7 +1256,7 @@
 									<div>
 										<label
 											for="new-attr-values"
-											class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+											class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 											>Values</label
 										>
 										<Input
@@ -1290,9 +1275,9 @@
 								</div>
 							</div>
 							<div class="mt-3 flex flex-wrap items-center justify-between gap-2">
-								<span class="text-[11px] text-[#5A5A5A]">
+								<span class="text-[11px] text-muted-foreground">
 									Combinations preview: <b>{combos.length}</b>
-									{#if combos.length > VARIANTS_MAX}<span class="text-[#D9534F]">
+									{#if combos.length > VARIANTS_MAX}<span class="text-destructive">
 											— Warn if &gt;{VARIANTS_MAX}, excessive</span
 										>{/if}
 								</span>
@@ -1304,14 +1289,12 @@
 
 						{#if draft.variants.length > 0}
 							<div
-								class="overflow-x-auto rounded-[10px] border"
-								style="border-color: var(--border);"
+								class="overflow-x-auto rounded-[10px] border border-border"
 							>
 								<table class="w-full text-left">
 									<thead>
 										<tr
-											class="border-b bg-[#FBFBFA] text-[10px] font-semibold tracking-[0.08em] text-[#636363] uppercase"
-											style="border-color: var(--border);"
+											class="border-b border-border bg-field text-[10px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 										>
 											<th class="px-3 py-2">Variant</th>
 											<th class="px-3 py-2">SKU</th>
@@ -1321,18 +1304,17 @@
 											<th class="px-3 py-2">Actions</th>
 										</tr>
 									</thead>
-									<tbody class="divide-y" style="border-color: var(--border);">
+									<tbody class="divide-y divide-border">
 										{#each draft.variants as v (v.id)}
-											<tr class={v.stock === 0 ? 'bg-[#FFFDF3]' : ''}>
+											<tr class={v.stock === 0 ? 'bg-warning/10' : ''}>
 												<td class="px-3 py-2">
 													<div class="text-[12px] font-medium">{v.name}</div>
-													<div class="text-[10px] text-[#5A5A5A]">
+													<div class="text-[10px] text-muted-foreground">
 														{v.attributes.map((a) => `${a.name}:${a.value}`).join(', ')}
 													</div>
 													{#if v.stock === 0}
 														<span
-															class="rounded-full border bg-[#FFF0F0] px-1.5 py-0.5 text-[9px] text-[#A33A37]"
-															style="border-color: #F2C2C0;">Out</span
+															class="rounded-full border border-destructive/25 bg-destructive/10 px-1.5 py-0.5 text-[9px] text-destructive">Out</span
 														>
 													{/if}
 												</td>
@@ -1344,7 +1326,7 @@
 														aria-invalid={Boolean(errors[`var-${v.id}-sku`])}
 														bind:value={v.sku}
 													/>
-													{#if errors[`var-${v.id}-sku`]}<p class="text-[9px] text-[#D9534F]">
+													{#if errors[`var-${v.id}-sku`]}<p class="text-[9px] text-destructive">
 															{errors[`var-${v.id}-sku`]}
 														</p>{/if}
 												</td>
@@ -1381,7 +1363,7 @@
 																)
 															})}
 													/>
-													{#if errors[`var-${v.id}-stock`]}<p class="text-[9px] text-[#D9534F]">
+													{#if errors[`var-${v.id}-stock`]}<p class="text-[9px] text-destructive">
 															{errors[`var-${v.id}-stock`]}
 														</p>{/if}
 												</td>
@@ -1401,7 +1383,7 @@
 														onclick={() => removeVariant(v.id)}
 														aria-label="Remove variant {v.name}"
 													>
-														<Trash2 class="h-3.5 w-3.5 text-[#5A5A5A]" />
+														<Trash2 class="h-3.5 w-3.5 text-muted-foreground" />
 													</Button>
 												</td>
 											</tr>
@@ -1410,10 +1392,10 @@
 								</table>
 							</div>
 						{/if}
-						{#if errors.variants}<p class="text-[11px] text-[#D9534F]">{errors.variants}</p>{/if}
+						{#if errors.variants}<p class="text-[11px] text-destructive">{errors.variants}</p>{/if}
 					</div>
 				{:else}
-					<p class="text-[11px] text-[#5A5A5A]">
+					<p class="text-[11px] text-muted-foreground">
 						Enable variants to manage Color/Size combinations. When disabled, product-level
 						pricing/inventory used.
 					</p>
@@ -1421,13 +1403,13 @@
 			</div>
 
 			<!-- Organization -->
-			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+			<div class="rounded-[12px] border border-border bg-card p-4 md:p-5">
 				<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold">
 					<Tag class="h-4 w-4 shrink-0" />Organization
 				</h3>
 				<div class="grid grid-cols-1 gap-3 md:grid-cols-2">
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 							>Category *</span
 						>
 						<div class="mt-1 space-y-2">
@@ -1451,12 +1433,12 @@
 								<Plus class="h-3.5 w-3.5 shrink-0" />Create category
 							</Button>
 						</div>
-						{#if errors.categoryId}<p class="mt-1 text-[11px] text-[#D9534F]">
+						{#if errors.categoryId}<p class="mt-1 text-[11px] text-destructive">
 								{errors.categoryId}
 							</p>{/if}
 					</div>
 					<div>
-						<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+						<span class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 							>Featured</span
 						>
 						<div class="mt-2 flex items-center gap-2">
@@ -1468,12 +1450,11 @@
 					</div>
 				</div>
 				<div class="mt-3">
-					<span class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+					<span class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 						>Collections</span
 					>
 					<div
-						class="mt-1 max-h-[120px] overflow-y-auto rounded-[8px] border bg-[#FBFBFA] p-2"
-						style="border-color: var(--border);"
+						class="mt-1 max-h-[120px] overflow-y-auto rounded-[8px] border border-border bg-field p-2"
 					>
 						{#each admin.collections as c (c.id)}
 							<label class="flex items-center gap-2 py-1 text-[12px]">
@@ -1486,7 +1467,7 @@
 									}}
 								/>
 								{c.name}
-								<span class="text-[10px] text-[#636363]">({c.slug})</span>
+								<span class="text-[10px] text-muted-foreground">({c.slug})</span>
 							</label>
 						{/each}
 					</div>
@@ -1502,7 +1483,7 @@
 			</div>
 
 			<!-- SEO -->
-			<div class="rounded-[12px] border bg-white p-4 md:p-5" style="border-color: var(--border);">
+			<div class="rounded-[12px] border border-border bg-card p-4 md:p-5">
 				<Button
 					variant="ghost"
 					size="default"
@@ -1518,14 +1499,14 @@
 					<div class="mt-3 space-y-3">
 						<div>
 							<span
-								class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+								class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 								>SEO Title</span
 							>
 							<Input class="mt-1" bind:value={draft.seoTitle} placeholder="60 chars recommended" />
 						</div>
 						<div>
 							<span
-								class="block text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase"
+								class="block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 								>SEO Description</span
 							>
 							<Textarea
@@ -1548,43 +1529,43 @@
 		<!-- Publishing rail -->
 		{#if !embedded}
 		<div class="shrink-0 space-y-4 self-start lg:sticky lg:top-[88px] lg:w-[320px]">
-			<div class="rounded-[12px] border bg-white p-4" style="border-color: var(--border);">
-				<h3 class="text-[12px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase">
+			<div class="rounded-[12px] border border-border bg-card p-4">
+				<h3 class="text-[12px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
 					Publishing
 				</h3>
 				<div class="mt-3 space-y-2 text-[12px]">
 					<div class="flex justify-between">
-						<span class="text-[#5A5A5A]">Status</span><StatusBadge status={draft.status} />
+						<span class="text-muted-foreground">Status</span><StatusBadge status={draft.status} />
 					</div>
 					<div class="flex justify-between">
-						<span class="text-[#5A5A5A]">Featured</span><span>{draft.featured ? 'Yes' : 'No'}</span>
+						<span class="text-muted-foreground">Featured</span><span>{draft.featured ? 'Yes' : 'No'}</span>
 					</div>
 					<div class="flex justify-between">
-						<span class="text-[#5A5A5A]">Inventory</span>
+						<span class="text-muted-foreground">Inventory</span>
 						<span>{draft.trackInventory ? `${inventoryTotal} total` : 'Not tracked'}</span>
 					</div>
 					<div class="flex justify-between">
-						<span class="text-[#5A5A5A]">Variants</span><span
+						<span class="text-muted-foreground">Variants</span><span
 							>{draft.hasVariants ? `${draft.variants.length}` : 'No'}</span
 						>
 					</div>
 				</div>
 				<div class="mt-4">
-					<p class="mb-2 text-[11px] font-semibold tracking-[0.08em] text-[#5A5A5A] uppercase">
+					<p class="mb-2 text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
 						Validation summary
 					</p>
 					{#if Object.keys(publishErrors).length === 0}
-						<p class="flex items-center gap-1 text-[11px] text-[#269B65]">
+						<p class="flex items-center gap-1 text-[11px] text-success-text">
 							<CircleCheck class="h-3.5 w-3.5 shrink-0" /> No errors
 						</p>
 					{:else}
 						<ul class="space-y-1">
 							{#each Object.entries(publishErrors) as [k, v] (k)}
-								<li class="text-[11px] text-[#D9534F]">• {k}: {v}</li>
+								<li class="text-[11px] text-destructive">• {k}: {v}</li>
 							{/each}
 						</ul>
 					{/if}
-					<p class="mt-2 text-[10px] text-[#5A5A5A]">
+					<p class="mt-2 text-[10px] text-muted-foreground">
 						Business rules: publish requires name, valid price, category, primary image. Variants
 						must have valid configs. SKU unique. Inventory never negative. Archived/Draft not in
 						storefront. No inaccurate stock when tracking off.
@@ -1621,8 +1602,8 @@
 					</Button>
 				</div>
 			</div>
-			<div class="rounded-[12px] border bg-[#FBFBFA] p-3" style="border-color: var(--border);">
-				<p class="text-[11px] text-[#5A5A5A]">
+			<div class="rounded-[12px] border border-border bg-field p-3">
+				<p class="text-[11px] text-muted-foreground">
 					Saved to SQLite — the storefront catalog shows this product as soon as it is published.
 					Uploaded images are written to disk.
 				</p>
@@ -1634,7 +1615,7 @@
 
 {#if catModal}
 	<Modal title="Create category inline">
-		<p class="mt-1 text-[11px] text-[#5A5A5A]">
+		<p class="mt-1 text-[11px] text-muted-foreground">
 			Auto-selects new category without losing form data.
 		</p>
 		<div class="mt-3 space-y-2">
@@ -1667,7 +1648,7 @@
 
 {#if colModal}
 	<Modal title="Create collection inline">
-		<p class="mt-1 text-[11px] text-[#5A5A5A]">
+		<p class="mt-1 text-[11px] text-muted-foreground">
 			Auto-selects new collection without losing form data.
 		</p>
 		<div class="mt-3 space-y-2">
@@ -1700,7 +1681,7 @@
 
 {#if guardOpen}
 	<Modal title="Leave form?">
-		<p class="mt-1 text-[12px] text-[#5A5A5A]">You have unsaved changes. Leave without saving?</p>
+		<p class="mt-1 text-[12px] text-muted-foreground">You have unsaved changes. Leave without saving?</p>
 		<div class="mt-4 flex gap-2">
 			<Button variant="default" size="lg" class="flex-1" type="button" onclick={leave}>Leave</Button
 			>

@@ -84,6 +84,9 @@
 	let orderOpen = $state(false);
 	let orderCode = $state('');
 
+	// Feature flag: temporarily deactivate storefront reviews without removing the feature.
+	const REVIEWS_ENABLED = false;
+
 	type Review = {
 		id: string;
 		author: string;
@@ -653,73 +656,75 @@
 				{/if}
 			</section>
 
-			<!-- Reviews -->
-			<section class="mt-16 border-t border-brand-border pt-10 sm:mt-24 sm:pt-14 lg:max-w-4xl">
-				<div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-					<div>
-						<p class="text-[10px] tracking-[0.18em] text-brand-muted uppercase">Ulasan</p>
-						<h2 class="mt-2 font-display text-[28px] leading-tight sm:text-[34px]">
-							Apa kata pembeli
-						</h2>
+			{#if REVIEWS_ENABLED}
+				<!-- Reviews -->
+				<section class="mt-16 border-t border-brand-border pt-10 sm:mt-24 sm:pt-14 lg:max-w-4xl">
+					<div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+						<div>
+							<p class="text-[10px] tracking-[0.18em] text-brand-muted uppercase">Ulasan</p>
+							<h2 class="mt-2 font-display text-[28px] leading-tight sm:text-[34px]">
+								Apa kata pembeli
+							</h2>
+						</div>
+						<div class="flex flex-wrap gap-2" role="group" aria-label="Filter ulasan">
+							{#each reviewFilters as filter (filter.value)}
+								<button
+									type="button"
+									class="border px-3 py-2 text-[10px] tracking-[0.12em] uppercase transition {reviewFilter ===
+									filter.value
+										? 'border-brand-ink bg-brand-ink text-white'
+										: 'border-[#D9D6CE] text-brand-ink hover:border-brand-ink'}"
+									aria-pressed={reviewFilter === filter.value}
+									onclick={() => (reviewFilter = filter.value)}
+								>
+									{filter.label}
+								</button>
+							{/each}
+						</div>
 					</div>
-					<div class="flex flex-wrap gap-2" role="group" aria-label="Filter ulasan">
-						{#each reviewFilters as filter (filter.value)}
-							<button
-								type="button"
-								class="border px-3 py-2 text-[10px] tracking-[0.12em] uppercase transition {reviewFilter ===
-								filter.value
-									? 'border-brand-ink bg-brand-ink text-white'
-									: 'border-[#D9D6CE] text-brand-ink hover:border-brand-ink'}"
-								aria-pressed={reviewFilter === filter.value}
-								onclick={() => (reviewFilter = filter.value)}
-							>
-								{filter.label}
-							</button>
-						{/each}
-					</div>
-				</div>
 
-				{#if filteredReviews.length === 0}
-					<p class="mt-8 text-[13px] leading-7 text-[#68675F]">
-						Belum ada ulasan untuk filter ini.
-					</p>
-				{:else}
-					<ul class="mt-8 space-y-4">
-						{#each filteredReviews as review (review.id)}
-							<li class="border border-brand-border bg-white p-5 sm:p-6">
-								<div class="flex items-start justify-between gap-4">
-									<div>
-										<p class="text-[12px] font-medium text-brand-ink">{review.author}</p>
-										<p class="mt-1 text-[10px] tracking-[0.08em] text-brand-muted uppercase">
-											{review.date}
-										</p>
+					{#if filteredReviews.length === 0}
+						<p class="mt-8 text-[13px] leading-7 text-[#68675F]">
+							Belum ada ulasan untuk filter ini.
+						</p>
+					{:else}
+						<ul class="mt-8 space-y-4">
+							{#each filteredReviews as review (review.id)}
+								<li class="border border-brand-border bg-white p-5 sm:p-6">
+									<div class="flex items-start justify-between gap-4">
+										<div>
+											<p class="text-[12px] font-medium text-brand-ink">{review.author}</p>
+											<p class="mt-1 text-[10px] tracking-[0.08em] text-brand-muted uppercase">
+												{review.date}
+											</p>
+										</div>
+										<div class="flex items-center gap-0.5 text-brand-ink" aria-label={`Rating ${review.rating} dari 5`}>
+											{#each Array.from({ length: 5 }) as _, i (i)}
+												<span class="text-[11px]">{i < review.rating ? '★' : '☆'}</span>
+											{/each}
+										</div>
 									</div>
-									<div class="flex items-center gap-0.5 text-brand-ink" aria-label={`Rating ${review.rating} dari 5`}>
-										{#each Array.from({ length: 5 }) as _, i (i)}
-											<span class="text-[11px]">{i < review.rating ? '★' : '☆'}</span>
-										{/each}
-									</div>
-								</div>
-								{#if review.text}
-									<p class="mt-4 text-[13px] leading-7 text-[#68675F]">{review.text}</p>
-								{/if}
-								{#if review.images.length > 0}
-									<div class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
-										{#each review.images as image, i (image + i)}
-											<img
-												src={image}
-												alt={`Foto ulasan ${review.author} ${i + 1}`}
-												class="aspect-square w-full bg-[#F5F3EF] object-cover"
-												loading="lazy"
-											/>
-										{/each}
-									</div>
-								{/if}
-							</li>
-						{/each}
-					</ul>
-				{/if}
-			</section>
+									{#if review.text}
+										<p class="mt-4 text-[13px] leading-7 text-[#68675F]">{review.text}</p>
+									{/if}
+									{#if review.images.length > 0}
+										<div class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4">
+											{#each review.images as image, i (image + i)}
+												<img
+													src={image}
+													alt={`Foto ulasan ${review.author} ${i + 1}`}
+													class="aspect-square w-full bg-[#F5F3EF] object-cover"
+													loading="lazy"
+												/>
+											{/each}
+										</div>
+									{/if}
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</section>
+			{/if}
 
 			<!-- Recommendations -->
 			{#if related.length > 0}

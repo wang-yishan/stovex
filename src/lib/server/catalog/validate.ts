@@ -155,3 +155,44 @@ export function validateProduct(input: Product, existing: Product[]): Record<str
 
 	return errors;
 }
+
+const PATCH_FIELDS = [
+	'name',
+	'slug',
+	'shortDescription',
+	'fullDescription',
+	'material',
+	'categoryId',
+	'collectionIds',
+	'basePrice',
+	'compareAtPrice',
+	'sku',
+	'status',
+	'featured',
+	'seoTitle',
+	'seoDescription',
+	'hasVariants',
+	'trackInventory',
+	'stock',
+	'lowStockThreshold'
+] as const;
+
+/**
+ * Merge a partial product update into the stored product. Only fields the
+ * caller actually sent are applied; everything else keeps its current value.
+ */
+export function mergeProductPatch(existing: Product, raw: unknown): Product {
+	const parsed = parseProductPayload(raw);
+	const source = ((raw as Record<string, unknown> | null | undefined) ?? {}) as Record<
+		string,
+		unknown
+	>;
+	const patch: Partial<Product> = {};
+	for (const field of PATCH_FIELDS) {
+		if (source[field] !== undefined) patch[field] = parsed[field];
+	}
+	for (const field of ['images', 'bannerImages', 'variants'] as const) {
+		if (source[field] !== undefined) patch[field] = parsed[field];
+	}
+	return { ...existing, ...patch };
+}

@@ -12,55 +12,78 @@
 	<title>Verify email</title>
 </svelte:head>
 
-<div class="rounded-[12px] border bg-white p-6 shadow-sm" style="border-color: var(--border);">
-	<div class="mb-6 text-center">
-		<h1 class="text-[22px] font-semibold tracking-tight text-[#242424]">Verify your email</h1>
-		<p class="mt-1 text-[13px] text-[#5A5A5A]">Enter the 6-digit code sent to your email.</p>
-	</div>
-
-	{#if form?.message}
-		<div
-			class="mb-4 rounded-md border border-[#f0c2c0] bg-[#fef2f2] px-3 py-2 text-[13px] text-[#A33A37]"
-		>
-			{form.message}
-		</div>
-	{/if}
-
-	{#if form?.sent}
-		<div
-			class="mb-4 rounded-md border border-[#b7e4c7] bg-[#f0fdf4] px-3 py-2 text-[13px] text-[#166534]"
-		>
-			A new code has been sent.
-		</div>
-	{/if}
-
-	<form method="POST" action="?/verify" class="space-y-4">
-		<div class="space-y-1.5">
-			<Label for="email">Email</Label>
-			<Input id="email" name="email" type="email" required value={email} />
-		</div>
-		<div class="space-y-1.5">
-			<Label for="otp">Verification code</Label>
-			<Input
-				id="otp"
-				name="otp"
-				type="text"
-				inputmode="numeric"
-				autocomplete="one-time-code"
-				required
-				maxlength={6}
-				placeholder="123456"
-			/>
-		</div>
-		<Button type="submit" class="w-full">Verify</Button>
-	</form>
-
-	<form method="POST" action="?/resend" class="mt-3">
-		<input type="hidden" name="email" value={email} />
-		<Button type="submit" variant="outline" class="w-full">Resend code</Button>
-	</form>
-
-	<p class="mt-5 text-center text-[13px] text-[#5A5A5A]">
-		<a href="/login" class="font-medium text-[#242424] underline underline-offset-2">Back to log in</a>
+<div class="mb-9">
+	<h1 class="font-display text-[32px] leading-tight text-foreground">Verify your email</h1>
+	<p class="mt-3 text-sm leading-6 text-muted-foreground">
+		Enter the 6-digit code sent to your email.
 	</p>
 </div>
+
+{#if form?.message}
+	<div
+		class="mb-5 rounded-md border border-danger/40 bg-danger/10 px-3 py-2 text-[13px] text-danger-text"
+	>
+		{form.message}
+	</div>
+{/if}
+
+{#if form?.sent}
+	<div
+		class="mb-5 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-[13px] text-success-text"
+	>
+		A new code has been sent.
+	</div>
+{/if}
+
+<form method="POST" action="?/verify" class="space-y-4">
+	<div>
+		<Label for="email" class="mb-2 block">Email</Label>
+		<Input
+			id="email"
+			name="email"
+			type="email"
+			required
+			value={email}
+			size="lg"
+			class="rounded-[4px]"
+		/>
+	</div>
+	<div>
+		<Label for="otp" class="mb-2 block">Verification code</Label>
+		<Input
+			id="otp"
+			name="otp"
+			type="text"
+			inputmode="numeric"
+			autocomplete="one-time-code"
+			required
+			maxlength={6}
+			placeholder="123456"
+			size="lg"
+			class="rounded-[4px]"
+		/>
+	</div>
+	<Button
+		type="submit"
+		class="h-12 w-full rounded-[4px] text-[11px] tracking-[0.2em] uppercase sm:h-12"
+	>
+		Verify
+	</Button>
+</form>
+
+<form method="POST" action="?/resend" class="mt-3">
+	<input type="hidden" name="email" value={email} />
+	<Button
+		type="submit"
+		variant="outline"
+		class="h-12 w-full rounded-[4px] text-[11px] tracking-[0.2em] uppercase sm:h-12"
+	>
+		Resend code
+	</Button>
+</form>
+
+<p class="mt-8 text-center text-sm text-muted-foreground">
+	<a href="/login" class="font-medium text-foreground underline underline-offset-4">
+		Back to log in
+	</a>
+</p>

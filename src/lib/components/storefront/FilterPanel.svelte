@@ -206,7 +206,7 @@
 					value={filters.maxPrice !== null ? formatIDR(filters.maxPrice) : ''}
 					class="w-full bg-transparent px-3 py-2.5 text-[12px]"
 					onchange={(e) => setPrice('max', e.currentTarget.value)}
-				/>>
+				/>
 			</label>
 		</div>
 	</section>

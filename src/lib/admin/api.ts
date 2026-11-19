@@ -22,7 +22,7 @@ import type {
 } from './types.ts';
 
 interface ErrorPayload {
-	errors?: Record<string, string>;
+	errors?: Record<string, string | Record<string, string>>;
 	message?: string;
 }
 
@@ -34,7 +34,8 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
 	const payload = (await res.json().catch(() => null)) as (ErrorPayload & T) | null;
 
 	if (!res.ok) {
-		const fields = payload?.errors ? Object.values(payload.errors) : [];
+		const values = payload?.errors ? Object.values(payload.errors) : [];
+		const fields = values.flatMap((v) => (v && typeof v === 'object' ? Object.values(v) : [v]));
 		const message =
 			fields.length > 0
 				? fields.join(' • ')
@@ -63,6 +64,31 @@ export const productApi = {
 		request<{ movement: StockMovement }>(`/api/products/${id}/stock`, {
 			method: 'POST',
 			body: JSON.stringify(input)
+		}),
+	bulkCreate: (products: Product[]) =>
+		request<{ products: Product[]; created: number }>('/api/products/bulk', {
+			method: 'POST',
+			body: JSON.stringify({ products })
+		}),
+	bulkUpdate: (updates: Product[]) =>
+		request<{ products: Product[] }>('/api/products/bulk', {
+			method: 'PUT',
+			body: JSON.stringify({ updates })
+		}),
+	bulkDelete: (ids: string[]) =>
+		request<{ deleted: string[] }>('/api/products/bulk', {
+			method: 'DELETE',
+			body: JSON.stringify({ ids })
+		}),
+	bulkDuplicate: (ids: string[]) =>
+		request<{ products: Product[]; duplicated: string[] }>('/api/products/bulk/duplicate', {
+			method: 'POST',
+			body: JSON.stringify({ ids })
+		}),
+	bulkAdjustStock: (adjustments: AdjustStockInput[]) =>
+		request<{ movements: StockMovement[] }>('/api/products/bulk/stock', {
+			method: 'POST',
+			body: JSON.stringify({ adjustments })
 		})
 };
 
@@ -222,7 +248,7 @@ export const adminUsersApi = {
 		)
 };
 
-/** Upload image files to disk; returns the stored URLs. */
+/** Upload image files to Vercel Blob; returns the stored URLs. */
 export async function uploadImages(files: File[]): Promise<{ url: string; name: string }[]> {
 	if (files.length === 0) return [];
 	const form = new FormData();

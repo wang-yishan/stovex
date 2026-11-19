@@ -135,7 +135,6 @@
 	}
 	async function doDeleteMany() {
 		await admin.deleteProducts([...selected]);
-		admin.showToast('Deleted selected', 'success');
 		selected.clear();
 		deleteMany = false;
 	}
@@ -197,38 +196,38 @@
 >
 	<!-- Stat cards -->
 	<div class="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-		<div class="rounded-[12px] border bg-white p-3.5" style="border-color: var(--border);">
-			<div class="text-[11px] font-semibold tracking-[0.08em] text-[#636363] uppercase">Total</div>
-			<div class="mt-1 text-[22px] leading-none font-semibold">{stats.total}</div>
-			<div class="mt-1 text-[11px] text-[#5A5A5A]">All catalog</div>
+		<div class="rounded-[12px] border border-border bg-card p-3.5">
+			<div class="text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">Total</div>
+			<div class="mt-1 text-[22px] leading-none font-semibold text-foreground">{stats.total}</div>
+			<div class="mt-1 text-[11px] text-muted-foreground">All catalog</div>
 		</div>
-		<div class="rounded-[12px] border bg-white p-3.5" style="border-color: var(--border);">
+		<div class="rounded-[12px] border border-border bg-card p-3.5">
 			<div
-				class="flex items-center gap-1 text-[11px] font-semibold tracking-[0.08em] text-[#636363] uppercase"
+				class="flex items-center gap-1 text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 			>
-				<span class="h-1.5 w-1.5 rounded-full bg-[#269B65]"></span> Active
+				<span class="h-1.5 w-1.5 rounded-full bg-success"></span> Active
 			</div>
-			<div class="mt-1 text-[22px] leading-none font-semibold">{stats.active}</div>
-			<div class="mt-1 text-[11px] text-[#5A5A5A]">In storefront</div>
+			<div class="mt-1 text-[22px] leading-none font-semibold text-foreground">{stats.active}</div>
+			<div class="mt-1 text-[11px] text-muted-foreground">In storefront</div>
 		</div>
-		<div class="rounded-[12px] border bg-white p-3.5" style="border-color: var(--border);">
-			<div class="text-[11px] font-semibold tracking-[0.08em] text-[#636363] uppercase">Draft</div>
-			<div class="mt-1 text-[22px] leading-none font-semibold">{stats.draft}</div>
-			<div class="mt-1 text-[11px] text-[#5A5A5A]">Not visible</div>
+		<div class="rounded-[12px] border border-border bg-card p-3.5">
+			<div class="text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">Draft</div>
+			<div class="mt-1 text-[22px] leading-none font-semibold text-foreground">{stats.draft}</div>
+			<div class="mt-1 text-[11px] text-muted-foreground">Not visible</div>
 		</div>
-		<div class="rounded-[12px] border bg-[#FFFDF3] p-3.5" style="border-color: #F0D99E;">
+		<div class="rounded-[12px] border border-warning/30 bg-warning/10 p-3.5">
 			<div
-				class="flex items-center gap-1 text-[11px] font-semibold tracking-[0.08em] text-[#8A6A24] uppercase"
+				class="flex items-center gap-1 text-[11px] font-semibold tracking-[0.08em] text-warning-text uppercase"
 			>
 				<TriangleAlert class="h-3.5 w-3.5 shrink-0" /> Low Stock
 			</div>
-			<div class="mt-1 text-[22px] leading-none font-semibold text-[#7A5A1A]">{stats.low}</div>
-			<div class="mt-1 text-[11px] text-[#8A6A24]">Needs attention</div>
+			<div class="mt-1 text-[22px] leading-none font-semibold text-warning-text">{stats.low}</div>
+			<div class="mt-1 text-[11px] text-warning-text/80">Needs attention</div>
 		</div>
 	</div>
 
 	<!-- Filters -->
-	<div class="mb-4 rounded-[12px] border bg-white p-3 md:p-4" style="border-color: var(--border);">
+	<div class="mb-4 rounded-[12px] border border-border bg-card p-3 md:p-4">
 		<div class="flex flex-col gap-2 lg:flex-row">
 			<SearchInput bind:value={search} placeholder="Search by name, SKU..." />
 			<div class="flex flex-wrap items-center gap-2">
@@ -273,8 +272,7 @@
 		</div>
 		{#if storefrontPreview}
 			<div
-				class="mt-3 flex items-center gap-2 rounded-[8px] border bg-[#F0FAF6] p-2.5 text-[11px] text-[#1A7A52]"
-				style="border-color: #C7EBDB;"
+				class="mt-3 flex items-center gap-2 rounded-[8px] border border-success/25 bg-success/10 p-2.5 text-[11px] text-success-text"
 			>
 				<Eye class="h-4 w-4 shrink-0" />
 				<span
@@ -288,7 +286,7 @@
 	<!-- Bulk selection bar -->
 	{#if selected.size > 0}
 		<div
-			class="mb-4 flex flex-col items-start justify-between gap-3 rounded-[12px] bg-[#242424] p-3 text-white md:flex-row md:items-center"
+			class="mb-4 flex flex-col items-start justify-between gap-3 rounded-[12px] bg-primary p-3 text-primary-foreground md:flex-row md:items-center"
 		>
 			<div class="text-[12px] font-medium">{selected.size} selected</div>
 			<div class="flex items-center gap-2">
@@ -301,7 +299,7 @@
 				<Button
 					variant="secondary"
 					size="sm"
-					class="h-10 border border-white/20 bg-white/10 text-[12px] hover:bg-white/20 sm:h-7 sm:text-[11px]"
+					class="h-10 border border-primary-foreground/20 bg-primary-foreground/10 text-[12px] text-primary-foreground hover:bg-primary-foreground/20 sm:h-7 sm:text-[11px]"
 					onclick={() => bulkSet('archived')}>Archive</Button
 				>
 				<Button
@@ -313,7 +311,7 @@
 				<Button
 					variant="secondary"
 					size="icon-lg"
-					class="h-10 w-10 bg-white/10 hover:bg-white/20 sm:h-7 sm:w-7"
+					class="h-10 w-10 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20 sm:h-7 sm:w-7"
 					onclick={() => selected.clear()}
 					aria-label="Clear selection"
 				>
@@ -324,15 +322,15 @@
 	{/if}
 
 	<!-- Table (desktop) / mobile cards -->
-	<div class="overflow-hidden rounded-[12px] border bg-white" style="border-color: var(--border);">
+	<div class="overflow-hidden rounded-[12px] border border-border bg-card">
 		{#if loading}
 			<div class="space-y-3 p-4" aria-hidden="true">
 				{#each Array(5) as _, i (i)}
 					<div class="flex animate-pulse gap-3">
-						<div class="h-10 w-10 rounded-[8px] bg-[#F5F5F4]"></div>
+						<div class="h-10 w-10 rounded-[8px] bg-muted"></div>
 						<div class="flex-1 space-y-2">
-							<div class="h-3 w-1/3 rounded bg-[#F5F5F4]"></div>
-							<div class="h-2 w-1/2 rounded bg-[#F5F5F4]"></div>
+							<div class="h-3 w-1/3 rounded bg-muted"></div>
+							<div class="h-2 w-1/2 rounded bg-muted"></div>
 						</div>
 					</div>
 				{/each}
@@ -340,13 +338,12 @@
 		{:else if filtered.length === 0 && admin.products.length === 0}
 			<div class="px-6 py-16 text-center">
 				<div
-					class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border bg-[#F5F5F4]"
-					style="border-color: var(--border);"
+					class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-muted"
 				>
-					<Package class="h-6 w-6 text-[#636363]" />
+					<Package class="h-6 w-6 text-muted-foreground" />
 				</div>
-				<h3 class="text-[14px] font-semibold">Empty catalog</h3>
-				<p class="mx-auto mt-1 max-w-[320px] text-[12px] text-[#5A5A5A]">
+				<h3 class="text-[14px] font-semibold text-foreground">Empty catalog</h3>
+				<p class="mx-auto mt-1 max-w-[320px] text-[12px] text-muted-foreground">
 					No products yet. Add your first bag to start managing catalog with full spec.
 				</p>
 				<Button href={resolve('/dashboard/products/new')} class="mt-4 px-5">
@@ -356,23 +353,22 @@
 		{:else if filtered.length === 0}
 			<div class="px-6 py-16 text-center">
 				<div
-					class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border bg-muted"
+					class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-muted"
 				>
 					<Search class="h-6 w-6 text-muted-foreground" />
 				</div>
-				<h3 class="text-[14px] font-semibold">No search results</h3>
+				<h3 class="text-[14px] font-semibold text-foreground">No search results</h3>
 				<p class="mt-1 text-[12px] text-muted-foreground">Try adjusting search or filters.</p>
 				<Button variant="outline" class="mt-4 px-4" onclick={clearFilters}>Clear filters</Button>
 			</div>
 		{:else if !isMobile}
 			<div class="overflow-x-auto">
-				<table class="w-full text-left">
+				<table class="w-full min-w-[920px] text-left">
 					<thead>
 						<tr
-							class="border-b bg-[#FBFBFA] text-[10px] font-semibold tracking-[0.08em] text-[#636363] uppercase"
-							style="border-color: var(--border);"
+							class="border-b border-border bg-field text-[10px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
 						>
-							<th class="w-8 px-3 py-2.5">
+							<th class="w-10 px-3 py-2.5">
 								<Checkbox
 									checked={selected.size === pageItems.length && pageItems.length > 0}
 									indeterminate={selected.size > 0 && selected.size < pageItems.length}
@@ -391,12 +387,12 @@
 							<th class="px-3 py-2.5 text-right font-semibold">Actions</th>
 						</tr>
 					</thead>
-					<tbody class="divide-y" style="border-color: var(--border);">
+					<tbody class="divide-y divide-border">
 						{#each pageItems as p (p.id)}
 							{@const stock = effectiveStock(p)}
 							{@const st = stockStatus(stock, lowThreshold(p), p.trackInventory)}
 							{@const primary = p.images.find((i) => i.isPrimary) ?? p.images[0]}
-							<tr class="transition-colors hover:bg-muted">
+							<tr class="transition-colors hover:bg-muted/50">
 								<td class="px-3 py-3">
 									<Checkbox
 										checked={selected.has(p.id)}
@@ -407,8 +403,7 @@
 								<td class="px-3 py-3">
 									<a
 										href={resolvePath(`/dashboard/products/${p.id}`)}
-										class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-[8px] border bg-[#F5F5F4] text-[10px] font-bold"
-										style="border-color: var(--border);"
+										class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-[8px] border border-border bg-muted text-[10px] font-bold text-foreground"
 									>
 										{#if primary?.url}
 											<img
@@ -424,38 +419,38 @@
 								<td class="px-3 py-3">
 									<a
 										href={resolvePath(`/dashboard/products/${p.id}`)}
-										class="block max-w-[180px] truncate text-left text-[13px] leading-tight font-medium text-[#242424] hover:underline"
+										class="block max-w-[200px] truncate text-left text-[13px] leading-tight font-medium text-foreground hover:underline"
 										title={p.name}>{p.name}</a
 									>
 									{#if p.featured}
 										<span
-											class="mt-1 inline-flex rounded-full border bg-[#FFF8E6] px-1.5 py-0.5 text-[9px] text-[#8A6A24]"
-											style="border-color: #F3D9A0;">Featured</span
+											class="mt-1 inline-flex rounded-full border border-warning/30 bg-warning/10 px-1.5 py-0.5 text-[9px] font-medium text-warning-text"
+											>Featured</span
 										>
 									{/if}
 								</td>
-								<td class="mono max-w-[110px] truncate px-3 py-3 text-[11px] text-[#5A5A5A]"
+								<td class="mono max-w-[120px] truncate px-3 py-3 text-[11px] text-muted-foreground"
 									>{p.sku || '—'}</td
 								>
-								<td class="px-3 py-3 text-[12px] text-[#5A5A5A]">
+								<td class="px-3 py-3 text-[12px] text-muted-foreground">
 									{admin.categories.find((c) => c.id === p.categoryId)?.name ?? '—'}
 								</td>
 								<td class="px-3 py-3">
-									<div class="text-[12px] font-medium">{formatIDR(p.basePrice)}</div>
+									<div class="text-[12px] font-medium text-foreground">{formatIDR(p.basePrice)}</div>
 									{#if p.compareAtPrice}
-										<div class="text-[11px] text-[#636363] line-through">
+										<div class="text-[11px] text-muted-foreground line-through">
 											{formatIDR(p.compareAtPrice)}
 										</div>
 									{/if}
 									{#if p.hasVariants}
-										<div class="text-[10px] text-[#5A5A5A]">{p.variants.length} variants</div>
+										<div class="text-[10px] text-muted-foreground">{p.variants.length} variants</div>
 									{/if}
 								</td>
 								<td class="px-3 py-3"
 									><StockBadge status={st} {stock} tracking={p.trackInventory} /></td
 								>
 								<td class="px-3 py-3"><StatusBadge status={p.status} /></td>
-								<td class="px-3 py-3 text-[11px] text-[#5A5A5A]">
+								<td class="px-3 py-3 text-[11px] text-muted-foreground">
 									{new Date(p.updatedAt).toLocaleDateString('id-ID', {
 										day: '2-digit',
 										month: 'short'
@@ -484,7 +479,7 @@
 												<Ellipsis class="h-3.5 w-3.5 text-muted-foreground" />
 											</Button>
 											<div
-												class="absolute top-8 right-0 z-20 hidden min-w-[160px] rounded-[10px] border bg-card p-1 shadow-lg group-hover/menu:block"
+												class="absolute top-8 right-0 z-20 hidden min-w-[160px] rounded-[10px] border border-border bg-card p-1 shadow-lg group-hover/menu:block group-focus-within/menu:block"
 											>
 												<Button
 													variant="ghost"
@@ -523,10 +518,11 @@
 				</table>
 			</div>
 		{:else}
-			<div class="divide-y" style="border-color: var(--border);">
+			<div class="divide-y divide-border">
 				{#each pageItems as p (p.id)}
 					{@const stock = effectiveStock(p)}
 					{@const st = stockStatus(stock, lowThreshold(p), p.trackInventory)}
+					{@const primary = p.images.find((i) => i.isPrimary) ?? p.images[0]}
 					<div class="flex gap-3 p-4">
 						<Checkbox
 							checked={selected.has(p.id)}
@@ -535,23 +531,26 @@
 							aria-label="Select {p.name}"
 						/>
 						<div
-							class="flex h-12 w-12 shrink-0 items-center justify-center rounded-[10px] border bg-[#F5F5F4] text-[11px] font-bold"
-							style="border-color: var(--border);"
+							class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[10px] border border-border bg-muted text-[11px] font-bold text-foreground"
 						>
-							{p.name.slice(0, 2).toUpperCase()}
+							{#if primary?.url}
+								<img src={primary.url} alt={primary.alt ?? p.name} class="h-full w-full object-cover" />
+							{:else}
+								{p.name.slice(0, 2).toUpperCase()}
+							{/if}
 						</div>
 						<div class="min-w-0 flex-1">
 							<a
 								href={resolvePath(`/dashboard/products/${p.id}`)}
-								class="block truncate text-left text-[13px] font-medium">{p.name}</a
+								class="block truncate text-left text-[13px] font-medium text-foreground">{p.name}</a
 							>
-							<div class="mt-0.5 flex items-center gap-1.5 text-[11px] text-[#5A5A5A]">
+							<div class="mt-0.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
 								<span class="mono">{p.sku || '—'}</span>
-								<span class="h-1 w-1 rounded-full bg-[#D9D9D9]"></span>
+								<span class="h-1 w-1 rounded-full bg-border"></span>
 								<span class="truncate"
 									>{admin.categories.find((c) => c.id === p.categoryId)?.name ?? '—'}</span
 								>
-								<span class="h-1 w-1 rounded-full bg-[#D9D9D9]"></span>
+								<span class="h-1 w-1 rounded-full bg-border"></span>
 								<span class="shrink-0">{formatIDR(p.basePrice)}</span>
 							</div>
 							<div class="mt-2 flex items-center gap-2">
@@ -561,11 +560,10 @@
 						</div>
 						<a
 							href={resolvePath(`/dashboard/products/${p.id}/edit`)}
-							class="flex h-8 w-8 shrink-0 items-center justify-center self-center rounded-full border bg-white"
-							style="border-color: var(--border);"
+							class="flex h-8 w-8 shrink-0 items-center justify-center self-center rounded-full border border-border bg-card"
 							aria-label="Edit"
 						>
-							<PenLine class="h-4 w-4 text-[#5A5A5A]" />
+							<PenLine class="h-4 w-4 text-muted-foreground" />
 						</a>
 					</div>
 				{/each}
@@ -575,12 +573,11 @@
 		<!-- Pagination footer (inside card, ref parity) -->
 		{#if !loading && filtered.length > 0}
 			<div
-				class="flex items-center justify-between gap-3 border-t bg-[#FBFBFA] px-4 py-3 md:px-5"
-				style="border-color: var(--border);"
+				class="flex items-center justify-between gap-3 border-t border-border bg-field px-4 py-3 md:px-5"
 			>
-				<span class="text-[11px] text-[#5A5A5A]">
-					Showing <span class="font-medium text-[#242424]">{pageItems.length}</span> of
-					<span class="font-medium text-[#242424]">{filtered.length}</span> • Page {clampedPage}/{totalPages}
+				<span class="text-[11px] text-muted-foreground">
+					Showing <span class="font-medium text-foreground">{pageItems.length}</span> of
+					<span class="font-medium text-foreground">{filtered.length}</span> • Page {clampedPage}/{totalPages}
 				</span>
 				<div class="flex items-center gap-1">
 					<Button
@@ -592,7 +589,7 @@
 					>
 						<ChevronLeft class="h-3.5 w-3.5" />
 					</Button>
-					<span class="px-2 text-[11px]">{clampedPage}/{totalPages}</span>
+					<span class="px-2 text-[11px] text-muted-foreground">{clampedPage}/{totalPages}</span>
 					<Button
 						variant="outline"
 						size="icon-lg"
@@ -621,7 +618,6 @@
 		onconfirm={async () => {
 			const id = deleteId!;
 			await admin.deleteProducts([id]);
-			admin.showToast('Product deleted', 'success');
 			selected.delete(id);
 			deleteId = null;
 		}}

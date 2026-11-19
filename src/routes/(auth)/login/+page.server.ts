@@ -25,6 +25,8 @@ export const actions: Actions = {
 		const identifier = (formData.get('identifier')?.toString() ?? '').trim();
 		const password = formData.get('password')?.toString() ?? '';
 		const next = formData.get('next')?.toString() || '/dashboard';
+		// Unchecked "Remember me" → a session cookie that dies with the browser.
+		const rememberMe = formData.get('remember') === 'on';
 
 		if (!identifier || !password) {
 			return fail(400, { message: 'Email/username and password are required.', identifier });
@@ -44,12 +46,12 @@ export const actions: Actions = {
 		try {
 			if (identifier.includes('@')) {
 				await auth.api.signInEmail({
-					body: { email: identifier, password },
+					body: { email: identifier, password, rememberMe },
 					headers: request.headers
 				});
 			} else {
 				await auth.api.signInUsername({
-					body: { username: identifier, password },
+					body: { username: identifier, password, rememberMe },
 					headers: request.headers
 				});
 			}

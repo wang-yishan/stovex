@@ -11,22 +11,22 @@
 -->
 
 {#if !tracking}
-	<span class="text-[11px] text-[#5A5A5A]">Stock not tracked</span>
+	<span class="text-[11px] text-muted-foreground">Stock not tracked</span>
 {:else if status === 'out'}
 	<span
-		class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium border bg-[#FFF0F0] text-[#A33A37] border-[#F2C2C0]"
+		class="inline-flex rounded-full border border-destructive/25 bg-destructive/10 px-2 py-0.5 text-[10px] font-medium text-destructive"
 	>
 		Out • {stock}
 	</span>
 {:else if status === 'low'}
 	<span
-		class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium border bg-[#FFF8E6] text-[#8A6A24] border-[#F3D9A0]"
+		class="inline-flex rounded-full border border-warning/30 bg-warning/10 px-2 py-0.5 text-[10px] font-medium text-warning-text"
 	>
 		Low • {stock}
 	</span>
 {:else}
 	<span
-		class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium border bg-[#F5F5F4] text-[#5A5A5A] border-[#EAEAEA]"
+		class="inline-flex rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
 	>
 		In • {stock}
 	</span>

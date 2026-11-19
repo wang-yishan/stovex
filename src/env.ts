@@ -31,5 +31,13 @@ export const variables = defineEnvVars({
 	GOOGLE_CLIENT_SECRET: {
 		description: 'Google OAuth client secret for "Continue with Google" sign-in.',
 		required: false
+	},
+	WYSHANZZZ_STORE_ID: {
+		description: 'Vercel Blob store ID used for image uploads.',
+		required: false
+	},
+	BLOB_READ_WRITE_TOKEN: {
+		description: 'Vercel Blob read/write token used for image uploads (if required).',
+		required: false
 	}
 });
